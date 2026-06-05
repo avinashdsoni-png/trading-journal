@@ -1,0 +1,2977 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src &#39;self&#39; &#39;unsafe-inline&#39; &#39;unsafe-eval&#39; https: data: blob:;">
+<title>Trading Journal</title>
+<link href="./index_files/css2" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f12;
+  --bg2: #12151a;
+  --bg3: #181c23;
+  --surface: #1e2330;
+  --surface2: #252b38;
+  --border: #2d3445;
+  --border2: #3a4255;
+  --text: #e8ecf4;
+  --text2: #9aa3b8;
+  --text3: #5a6478;
+  --accent: #e8b84b;
+  --accent2: #f0ca7a;
+  --green: #3dd68c;
+  --green2: #2ab87a;
+  --red: #f05252;
+  --red2: #d43c3c;
+  --blue: #5b8dee;
+  --blue2: #7ba3f5;
+  --orange: #f07850;
+  --purple: #9b72f5;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ══ LOCK SCREEN ══ */
+#lockScreen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.lock-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px;
+  letter-spacing: 6px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.lock-logo span { color: var(--accent); }
+
+.lock-sub {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  letter-spacing: 4px;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 52px;
+}
+
+.lock-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 36px 40px;
+  width: 360px;
+  position: relative;
+}
+
+.lock-box::before {
+  content: '🔒';
+  font-size: 28px;
+  display: block;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.lock-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+
+.lock-input {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 12px 14px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+  margin-bottom: 16px;
+  letter-spacing: 3px;
+}
+.lock-input:focus { border-color: var(--accent); }
+
+.lock-btn {
+  width: 100%;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: 7px;
+  padding: 13px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.lock-btn:hover { background: var(--accent2); }
+
+.lock-error {
+  color: var(--red);
+  font-size: 12px;
+  text-align: center;
+  margin-top: 12px;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 1px;
+  min-height: 16px;
+}
+
+/* ══ APP ══ */
+#app { display: none; }
+#app.show { display: block; }
+
+/* ══ TOPBAR ══ */
+.topbar {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.topbar-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 4px;
+  color: var(--text);
+}
+.topbar-logo span { color: var(--accent); }
+
+.topbar-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.nav-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  transition: all 0.15s;
+}
+.nav-btn:hover { color: var(--text); background: var(--surface); }
+.nav-btn.active { color: var(--accent); background: rgba(232,184,75,0.08); }
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.balance-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: var(--text2);
+}
+.balance-chip strong { color: var(--green); }
+
+.icon-btn {
+  width: 34px; height: 34px;
+  border-radius: 7px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  transition: all 0.15s;
+}
+.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ══ SECTIONS ══ */
+.section {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 28px 24px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 3px;
+  color: var(--text);
+}
+.section-title span { color: var(--accent); }
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, var(--border) 0%, transparent 100%);
+  margin: 0 24px;
+}
+
+/* ══ BUTTONS ══ */
+.btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 9px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-gold { background: var(--accent); color: var(--bg); }
+.btn-gold:hover { background: var(--accent2); }
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-danger { background: transparent; color: var(--red); border: 1px solid rgba(240,82,82,0.3); }
+.btn-danger:hover { background: rgba(240,82,82,0.08); }
+.btn-green { background: var(--green2); color: #fff; }
+.btn-sm { padding: 6px 12px; font-size: 10px; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ══ TABLE ══ */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  overflow-x: auto;
+}
+
+table { width: 100%; border-collapse: collapse; min-width: 900px; }
+
+thead th {
+  background: var(--bg2);
+  padding: 10px 12px;
+  text-align: left;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text3);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+thead th:hover { color: var(--text2); }
+
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+td {
+  padding: 10px 12px;
+  font-size: 13px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.td-symbol {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+  letter-spacing: 0.5px;
+}
+
+.td-rr {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  display: inline-block;
+}
+.rr-win { background: rgba(61,214,140,0.12); color: var(--green); }
+.rr-loss { background: rgba(240,82,82,0.12); color: var(--red); }
+.rr-be { background: rgba(90,100,120,0.15); color: var(--text3); }
+.rr-big { background: var(--accent); color: var(--bg); }
+
+.td-risk {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+}
+
+.td-pnl {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+}
+.pnl-pos { color: var(--green); }
+.pnl-neg { color: var(--red); }
+.pnl-zero { color: var(--text3); }
+
+.screenshot-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.link-entry { background: rgba(91,141,238,0.1); color: var(--blue2); }
+.link-entry:hover { background: rgba(91,141,238,0.2); }
+.link-validation { background: rgba(155,114,245,0.1); color: var(--purple); }
+.link-validation:hover { background: rgba(155,114,245,0.2); }
+.link-context { background: rgba(240,120,80,0.1); color: var(--orange); }
+.link-context:hover { background: rgba(240,120,80,0.2); }
+.no-link { color: var(--text3); font-size: 11px; font-family: 'Barlow Condensed', sans-serif; }
+
+/* ══ ANALYSIS STATS ══ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--border);
+}
+.stat-card.gold::before { background: var(--accent); }
+.stat-card.green::before { background: var(--green); }
+.stat-card.red::before { background: var(--red); }
+.stat-card.blue::before { background: var(--blue); }
+.stat-card.purple::before { background: var(--purple); }
+
+.stat-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 1px;
+  line-height: 1;
+  color: var(--text);
+}
+
+.stat-value.green { color: var(--green); }
+.stat-value.red { color: var(--red); }
+.stat-value.gold { color: var(--accent); }
+.stat-value.blue { color: var(--blue2); }
+
+.stat-sub {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 4px;
+  font-family: 'Barlow Condensed', sans-serif;
+}
+
+/* ══ ANALYSIS ROWS ══ */
+.analysis-row {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.row-5 { grid-template-columns: repeat(5, 1fr); }
+.row-4 { grid-template-columns: repeat(4, 1fr); }
+.row-3 { grid-template-columns: repeat(3, 1fr); }
+.row-2 { grid-template-columns: 1fr 1fr; }
+.row-2-3 { grid-template-columns: 2fr 3fr; }
+
+@media (max-width: 900px) {
+  .row-5, .row-4, .row-3 { grid-template-columns: repeat(2, 1fr); }
+  .row-2, .row-2-3 { grid-template-columns: 1fr; }
+}
+
+/* ══ CHART AREA ══ */
+.chart-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  position: relative;
+}
+
+.chart-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 2px;
+}
+
+/* ══ DONUT ══ */
+.donut-wrap {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.donut-canvas { max-width: 160px; max-height: 160px; }
+
+.donut-stats { flex: 1; min-width: 120px; }
+.donut-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+}
+.donut-stat:last-child { border-bottom: none; }
+.donut-stat-label { color: var(--text3); }
+.donut-stat-val { font-weight: 700; font-size: 16px; }
+
+/* ══ BALANCE BAR ══ */
+.balance-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  display: flex;
+  gap: 0;
+  flex-wrap: wrap;
+  overflow: hidden;
+}
+
+.balance-item {
+  flex: 1;
+  min-width: 140px;
+  padding: 0 20px;
+  border-right: 1px solid var(--border);
+}
+.balance-item:first-child { padding-left: 0; }
+.balance-item:last-child { border-right: none; }
+
+.balance-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 5px;
+}
+
+.balance-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.balance-sub {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 3px;
+  font-family: 'Barlow Condensed', sans-serif;
+}
+
+/* ══ FUNDS TABLE ══ */
+.funds-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 700px) { .funds-grid { grid-template-columns: 1fr; } }
+
+/* ══ TRADING PLAN ══ */
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 900px) { .plan-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 500px) { .plan-grid { grid-template-columns: 1fr; } }
+
+.plan-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.plan-card-header {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.plan-num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 10px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plan-textarea {
+  width: 100%;
+  min-height: 280px;
+  background: transparent;
+  border: none;
+  padding: 14px 16px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--text2);
+  line-height: 1.7;
+  resize: vertical;
+  outline: none;
+}
+.plan-textarea:focus { color: var(--text); }
+
+/* ══ MODAL ══ */
+.modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal-bg.show { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  width: 520px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: popIn 0.2s ease;
+}
+@keyframes popIn { from { transform: scale(0.95); opacity:0; } to { transform: scale(1); opacity:1; } }
+
+.modal h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+.modal-sub { font-size: 12px; color: var(--text3); margin-bottom: 22px; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.5px; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-grid.full { grid-template-columns: 1fr; }
+
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group.span2 { grid-column: span 2; }
+
+.form-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+
+.form-input, .form-select {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.form-input:focus, .form-select:focus { border-color: var(--accent); }
+.form-input::placeholder { color: var(--text3); }
+
+.modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+/* ══ SETTINGS PANEL ══ */
+.settings-panel {
+  display: none;
+  position: fixed;
+  right: 0; top: 56px; bottom: 0;
+  width: 320px;
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  z-index: 150;
+  padding: 24px;
+  overflow-y: auto;
+  animation: slideIn 0.2s ease;
+}
+.settings-panel.show { display: block; }
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+.settings-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 3px;
+  margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-section { margin-bottom: 28px; }
+.settings-section-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 12px;
+}
+
+/* ══ TOAST ══ */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 11px 20px;
+  border-radius: 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  z-index: 999;
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success::before { content:'✓'; color: var(--green); font-weight:700; }
+.toast.error::before { content:'✕'; color: var(--red); font-weight:700; }
+.toast.info::before { content:'◆'; color: var(--accent); }
+
+/* ══ EMPTY STATE ══ */
+.empty {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text3);
+}
+.empty-icon { font-size: 36px; margin-bottom: 12px; }
+.empty h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 600; color: var(--text2); margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+.empty p { font-size: 13px; }
+
+/* ══ OUTCOME BADGE ══ */
+.outcome-badge {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.ob-win { background: rgba(61,214,140,0.12); color: var(--green); }
+.ob-loss { background: rgba(240,82,82,0.12); color: var(--red); }
+.ob-be { background: rgba(90,100,120,0.15); color: var(--text3); }
+
+/* ══ LOADING ══ */
+.spin { display: inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.2); border-top-color:#fff; border-radius:50%; animation: spin 0.6s linear infinite; vertical-align:middle; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ══ SCROLLBAR ══ */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ══ PAGE SECTIONS ══ */
+.page { display: none; }
+.page.active { display: block; }
+/* ===== RS Scoring Dashboard (scoped to #page-rs, dark theme) ===== */
+#page-rs .rs-sub{color:var(--text2);margin:0 0 14px;font-size:13px}
+#page-rs .rs-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px}
+#page-rs .rs-row{display:flex;flex-wrap:wrap;gap:16px}
+#page-rs .rs-col{flex:1;min-width:260px}
+#page-rs details{margin-bottom:10px}
+#page-rs summary{cursor:pointer;font-weight:600;color:var(--accent);padding:6px 0;user-select:none}
+#page-rs label{font-size:12px;color:var(--text2);display:block;margin-bottom:3px}
+#page-rs select,#page-rs input[type=text],#page-rs input[type=number]{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg3);color:var(--text)}
+#page-rs .rs-drop{border:2px dashed var(--accent);border-radius:10px;padding:24px;text-align:center;cursor:pointer;color:var(--accent);background:var(--bg3);transition:.15s}
+#page-rs .rs-drop:hover,#page-rs .rs-drop.over{background:var(--surface)}
+#page-rs .rs-status{font-size:12px;margin-top:8px;color:var(--text2)}
+#page-rs .rs-status.ok{color:var(--green)}
+#page-rs .rs-status.warn{color:var(--accent)}
+#page-rs .rs-status.err{color:var(--red)}
+#page-rs button.rs-btn{background:var(--accent);color:var(--bg);border:0;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer;font-weight:700}
+#page-rs button.rs-btn:hover{background:var(--accent2)}
+#page-rs button.rs-ghost{background:transparent;color:var(--text);border:1px solid var(--border);border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer;font-weight:600}
+#page-rs button.rs-ghost:hover{background:var(--surface)}
+#page-rs .rs-wgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+#page-rs .rs-wgrid input{text-align:center;padding:5px}
+#page-rs .rs-wsum{font-size:12px;color:var(--text2);margin-top:8px}
+#page-rs .rs-tabs{display:flex;gap:6px;margin-bottom:0}
+#page-rs .rs-tab{padding:9px 18px;border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;background:var(--bg3);cursor:pointer;font-weight:600;color:var(--text2)}
+#page-rs .rs-tab.active{background:var(--surface);color:var(--accent)}
+#page-rs .rs-panel{border:1px solid var(--border);border-radius:0 10px 10px 10px;background:var(--bg2);padding:14px}
+#page-rs .rs-toolbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:12px}
+#page-rs .rs-switch{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text)}
+#page-rs .rs-toggle{position:relative;width:42px;height:22px;background:var(--border2);border-radius:22px;cursor:pointer;transition:.15s}
+#page-rs .rs-toggle.on{background:var(--accent)}
+#page-rs .rs-toggle:after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;background:var(--text);border-radius:50%;transition:.15s}
+#page-rs .rs-toggle.on:after{left:22px;background:var(--bg)}
+#page-rs .rs-exp{display:flex;align-items:center;gap:8px;margin-left:auto}
+#page-rs .rs-exp input{width:90px}
+#page-rs .rs-tablewrap{max-height:620px;overflow:auto;border:1px solid var(--border);border-radius:8px}
+#page-rs table.rs-table{border-collapse:collapse;width:100%;font-size:13px}
+#page-rs table.rs-table th,#page-rs table.rs-table td{padding:7px 8px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text)}
+#page-rs table.rs-table th:first-child,#page-rs table.rs-table td:first-child{text-align:left}
+#page-rs table.rs-table th{position:sticky;top:0;background:var(--surface);color:var(--accent);cursor:pointer;user-select:none;font-size:12px}
+#page-rs table.rs-table th:hover{background:var(--surface2)}
+#page-rs table.rs-table th .rs-arr{font-size:10px;color:var(--accent);margin-left:3px}
+#page-rs td.rs-tk{font-weight:600;color:var(--text)}
+#page-rs td.rs-tot{font-weight:700;color:var(--text)}
+#page-rs td.rs-rk{font-weight:700;color:var(--accent);text-align:center}
+#page-rs .rs-empty{padding:40px;text-align:center;color:var(--text2)}
+#page-rs .rs-note{font-size:12px;color:var(--text2);margin-top:6px}
+#page-rs code{background:var(--surface);padding:1px 5px;border-radius:4px;font-size:12px;color:var(--text)}
+</style>
+<script src="./index_files/chart.umd.min.js.download"></script><script src="./index_files/chart.umd.min(1).js.download"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lockScreen">
+  <div class="lock-logo">TRADE<span>LOG</span></div>
+  <div class="lock-sub">Private Trading Journal</div>
+  <div class="lock-box">
+    <div class="lock-label">Enter Password</div>
+    <input class="lock-input" type="password" id="lockInput" placeholder="••••••••" onkeydown="if(event.key===&#39;Enter&#39;)unlock()">
+    <button class="lock-btn" onclick="unlock()">Unlock Journal</button>
+    <div class="lock-error" id="lockError"></div>
+  </div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div class="settings-panel" id="settingsPanel">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+    <div class="settings-title" style="margin:0;padding:0;border:none">SETTINGS</div>
+    <button class="icon-btn" onclick="closeSettings()">✕</button>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Account</div>
+    <div class="form-group" style="margin-bottom:10px">
+      <div class="form-label">Starting Balance (USD)</div>
+      <input class="form-input" id="settingStartBalance" type="number" placeholder="10000">
+    </div>
+    <button class="btn btn-gold" style="width:100%" onclick="saveSettings()">Save Settings</button>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Change Password</div>
+    <div class="form-group" style="margin-bottom:10px">
+      <div class="form-label">Current Password</div>
+      <input class="form-input" id="pwCurrent" type="password" placeholder="••••••••">
+    </div>
+    <div class="form-group" style="margin-bottom:10px">
+      <div class="form-label">New Password</div>
+      <input class="form-input" id="pwNew" type="password" placeholder="••••••••">
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <div class="form-label">Confirm New Password</div>
+      <input class="form-input" id="pwConfirm" type="password" placeholder="••••••••">
+    </div>
+    <button class="btn btn-ghost" style="width:100%" onclick="changePassword()">Update Password</button>
+    <div id="pwError" style="color:var(--red);font-size:11px;margin-top:8px;font-family:&#39;Barlow Condensed&#39;,sans-serif;min-height:14px"></div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Data Backup</div>
+    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="exportAllData()">📥 Export All Data</button>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--text3);letter-spacing:0.5px;margin-bottom:12px;line-height:1.5">
+      Downloads all trades, funds, settings &amp; trading plan as a dated JSON file to your laptop.
+    </div>
+    <label class="btn btn-ghost" style="width:100%;margin-bottom:8px;cursor:pointer;text-align:center;display:block">
+      📤 Import / Restore
+      <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importAllData(event)">
+    </label>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--text3);letter-spacing:0.5px;line-height:1.5">
+      Restore data from a previously exported JSON backup file.
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Danger Zone</div>
+    <button class="btn btn-danger" style="width:100%" onclick="logout()">🔒 Lock Journal</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-logo">TRADE<span>LOG</span></div>
+    <div class="topbar-nav">
+      <button class="nav-btn active" onclick="showPage(&#39;data&#39;,this)">📋 Data</button>
+      <button class="nav-btn" onclick="showPage(&#39;analysis&#39;,this)">📊 Analysis</button>
+      <button class="nav-btn" onclick="showPage(&#39;funds&#39;,this)">💰 Funds</button>
+      <button class="nav-btn" onclick="showPage(&#39;plan&#39;,this)">📐 Trading Plan</button>
+      <button class="nav-btn" onclick="showPage(&#39;rs&#39;,this); if(window.RS) RS.ensureInit();">📈 RS Score</button>
+    </div>
+    <div class="topbar-right">
+      <div class="balance-chip">Balance: <strong id="topbarBalance">$10,764.09</strong></div>
+      <button class="icon-btn" title="Settings" onclick="toggleSettings()">⚙</button>
+    </div>
+  </div>
+
+  <!-- ══ DATA PAGE ══ -->
+  <div class="page active" id="page-data">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">TRADE <span>DATA</span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-gold" onclick="openAddTrade()">+ Add Trade</button>
+          <button class="btn btn-ghost btn-sm" onclick="loadData()">↻ Refresh</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>✓</th>
+              <th>Symbol</th>
+              <th>Date</th>
+              <th>RR Secured</th>
+              <th>Risk USD</th>
+              <th>P&amp;L (USD)</th>
+              <th>Duration (C)</th>
+              <th>Max RR</th>
+              <th>Outcome</th>
+              <th style="color:var(--blue2)">Entry</th>
+              <th style="color:var(--purple)">Validation</th>
+              <th style="color:var(--orange)">Context</th>
+              <th>Notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="dataTableBody"><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">BNO</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Mar 29, 2026</td>
+      <td><span class="td-rr rr-loss">-0.82r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-neg">$-41.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
+      <td><span class="outcome-badge ob-loss">Loss</span></td>
+      <td><span class="no-link">—</span></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/39y3iqfG/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/HdUziMdT/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;0a28204e-c55c-418d-9019-e1ffe32960b3&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;0a28204e-c55c-418d-9019-e1ffe32960b3&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">LNG</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 6, 2026</td>
+      <td><span class="td-rr rr-loss">-0.60r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-neg">$-30.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
+      <td><span class="outcome-badge ob-loss">Loss</span></td>
+      <td><span class="no-link">—</span></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/Zr7DWbfb/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/wJwv1TAj/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;0551a072-869b-4d58-a792-44005aed9f7d&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;0551a072-869b-4d58-a792-44005aed9f7d&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">DELL</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 7, 2026</td>
+      <td><span class="td-rr rr-be">+0.00r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-zero">+$0.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
+      <td><span class="outcome-badge ob-be">BE</span></td>
+      <td><span class="no-link">—</span></td>
+      <td><span class="no-link">—</span></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/HdUziMdT/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;c4c0c69d-e393-42ad-a7a2-96c16f4ebb3b&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;c4c0c69d-e393-42ad-a7a2-96c16f4ebb3b&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">DELL</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 12, 2026</td>
+      <td><span class="td-rr rr-loss">-0.65r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-neg">$-32.50</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">3</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1r</td>
+      <td><span class="outcome-badge ob-loss">Loss</span></td>
+      <td><span class="no-link">—</span></td>
+      <td><span class="no-link">—</span></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/HdUziMdT/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;d65634b3-76e1-4539-bf6f-e7cbb6da79c2&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;d65634b3-76e1-4539-bf6f-e7cbb6da79c2&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">DELL</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 12, 2026</td>
+      <td><span class="td-rr rr-loss">-0.60r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-neg">$-30.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">3</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1r</td>
+      <td><span class="outcome-badge ob-loss">Loss</span></td>
+      <td><span class="no-link">—</span></td>
+      <td><span class="no-link">—</span></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/HdUziMdT/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;9730eca8-e326-4783-a778-b8a520feb9dc&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;9730eca8-e326-4783-a778-b8a520feb9dc&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">NOK</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 15, 2026</td>
+      <td><span class="td-rr rr-be">+0.00r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-zero">+$0.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">4</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">2r</td>
+      <td><span class="outcome-badge ob-be">BE</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/7WcEtvRL/" target="_blank">📷 Entry</a></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/f5PnJpHO/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/g8GblA4f/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;113c25b7-7ca2-4743-a50a-e606451a17d1&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;113c25b7-7ca2-4743-a50a-e606451a17d1&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">NOK</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 22, 2026</td>
+      <td><span class="td-rr rr-loss">-0.70r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-neg">$-35.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">0.5r</td>
+      <td><span class="outcome-badge ob-loss">Loss</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/jrDwzBDn/" target="_blank">📷 Entry</a></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/S9glU2hz/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/5JGIqhF9/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;7373143a-b23f-4423-b604-1d498dc61b5c&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;7373143a-b23f-4423-b604-1d498dc61b5c&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--text3);font-size:14px">○</span></td>
+      <td><span class="td-symbol">GOOGL</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 22, 2026</td>
+      <td><span class="td-rr rr-be">+0.00r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-zero">+$0.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
+      <td><span class="outcome-badge ob-be">BE</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/1O9r7h91/" target="_blank">📷 Entry</a></td>
+      <td><span class="no-link">—</span></td>
+      <td><span class="no-link">—</span></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;85451951-94a2-46f4-97a3-b269348e9f22&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;85451951-94a2-46f4-97a3-b269348e9f22&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">AMD</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 23, 2026</td>
+      <td><span class="td-rr rr-loss">-0.15r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-neg">$-7.75</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">2</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
+      <td><span class="outcome-badge ob-loss">Loss</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/wbEmVcaq/" target="_blank">📷 Entry</a></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/3iRupCk2/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/7o2di1iJ/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;2a5f0828-fcab-4a91-925f-f7d63a7e6f1a&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;2a5f0828-fcab-4a91-925f-f7d63a7e6f1a&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">DELL</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 26, 2026</td>
+      <td><span class="td-rr rr-loss">-0.60r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-neg">$-30.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">0.5r</td>
+      <td><span class="outcome-badge ob-loss">Loss</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/xvFAIl4d/" target="_blank">📷 Entry</a></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/EgPwinJU/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/5kiHoruJ/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;efdfeb6e-ad4b-4624-a778-ea937a265fe5&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;efdfeb6e-ad4b-4624-a778-ea937a265fe5&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">RMAK</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 27, 2026</td>
+      <td><span class="td-rr rr-be">+0.00r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-zero">+$0.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">0.5r</td>
+      <td><span class="outcome-badge ob-be">BE</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/yHtHVo76/" target="_blank">📷 Entry</a></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/h2WO8V8v/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/V59c9lg1/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;a2554c17-e109-4a37-b8fd-5de3d1ab235c&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;a2554c17-e109-4a37-b8fd-5de3d1ab235c&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">SNDK</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 28, 2026</td>
+      <td><span class="td-rr rr-be">+0.00r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-zero">+$0.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">0.5r</td>
+      <td><span class="outcome-badge ob-be">BE</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/H7XOLeiv/" target="_blank">📷 Entry</a></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/2pv41dOc/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/cwOuIi2o/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;4d850110-1ead-431f-96f8-642387edc243&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;4d850110-1ead-431f-96f8-642387edc243&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">SNDK</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 29, 2026</td>
+      <td><span class="td-rr rr-loss">-0.60r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-neg">$-30.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">0.5r</td>
+      <td><span class="outcome-badge ob-loss">Loss</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/zr19i73Q/" target="_blank">📷 Entry</a></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/xLJ6EFRs/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/8KsTsBcG/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;087972ca-3115-430e-92f2-19d077fed30d&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;087972ca-3115-430e-92f2-19d077fed30d&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">SNDK</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 29, 2026</td>
+      <td><span class="td-rr rr-loss">-0.20r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-neg">$-10.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">0.5r</td>
+      <td><span class="outcome-badge ob-loss">Loss</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/ZjbbNpoo/" target="_blank">📷 Entry</a></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/TsC7kb7E/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/eNF7zimi/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;d5e543ba-faf4-48e2-b1a1-ebd6d6b8e3ad&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;d5e543ba-faf4-48e2-b1a1-ebd6d6b8e3ad&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">WDC</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 30, 2026</td>
+      <td><span class="td-rr rr-loss">-0.32r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-neg">$-16.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1.2r</td>
+      <td><span class="outcome-badge ob-loss">Loss</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/SSCMoFFa/" target="_blank">📷 Entry</a></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/bCtryO0w/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/A79p73V3/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;fe46e3f6-ce2f-43b8-940a-a8716fa96dcd&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;fe46e3f6-ce2f-43b8-940a-a8716fa96dcd&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--text3);font-size:14px">○</span></td>
+      <td><span class="td-symbol">DELL</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 30, 2026</td>
+      <td><span class="td-rr rr-be">+0.00r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-zero">+$0.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
+      <td><span class="outcome-badge ob-be">BE</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/YDwEPOeP/" target="_blank">📷 Entry</a></td>
+      <td><span class="no-link">—</span></td>
+      <td><span class="no-link">—</span></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;7278b903-cef6-4be9-a42a-d4fa3a54c307&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;7278b903-cef6-4be9-a42a-d4fa3a54c307&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">NOK</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">May 4, 2026</td>
+      <td><span class="td-rr rr-loss">-1.32r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-neg">$-66.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">3</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">2r</td>
+      <td><span class="outcome-badge ob-loss">Loss</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/3DNpSwEe/" target="_blank">📷 Entry</a></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/KYdyTAQv/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/rRm8FXmS/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;67fc80bd-73c4-48fe-891c-cc27c6477065&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;67fc80bd-73c4-48fe-891c-cc27c6477065&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">MU</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">May 6, 2026</td>
+      <td><span class="td-rr rr-loss">-0.80r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-neg">$-40.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
+      <td><span class="outcome-badge ob-loss">Loss</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/b4btT6tb/" target="_blank">📷 Entry</a></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/CNS1Egay/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/sn0vRkpG/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;cc793066-9292-4ae2-bc00-5c6f807cf1ad&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;cc793066-9292-4ae2-bc00-5c6f807cf1ad&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">SNDK</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">May 7, 2026</td>
+      <td><span class="td-rr rr-be">+0.00r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-zero">+$0.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">3</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">2r</td>
+      <td><span class="outcome-badge ob-be">BE</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/puPT1KOE/" target="_blank">📷 Entry</a></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/X59EsLzV/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/csHAB5Wq/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;66f5a997-e1f2-4a96-9cd9-fbd26cdf65f5&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;66f5a997-e1f2-4a96-9cd9-fbd26cdf65f5&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">INTC</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">May 11, 2026</td>
+      <td><span class="td-rr rr-big">+27.48r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-pos">+$1374.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">21</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">34.75r</td>
+      <td><span class="outcome-badge ob-win">Win</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/7daVGnyk/" target="_blank">📷 Entry</a></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/CdiVfqyT/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/QyeRuGDN/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="Entered: 2026-04-10">Entered: 2026-04-10</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;e6fe47a1-1e08-4839-9774-5f903eb0c974&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;e6fe47a1-1e08-4839-9774-5f903eb0c974&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr><tr>
+      <td><span style="color:var(--green);font-size:14px">✓</span></td>
+      <td><span class="td-symbol">CIEN</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">May 12, 2026</td>
+      <td><span class="td-rr rr-loss">-1.00r</span></td>
+      <td><span class="td-risk">$50</span></td>
+      <td><span class="td-pnl pnl-neg">$-50.00</span></td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
+      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
+      <td><span class="outcome-badge ob-loss">Loss</span></td>
+      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/0ZCuoOD7/" target="_blank">📷 Entry</a></td>
+      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/VLm0IDK8/" target="_blank">📷 Val</a></td>
+      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/kGGRy9em/" target="_blank">📷 Ctx</a></td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;57be5c36-52f5-42e4-ad5c-95fb858794aa&#39;)">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;57be5c36-52f5-42e4-ad5c-95fb858794aa&#39;,&#39;trades&#39;)">✕</button>
+        </div>
+      </td>
+    </tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ANALYSIS PAGE ══ -->
+  <div class="page" id="page-analysis">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">PERFORMANCE <span>ANALYSIS</span></div>
+        <div style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:11px;color:var(--text3);letter-spacing:1px">Based on included trades only</div>
+      </div>
+
+      <!-- STATS ROW 1 -->
+      <div class="analysis-row row-5" style="margin-bottom:12px">
+        <div class="stat-card gold">
+          <div class="stat-label">Total Trades</div>
+          <div class="stat-value" id="aTrades">0</div>
+          <div class="stat-sub" id="aWBL">— W / — BE / — L</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">R Secured</div>
+          <div class="stat-value green" id="aRSecured">0.00r</div>
+          <div class="stat-sub">total net R</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Avg Win (R)</div>
+          <div class="stat-value blue" id="aAvgWin">0.00r</div>
+          <div class="stat-sub">per winning trade</div>
+        </div>
+        <div class="stat-card gold">
+          <div class="stat-label">Expected Value</div>
+          <div class="stat-value gold" id="aEV">0.00</div>
+          <div class="stat-sub">per trade (R)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Profit Factor</div>
+          <div class="stat-value" id="aPF" style="color:var(--text)">0.00</div>
+          <div class="stat-sub" id="aPFLabel">calculating...</div>
+        </div>
+      </div>
+
+      <!-- STATS ROW 2 -->
+      <div class="analysis-row row-4" style="margin-bottom:12px">
+        <div class="stat-card">
+          <div class="stat-label">Avg DD (R)</div>
+          <div class="stat-value red" id="aAvgDDR">0.00r</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg DD (%)</div>
+          <div class="stat-value red" id="aAvgDDP">0.00%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Max DD (R)</div>
+          <div class="stat-value red" id="aMaxDDR">0.00r</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Max DD (%)</div>
+          <div class="stat-value red" id="aMaxDDP">0.00%</div>
+        </div>
+      </div>
+
+      <!-- BALANCE BAR -->
+      <div class="balance-bar" style="margin-bottom:12px">
+        <div class="balance-item">
+          <div class="balance-label">Starting Balance</div>
+          <div class="balance-val" id="aStartBal">$0</div>
+          <div class="balance-sub">configured in settings</div>
+        </div>
+        <div class="balance-item">
+          <div class="balance-label">Trading P&amp;L</div>
+          <div class="balance-val" id="aTradePnL" style="color:var(--green)">$0</div>
+          <div class="balance-sub">from trades only</div>
+        </div>
+        <div class="balance-item">
+          <div class="balance-label">Net Contributions</div>
+          <div class="balance-val" id="aContrib" style="color:var(--blue2)">$0</div>
+          <div class="balance-sub">deposits − withdrawals</div>
+        </div>
+        <div class="balance-item">
+          <div class="balance-label">Current Balance</div>
+          <div class="balance-val" id="aBalance" style="color:var(--accent)">$0</div>
+          <div class="balance-sub" id="aROI">0% total return</div>
+        </div>
+        <div class="balance-item">
+          <div class="balance-label">Risk of Ruin</div>
+          <div class="balance-val" id="aRoR" style="color:var(--green)">0%</div>
+          <div class="balance-sub">probability</div>
+        </div>
+      </div>
+
+      <!-- CHARTS ROW -->
+      <div class="analysis-row row-2-3" style="margin-bottom:12px">
+
+        <!-- DONUT -->
+        <div class="chart-container">
+          <div class="chart-title">
+            Distribution
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Win</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--text3)"></div>BE</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Loss</div>
+            </div>
+          </div>
+          <div class="donut-wrap">
+            <canvas class="donut-canvas" id="donutChart" width="160" height="160"></canvas>
+            <div class="donut-stats">
+              <div class="donut-stat">
+                <span class="donut-stat-label">Win Rate</span>
+                <span class="donut-stat-val" style="color:var(--green)" id="dWinRate">0%</span>
+              </div>
+              <div class="donut-stat">
+                <span class="donut-stat-label">BE Rate</span>
+                <span class="donut-stat-val" style="color:var(--text3)" id="dBERate">0%</span>
+              </div>
+              <div class="donut-stat">
+                <span class="donut-stat-label">Loss Rate</span>
+                <span class="donut-stat-val" style="color:var(--red)" id="dLossRate">0%</span>
+              </div>
+              <div class="donut-stat">
+                <span class="donut-stat-label">Avg Days Between</span>
+                <span class="donut-stat-val" style="color:var(--text2)" id="dAvgDays">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DUAL CURVE -->
+        <div class="chart-container" style="height:260px;position:relative;overflow:hidden;">
+          <div class="chart-title">
+            Account Growth Curves
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Trading P&amp;L</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Net Contributions</div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Total Balance</div>
+            </div>
+          </div>
+          <canvas id="curveChart" style="position:absolute;top:40px;left:0;right:0;bottom:0;width:100%!important;height:calc(100% - 40px)!important;"></canvas>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ FUNDS PAGE ══ -->
+  <div class="page" id="page-funds">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">FUNDS <span>LOG</span></div>
+        <button class="btn btn-gold" onclick="openAddFund()">+ Add Entry</button>
+      </div>
+
+      <div class="funds-grid">
+        <!-- Funds table -->
+        <div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Amount (USD)</th>
+                  <th>Type</th>
+                  <th>Note</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="fundsTableBody">
+                <tr><td colspan="5"><div class="empty"><div class="empty-icon">💰</div><h3>No Entries</h3><p>Use + to log deposits or withdrawals</p></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Funds summary -->
+        <div>
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px">
+            <div style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:16px">Funds Summary</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border)">
+                <span style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:13px;color:var(--text2)">Total Deposited</span>
+                <span style="font-family:&#39;Bebas Neue&#39;,sans-serif;font-size:22px;color:var(--green)" id="fTotalDeposit">$0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border)">
+                <span style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:13px;color:var(--text2)">Total Withdrawn</span>
+                <span style="font-family:&#39;Bebas Neue&#39;,sans-serif;font-size:22px;color:var(--red)" id="fTotalWithdraw">$0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border)">
+                <span style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:13px;color:var(--text2)">Net Contribution</span>
+                <span style="font-family:&#39;Bebas Neue&#39;,sans-serif;font-size:22px;color:var(--blue2)" id="fNetContrib">$0</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:13px;color:var(--text2)">Trading P&amp;L</span>
+                <span style="font-family:&#39;Bebas Neue&#39;,sans-serif;font-size:22px;color:var(--accent)" id="fTradingPnL">$0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TRADING PLAN PAGE ══ -->
+  <div class="page" id="page-plan">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">TRADING <span>PLAN</span></div>
+        <button class="btn btn-gold" onclick="savePlan()">💾 Save Plan</button>
+      </div>
+
+      <div class="plan-grid">
+        <div class="plan-card">
+          <div class="plan-card-header"><div class="plan-num">1</div> Timeframes</div>
+          <textarea class="plan-textarea" id="plan1" placeholder="Enter your timeframe setup..."></textarea>
+        </div>
+        <div class="plan-card">
+          <div class="plan-card-header"><div class="plan-num">2</div> Context &amp; Validations</div>
+          <textarea class="plan-textarea" id="plan2" placeholder="Enter context and validation criteria..."></textarea>
+        </div>
+        <div class="plan-card">
+          <div class="plan-card-header"><div class="plan-num">3</div> Entry Criteria</div>
+          <textarea class="plan-textarea" id="plan3" placeholder="Enter your entry criteria..."></textarea>
+        </div>
+        <div class="plan-card">
+          <div class="plan-card-header"><div class="plan-num">4</div> Management</div>
+          <textarea class="plan-textarea" id="plan4" placeholder="Risk, stop loss, breakeven, close/trail rules..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RS SCORE PAGE ══ -->
+  <div class="page" id="page-rs">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">RELATIVE <span>STRENGTH</span></div>
+      </div>
+      <p class="rs-sub">Composite relative-strength ranking across six timeframes &middot; Z-Score (soft-capped) and Percentile &middot; dataset shared via your cloud (rs_dataset)</p>
+
+      <div class="rs-card">
+        <div class="rs-row">
+          <div class="rs-col">
+            <div id="rsDrop" class="rs-drop">
+              <div style="font-size:15px;font-weight:600">Drop CSV / Excel here, or click to choose</div>
+              <div style="font-size:12px;margin-top:4px">TradingView Screener export &middot; replaces the cloud copy</div>
+              <input id="rsFile" type="file" accept=".csv,.xlsx,.xls" style="display:none">
+            </div>
+            <div id="rsStatus" class="rs-status">Open this tab to load the latest dataset&hellip;</div>
+            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+              <button class="rs-ghost" id="rsReload">&#8635; Reload from cloud</button>
+              <span class="rs-note" id="rsCloudState" style="align-self:center"></span>
+            </div>
+          </div>
+          <div class="rs-col">
+            <details open>
+              <summary>Column mapping</summary>
+              <div id="rsMapping" style="margin-top:10px"><div class="rs-note">Load a file to map columns.</div></div>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <div class="rs-card">
+        <details open>
+          <summary>Weights &amp; settings</summary>
+          <div style="margin-top:12px">
+            <div class="rs-note" style="margin-bottom:8px">Set any weight to <b>0</b> to drop that timeframe &mdash; its cells show &ldquo;&mdash;&rdquo;. Keep the remaining weights summing to 100.</div>
+            <div class="rs-wgrid" id="rsWeights"></div>
+            <div class="rs-wsum" id="rsWsum"></div>
+            <div class="rs-row" style="margin-top:12px;align-items:flex-end">
+              <div style="max-width:200px">
+                <label>Z-Score soft cap (std devs)</label>
+                <input id="rsCap" type="number" min="1" max="6" step="0.5" value="2">
+                <div class="rs-note">Higher lets big leaders separate more.</div>
+              </div>
+              <div>
+                <button class="rs-ghost" id="rsResetW">Reset weights</button>
+                <button class="rs-btn" id="rsRecalc">Recalculate</button>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="rs-tabs">
+        <div class="rs-tab active" data-rstab="z">Z-Score (capped)</div>
+        <div class="rs-tab" data-rstab="p">Percentile</div>
+      </div>
+      <div class="rs-panel">
+        <div class="rs-toolbar">
+          <div class="rs-switch">
+            <span>Display:</span><span id="rsModeLbl">Weighted</span>
+            <div class="rs-toggle on" id="rsModeTog" title="Toggle weighted / unweighted display"></div>
+            <span class="rs-note">(Total &amp; Rank always weighted)</span>
+          </div>
+          <div class="rs-exp">
+            <label style="margin:0">Top</label>
+            <input id="rsTopn" type="number" min="1" value="20">
+            <button class="rs-btn" id="rsExportBtn">Export .txt for TradingView</button>
+          </div>
+        </div>
+        <div class="rs-tablewrap">
+          <table class="rs-table" id="rsTable">
+            <thead id="rsThead"></thead>
+            <tbody id="rsTbody"><tr><td class="rs-empty" colspan="9">Loading&hellip;</td></tr></tbody>
+          </table>
+        </div>
+        <div class="rs-note" id="rsExportNote"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end app -->
+
+<!-- ADD TRADE MODAL -->
+<div class="modal-bg" id="tradeModal">
+  <div class="modal">
+    <h3 id="tradeModalTitle">ADD TRADE</h3>
+    <div class="modal-sub" id="tradeModalSub">Log a new trade entry</div>
+    <input type="hidden" id="tradeEditId">
+    <div class="form-grid">
+      <div class="form-group">
+        <div class="form-label">Symbol *</div>
+        <input class="form-input" id="fSymbol" placeholder="e.g. AAPL" style="text-transform:uppercase">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Date *</div>
+        <input class="form-input" id="fDate" type="date">
+      </div>
+      <div class="form-group">
+        <div class="form-label">RR Secured *</div>
+        <input class="form-input" id="fRR" type="number" step="0.01" placeholder="e.g. 2.5 or -1">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Risk USD * (your $ risk)</div>
+        <input class="form-input" id="fRiskUSD" type="number" step="1" placeholder="e.g. 50 or 100">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Duration (Candles)</div>
+        <input class="form-input" id="fDuration" type="number" placeholder="e.g. 35">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Max RR Available</div>
+        <input class="form-input" id="fMaxRR" type="number" step="0.01" placeholder="e.g. 10">
+      </div>
+      <div class="form-group span2">
+        <div class="form-label" style="color:var(--blue2)">📷 Entry Screenshot (TradingView URL)</div>
+        <input class="form-input" id="fEntry" placeholder="https://www.tradingview.com/x/...">
+      </div>
+      <div class="form-group span2">
+        <div class="form-label" style="color:var(--purple)">📷 Validation Screenshot (TradingView URL)</div>
+        <input class="form-input" id="fValidation" placeholder="https://www.tradingview.com/x/...">
+      </div>
+      <div class="form-group span2">
+        <div class="form-label" style="color:var(--orange)">📷 Context Screenshot (TradingView URL)</div>
+        <input class="form-input" id="fContext" placeholder="https://www.tradingview.com/x/...">
+      </div>
+      <div class="form-group span2">
+        <div class="form-label">Notes</div>
+        <input class="form-input" id="fNotes" placeholder="Optional trade notes...">
+      </div>
+      <div class="form-group span2" style="flex-direction:row;align-items:center;gap:10px">
+        <input type="checkbox" id="fInclude" checked="" style="width:auto;cursor:pointer">
+        <label for="fInclude" style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:13px;color:var(--text2);cursor:pointer">Include in Analysis</label>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeTradeModal()">Cancel</button>
+      <button class="btn btn-gold" id="tradeSubmitBtn" onclick="saveTrade()">Save Trade</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD FUND MODAL -->
+<div class="modal-bg" id="fundModal">
+  <div class="modal" style="max-width:400px">
+    <h3>FUND ENTRY</h3>
+    <div class="modal-sub">Log a deposit (+) or withdrawal (−)</div>
+    <input type="hidden" id="fundEditId">
+    <div class="form-grid full">
+      <div class="form-group">
+        <div class="form-label">Date *</div>
+        <input class="form-input" id="fFundDate" type="date">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Amount USD * (negative = withdrawal)</div>
+        <input class="form-input" id="fFundAmount" type="number" step="100" placeholder="e.g. 2000 or -500">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Note</div>
+        <input class="form-input" id="fFundNote" placeholder="e.g. Monthly addition">
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeFundModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="saveFund()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="modal-bg" id="deleteModal">
+  <div class="modal" style="max-width:380px">
+    <h3>CONFIRM DELETE</h3>
+    <div class="modal-sub">This action cannot be undone.</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:8px">Are you sure you want to delete this entry?</p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger" id="confirmDeleteBtn" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ CONFIG ══
+const SB_URL = 'https://jpkniqmqoizscqdkaxag.supabase.co';
+const SB_KEY = 'sb_publishable_SKiVUnE0b4BkDh9JPRT0Ng_pYgjLErJ';
+
+let allTrades = [];
+let allFunds = [];
+let settings = { startBalance: 10000, password: 'trader123' };
+let deleteTarget = { id: null, table: null };
+let donutChart = null;
+let curveChart = null;
+
+// ══ SUPABASE ══
+async function sb(path, method='GET', body=null) {
+  const opts = {
+    method,
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': `Bearer ${SB_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const res = await fetch(`${SB_URL}/rest/v1/${path}`, opts);
+    const text = await res.text();
+    if (!res.ok) {
+      let msg = text;
+      try { const j = JSON.parse(text); msg = j.message || j.hint || j.details || text; } catch(e){}
+      throw new Error(`[${res.status}] ${msg}`);
+    }
+    return text ? JSON.parse(text) : null;
+  } catch(e) {
+    if (e.message.includes('fetch')) throw new Error('Network error — check internet connection');
+    throw e;
+  }
+}
+
+// ══ LOCK ══
+async function unlock() {
+  const val = document.getElementById('lockInput').value;
+  if (!val) return;
+  try {
+    await loadSettings();
+    if (val === settings.password) {
+      document.getElementById('lockScreen').style.display = 'none';
+      document.getElementById('app').classList.add('show');
+      loadData();
+    } else {
+      document.getElementById('lockError').textContent = 'Incorrect password. Try again.';
+      document.getElementById('lockInput').value = '';
+    }
+  } catch(e) {
+    document.getElementById('lockError').textContent = 'Connection error. Check your setup.';
+  }
+}
+
+function logout() {
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('lockScreen').style.display = 'flex';
+  document.getElementById('lockInput').value = '';
+  closeSettings();
+}
+
+// ══ SETTINGS ══
+async function loadSettings() {
+  try {
+    const data = await sb('settings?select=*&limit=1');
+    if (data && data.length > 0) {
+      const row = data[0];
+      // Handle both column name variants
+      settings.startBalance = row.startBalance || row["startBalance"] || 10000;
+      settings.password = row.password || 'trader123';
+      settings.id = row.id;
+    }
+  } catch(e) {
+    console.warn('loadSettings error:', e.message);
+  }
+}
+
+async function saveSettings() {
+  const bal = parseFloat(document.getElementById('settingStartBalance').value);
+  if (isNaN(bal)) return toast('Enter a valid balance', 'error');
+  settings.startBalance = bal;
+  try {
+    const existing = await sb('settings?select=id&limit=1');
+    if (existing && existing.length > 0) {
+      await sb(`settings?id=eq.${existing[0].id}`, 'PATCH', { "startBalance": bal });
+    } else {
+      await sb('settings', 'POST', { "startBalance": bal, "password": settings.password || 'trader123' });
+    }
+    updateTopbarBalance();
+    toast('Starting balance saved ✓', 'success');
+  } catch(e) { toast('Save failed: ' + e.message, 'error'); }
+}
+
+async function changePassword() {
+  const cur = document.getElementById('pwCurrent').value;
+  const nw = document.getElementById('pwNew').value;
+  const conf = document.getElementById('pwConfirm').value;
+  const errEl = document.getElementById('pwError');
+  errEl.textContent = '';
+
+  if (cur !== settings.password) { errEl.textContent = 'Current password incorrect.'; return; }
+  if (nw.length < 4) { errEl.textContent = 'New password must be at least 4 characters.'; return; }
+  if (nw !== conf) { errEl.textContent = 'Passwords do not match.'; return; }
+
+  try {
+    const existing = await sb('settings?select=id&limit=1');
+    if (existing && existing.length > 0) {
+      await sb(`settings?id=eq.${existing[0].id}`, 'PATCH', { "password": nw });
+    } else {
+      await sb('settings', 'POST', { "startBalance": settings.startBalance || 10000, "password": nw });
+    }
+    settings.password = nw;
+    document.getElementById('pwCurrent').value = '';
+    document.getElementById('pwNew').value = '';
+    document.getElementById('pwConfirm').value = '';
+    toast('Password updated ✓', 'success');
+  } catch(e) { errEl.textContent = 'Failed: ' + e.message; }
+}
+
+function toggleSettings() {
+  const p = document.getElementById('settingsPanel');
+  p.classList.toggle('show');
+  if (p.classList.contains('show')) {
+    document.getElementById('settingStartBalance').value = settings.startBalance || '';
+  }
+}
+function closeSettings() { document.getElementById('settingsPanel').classList.remove('show'); }
+
+// ══ NAV ══
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'analysis') {
+    // Wait for Chart.js to be available
+    function tryRender(attempts) {
+      if (typeof Chart !== 'undefined') {
+        setTimeout(() => renderAnalysis(), 50);
+      } else if (attempts > 0) {
+        setTimeout(() => tryRender(attempts - 1), 200);
+      }
+    }
+    tryRender(20); // try up to 20 times = 4 seconds max
+  }
+  if (name === 'funds') renderFunds();
+  if (name === 'plan') loadPlan();
+}
+
+// ══ DATA ══
+async function loadData() {
+  try {
+    const [trades, funds, sets] = await Promise.all([
+      sb('trades?select=*&order=trade_date.asc'),
+      sb('funds?select=*&order=fund_date.asc'),
+      sb('settings?select=*&limit=1')
+    ]);
+    allTrades = trades || [];
+    allFunds = funds || [];
+    if (sets && sets.length > 0) settings = { ...settings, ...sets[0] };
+    renderTrades();
+    updateTopbarBalance();
+  } catch(e) { toast('Failed to load data', 'error'); }
+}
+
+function renderTrades() {
+  const tbody = document.getElementById('dataTableBody');
+  if (!allTrades.length) {
+    tbody.innerHTML = `<tr><td colspan="14"><div class="empty"><div class="empty-icon">📊</div><h3>No Trades Yet</h3><p>Click + Add Trade to start logging</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = allTrades.map(t => {
+    const rr = parseFloat(t.rr_secured) || 0;
+    const risk = parseFloat(t.risk_usd) || 0;
+    const pnl = rr * risk;
+    const outcome = rr > 0.1 ? 'Win' : rr < -0.05 ? 'Loss' : 'BE';
+    const rrClass = Math.abs(rr) >= 5 ? 'rr-big' : rr > 0.1 ? 'rr-win' : rr < -0.05 ? 'rr-loss' : 'rr-be';
+    const pnlClass = pnl > 0 ? 'pnl-pos' : pnl < 0 ? 'pnl-neg' : 'pnl-zero';
+    const obClass = outcome === 'Win' ? 'ob-win' : outcome === 'Loss' ? 'ob-loss' : 'ob-be';
+
+    const entryLink = t.screenshot_entry
+      ? `<a class="screenshot-link link-entry" href="${t.screenshot_entry}" target="_blank">📷 Entry</a>`
+      : `<span class="no-link">—</span>`;
+    const valLink = t.screenshot_validation
+      ? `<a class="screenshot-link link-validation" href="${t.screenshot_validation}" target="_blank">📷 Val</a>`
+      : `<span class="no-link">—</span>`;
+    const ctxLink = t.screenshot_context
+      ? `<a class="screenshot-link link-context" href="${t.screenshot_context}" target="_blank">📷 Ctx</a>`
+      : `<span class="no-link">—</span>`;
+
+    return `<tr>
+      <td><span style="color:${t.include_analysis ? 'var(--green)' : 'var(--text3)'};font-size:14px">${t.include_analysis ? '✓' : '○'}</span></td>
+      <td><span class="td-symbol">${t.symbol || '—'}</span></td>
+      <td style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--text2)">${t.trade_date ? new Date(t.trade_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'}</td>
+      <td><span class="td-rr ${rrClass}">${rr >= 0 ? '+' : ''}${rr.toFixed(2)}r</span></td>
+      <td><span class="td-risk">$${risk.toFixed(0)}</span></td>
+      <td><span class="td-pnl ${pnlClass}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</span></td>
+      <td style="font-family:'Barlow Condensed',sans-serif;color:var(--text2)">${t.duration_candles || '—'}</td>
+      <td style="font-family:'Barlow Condensed',sans-serif;color:var(--text2)">${t.max_rr ? t.max_rr + 'r' : '—'}</td>
+      <td><span class="outcome-badge ${obClass}">${outcome}</span></td>
+      <td>${entryLink}</td>
+      <td>${valLink}</td>
+      <td>${ctxLink}</td>
+      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="${t.notes||''}">${t.notes || '—'}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editTrade('${t.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete('${t.id}','trades')">✕</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ══ ANALYSIS ══
+function renderAnalysis() {
+  const trades = allTrades.filter(t => t.include_analysis);
+  const startBal = parseFloat(settings.startBalance) || 10000;
+
+  if (!trades.length) {
+    ['aTrades','aRSecured','aAvgWin','aEV','aPF','aAvgDDR','aAvgDDP','aMaxDDR','aMaxDDP'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '—';
+    });
+    return;
+  }
+
+  const wins = trades.filter(t => parseFloat(t.rr_secured) > 0.1);
+  const losses = trades.filter(t => parseFloat(t.rr_secured) < -0.05);
+  const bes = trades.filter(t => {
+    const r = parseFloat(t.rr_secured);
+    return r >= -0.05 && r <= 0.1;
+  });
+
+  const totalR = trades.reduce((s, t) => s + (parseFloat(t.rr_secured) || 0), 0);
+  const avgWin = wins.length ? wins.reduce((s,t) => s + parseFloat(t.rr_secured), 0) / wins.length : 0;
+  const avgLoss = losses.length ? Math.abs(losses.reduce((s,t) => s + parseFloat(t.rr_secured), 0) / losses.length) : 0;
+  const winRate = trades.length ? wins.length / trades.length : 0;
+  const lossRate = trades.length ? losses.length / trades.length : 0;
+  const ev = (winRate * avgWin) - (lossRate * avgLoss);
+  const grossWin = wins.reduce((s,t) => s + parseFloat(t.rr_secured), 0);
+  const grossLoss = Math.abs(losses.reduce((s,t) => s + parseFloat(t.rr_secured), 0));
+  const pf = grossLoss > 0 ? grossWin / grossLoss : grossWin > 0 ? 999 : 0;
+
+  // DD calculation
+  let runningR = 0, peak = 0, maxDD = 0;
+  const dds = [];
+  trades.forEach(t => {
+    runningR += parseFloat(t.rr_secured) || 0;
+    if (runningR > peak) peak = runningR;
+    const dd = runningR - peak;
+    if (dd < 0) dds.push(dd);
+    if (dd < maxDD) maxDD = dd;
+  });
+  const avgDD = dds.length ? dds.reduce((s,d) => s+d, 0) / dds.length : 0;
+  const avgDDPct = startBal > 0 ? (avgDD / startBal) * 100 : 0;
+  const maxDDPct = startBal > 0 ? (maxDD / startBal) * 100 : 0;
+
+  // P&L in USD
+  const tradingPnL = trades.reduce((s,t) => s + (parseFloat(t.rr_secured)||0) * (parseFloat(t.risk_usd)||0), 0);
+  const netContrib = allFunds.reduce((s,f) => s + (parseFloat(f.amount_usd)||0), 0);
+  const currentBal = startBal + tradingPnL + netContrib;
+  const roi = startBal > 0 ? ((currentBal - startBal) / startBal) * 100 : 0;
+
+  // Risk of Ruin (Ralph Vince)
+  let ror = 0;
+  if (winRate > 0 && winRate < 1 && avgWin > 0 && avgLoss > 0) {
+    const a = (1 - winRate) / winRate;
+    const b = avgLoss / avgWin;
+    ror = Math.pow(a * b, 1) * 100;
+    ror = Math.max(0, Math.min(100, ror));
+  }
+
+  // Dates for avg days between
+  const dates = trades.map(t => new Date(t.trade_date)).sort((a,b) => a-b);
+  let avgDaysBetween = '—';
+  if (dates.length > 1) {
+    const diffs = [];
+    for (let i = 1; i < dates.length; i++) diffs.push((dates[i]-dates[i-1])/86400000);
+    avgDaysBetween = (diffs.reduce((s,d)=>s+d,0)/diffs.length).toFixed(0) + 'd';
+  }
+
+  // Update DOM
+  document.getElementById('aTrades').textContent = trades.length;
+  document.getElementById('aWBL').textContent = `${wins.length} W / ${bes.length} BE / ${losses.length} L`;
+  document.getElementById('aRSecured').textContent = (totalR >= 0 ? '+' : '') + totalR.toFixed(2) + 'r';
+  document.getElementById('aAvgWin').textContent = '+' + avgWin.toFixed(2) + 'r';
+  document.getElementById('aEV').textContent = (ev >= 0 ? '+' : '') + ev.toFixed(2);
+  document.getElementById('aPF').textContent = pf >= 999 ? '∞' : pf.toFixed(2);
+  document.getElementById('aPFLabel').textContent = pf > 1 ? 'Profitable' : pf === 0 ? 'No data' : 'Losing';
+  document.getElementById('aPF').style.color = pf > 1 ? 'var(--green)' : pf < 1 ? 'var(--red)' : 'var(--text)';
+  document.getElementById('aAvgDDR').textContent = avgDD.toFixed(2) + 'r';
+  document.getElementById('aAvgDDP').textContent = avgDDPct.toFixed(2) + '%';
+  document.getElementById('aMaxDDR').textContent = maxDD.toFixed(2) + 'r';
+  document.getElementById('aMaxDDP').textContent = maxDDPct.toFixed(2) + '%';
+  document.getElementById('aStartBal').textContent = '$' + fmtNum(startBal);
+  document.getElementById('aTradePnL').textContent = (tradingPnL >= 0 ? '+$' : '-$') + fmtNum(Math.abs(tradingPnL));
+  document.getElementById('aTradePnL').style.color = tradingPnL >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('aContrib').textContent = (netContrib >= 0 ? '+$' : '-$') + fmtNum(Math.abs(netContrib));
+  document.getElementById('aContrib').style.color = netContrib >= 0 ? 'var(--blue2)' : 'var(--red)';
+  document.getElementById('aBalance').textContent = '$' + fmtNum(currentBal);
+  document.getElementById('aROI').textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '% trading ROI';
+  document.getElementById('aRoR').textContent = ror.toFixed(1) + '%';
+  document.getElementById('aRoR').style.color = ror < 5 ? 'var(--green)' : ror < 20 ? 'var(--accent)' : 'var(--red)';
+  document.getElementById('dWinRate').textContent = (winRate*100).toFixed(1) + '%';
+  document.getElementById('dBERate').textContent = (trades.length ? (bes.length/trades.length)*100 : 0).toFixed(1) + '%';
+  document.getElementById('dLossRate').textContent = (lossRate*100).toFixed(1) + '%';
+  document.getElementById('dAvgDays').textContent = avgDaysBetween;
+
+  renderDonut(wins.length, bes.length, losses.length);
+  renderCurves(trades, allFunds, startBal);
+}
+
+function renderDonut(w, be, l) {
+  if (typeof Chart === 'undefined') { console.warn('Chart.js not loaded yet'); return; }
+  const canvas = document.getElementById('donutChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (donutChart) { try { donutChart.destroy(); } catch(e){} donutChart = null; }
+  donutChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [w, be, l],
+        backgroundColor: ['rgba(61,214,140,0.8)', 'rgba(90,100,120,0.6)', 'rgba(240,82,82,0.8)'],
+        borderColor: ['#0d0f12'],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      cutout: '65%',
+      plugins: { legend: { display: false }, tooltip: {
+        callbacks: { label: (ctx) => ` ${ctx.raw} trades` }
+      }},
+      animation: { duration: 600 }
+    }
+  });
+}
+
+function renderCurves(trades, funds, startBal) {
+  if (typeof Chart === 'undefined') { console.warn('Chart.js not loaded yet'); return; }
+  const canvas = document.getElementById('curveChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (curveChart) { try { curveChart.destroy(); } catch(e){} curveChart = null; }
+
+  // Build sorted timeline events — trades and fund entries merged by date
+  const events = [];
+  trades.forEach((t,i) => {
+    const pnl = (parseFloat(t.rr_secured)||0) * (parseFloat(t.risk_usd)||0);
+    events.push({ date: t.trade_date, tradePnL: pnl, contrib: 0, type: 'trade', label: t.symbol || ('T'+(i+1)), rawAmt: null });
+  });
+  funds.forEach(f => {
+    const amt = parseFloat(f.amount_usd) || 0;
+    events.push({ date: f.fund_date, tradePnL: 0, contrib: amt, type: amt >= 0 ? 'deposit' : 'withdrawal', label: amt >= 0 ? 'Deposit' : 'Withdrawal', rawAmt: amt });
+  });
+  events.sort((a,b) => new Date(a.date) - new Date(b.date));
+
+  const labels = [];
+  const tradingLine = [];
+  const contribLine = [];
+  const totalLine = [];
+  const totalPointColors = [];
+  const totalPointRadius = [];
+  const eventMeta = [];
+  let cumTrade = 0, cumContrib = 0;
+
+  // Add starting point before first trade
+  if (events.length > 0) {
+    const firstDate = new Date(events[0].date);
+    firstDate.setDate(firstDate.getDate() - 1);
+    labels.push('Start');
+    tradingLine.push(0);
+    contribLine.push(0);
+    totalLine.push(parseFloat(startBal.toFixed(2)));
+    totalPointColors.push('rgba(232,184,75,0.5)');
+    totalPointRadius.push(4);
+    eventMeta.push({ type: 'start', label: 'Start', rawAmt: null });
+  }
+
+  events.forEach(e => {
+    cumTrade += e.tradePnL;
+    cumContrib += e.contrib;
+    labels.push(new Date(e.date).toLocaleDateString('en-US', {month:'short', day:'numeric'}));
+    tradingLine.push(parseFloat(cumTrade.toFixed(2)));
+    contribLine.push(parseFloat(cumContrib.toFixed(2)));
+    totalLine.push(parseFloat((startBal + cumTrade + cumContrib).toFixed(2)));
+    eventMeta.push({ type: e.type, label: e.label, rawAmt: e.rawAmt });
+    // Colour-code points on total balance line by event type
+    if (e.type === 'withdrawal') {
+      totalPointColors.push('rgba(240,82,82,1)');
+      totalPointRadius.push(7);
+    } else if (e.type === 'deposit') {
+      totalPointColors.push('rgba(91,141,238,1)');
+      totalPointRadius.push(7);
+    } else {
+      totalPointColors.push('rgba(232,184,75,0.7)');
+      totalPointRadius.push(3);
+    }
+  });
+
+  curveChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Trading P&L',
+          data: tradingLine,
+          borderColor: 'rgba(61,214,140,0.9)',
+          backgroundColor: 'rgba(61,214,140,0.05)',
+          borderWidth: 2,
+          pointRadius: 3,
+          pointBackgroundColor: 'rgba(61,214,140,0.9)',
+          tension: 0.3,
+          fill: false
+        },
+        {
+          label: 'Net Contributions',
+          data: contribLine,
+          borderColor: 'rgba(91,141,238,0.9)',
+          backgroundColor: 'rgba(91,141,238,0.05)',
+          borderWidth: 2,
+          pointRadius: 3,
+          pointBackgroundColor: 'rgba(91,141,238,0.9)',
+          tension: 0,
+          fill: false
+        },
+        {
+          label: 'Total Balance',
+          data: totalLine,
+          borderColor: 'rgba(232,184,75,0.9)',
+          backgroundColor: 'rgba(232,184,75,0.05)',
+          borderWidth: 2.5,
+          pointRadius: totalPointRadius,
+          pointBackgroundColor: totalPointColors,
+          pointBorderColor: totalPointColors,
+          tension: 0.3,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(18,21,26,0.95)',
+          borderColor: 'rgba(45,52,69,1)',
+          borderWidth: 1,
+          titleColor: '#9aa3b8',
+          bodyColor: '#e8ecf4',
+          titleFont: { family: 'Barlow Condensed', size: 11 },
+          bodyFont: { family: 'Barlow Condensed', size: 13 },
+          callbacks: {
+            title: (items) => {
+              const idx = items[0].dataIndex;
+              const meta = eventMeta[idx];
+              let t = items[0].label;
+              if (meta.type === 'withdrawal') t += '   ⬇ WITHDRAWAL';
+              else if (meta.type === 'deposit') t += '   ⬆ DEPOSIT';
+              return t;
+            },
+            label: (item) => {
+              const idx = item.dataIndex;
+              const meta = eventMeta[idx];
+              let line = ' ' + item.dataset.label + ': $' + item.raw.toFixed(2);
+              if (item.dataset.label === 'Total Balance' && meta.rawAmt !== null) {
+                const sign = meta.rawAmt >= 0 ? '+' : '';
+                line += '  (' + sign + '$' + Math.abs(meta.rawAmt).toFixed(0) + ' ' + meta.label + ')';
+              }
+              return line;
+            },
+            afterBody: (items) => {
+              const meta = eventMeta[items[0].dataIndex];
+              if (meta.type === 'withdrawal') return ['', ' ⚠ Withdrawal — not a trading loss'];
+              if (meta.type === 'deposit') return ['', ' ✦ Capital added to account'];
+              return [];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(45,52,69,0.4)' },
+          ticks: { color: '#5a6478', font: { family: 'Barlow Condensed', size: 10 }, maxTicksLimit: 10 }
+        },
+        y: {
+          grid: { color: 'rgba(45,52,69,0.4)' },
+          beginAtZero: false,
+          ticks: { color: '#5a6478', font: { family: 'Barlow Condensed', size: 10 }, callback: v => '$' + v.toFixed(0) }
+        }
+      }
+    }
+  });
+}
+
+// ══ FUNDS ══
+function renderFunds() {
+  const tbody = document.getElementById('fundsTableBody');
+  if (!allFunds.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-icon">💰</div><h3>No Entries</h3><p>Log deposits and withdrawals here</p></div></td></tr>`;
+  } else {
+    tbody.innerHTML = allFunds.map(f => {
+      const amt = parseFloat(f.amount_usd) || 0;
+      const isPos = amt >= 0;
+      return `<tr>
+        <td style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--text2)">${new Date(f.fund_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</td>
+        <td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:${isPos?'var(--green)':'var(--red)'}">${isPos?'+':''}\$${Math.abs(amt).toFixed(2)}</span></td>
+        <td><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:${isPos?'rgba(61,214,140,0.1)':'rgba(240,82,82,0.1)'};color:${isPos?'var(--green)':'var(--red)'}">${isPos?'DEPOSIT':'WITHDRAWAL'}</span></td>
+        <td style="font-size:12px;color:var(--text3)">${f.note||'—'}</td>
+        <td><div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="editFund('${f.id}')">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="openDelete('${f.id}','funds')">✕</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Summary
+  const deposits = allFunds.filter(f => parseFloat(f.amount_usd) > 0).reduce((s,f) => s + parseFloat(f.amount_usd), 0);
+  const withdrawals = Math.abs(allFunds.filter(f => parseFloat(f.amount_usd) < 0).reduce((s,f) => s + parseFloat(f.amount_usd), 0));
+  const net = deposits - withdrawals;
+  const tradePnL = allTrades.filter(t=>t.include_analysis).reduce((s,t) => s + (parseFloat(t.rr_secured)||0)*(parseFloat(t.risk_usd)||0), 0);
+  document.getElementById('fTotalDeposit').textContent = '+$' + fmtNum(deposits);
+  document.getElementById('fTotalWithdraw').textContent = '-$' + fmtNum(withdrawals);
+  document.getElementById('fNetContrib').textContent = (net>=0?'+':'') + '$' + fmtNum(net);
+  document.getElementById('fTradingPnL').textContent = (tradePnL>=0?'+':'') + '$' + fmtNum(Math.abs(tradePnL));
+  document.getElementById('fTradingPnL').style.color = tradePnL >= 0 ? 'var(--accent)' : 'var(--red)';
+}
+
+function updateTopbarBalance() {
+  const startBal = parseFloat(settings.startBalance) || 10000;
+  const tradePnL = allTrades.filter(t=>t.include_analysis).reduce((s,t) => s + (parseFloat(t.rr_secured)||0)*(parseFloat(t.risk_usd)||0), 0);
+  const netContrib = allFunds.reduce((s,f) => s + (parseFloat(f.amount_usd)||0), 0);
+  document.getElementById('topbarBalance').textContent = '$' + fmtNum(startBal + tradePnL + netContrib);
+}
+
+// ══ TRADING PLAN ══
+async function loadPlan() {
+  try {
+    const data = await sb('trading_plan?select=*&limit=1');
+    if (data && data.length > 0) {
+      document.getElementById('plan1').value = data[0].timeframes || '';
+      document.getElementById('plan2').value = data[0].context_validations || '';
+      document.getElementById('plan3').value = data[0].entry_criteria || '';
+      document.getElementById('plan4').value = data[0].management || '';
+    } else {
+      // Pre-fill from Excel data
+      document.getElementById('plan1').value = `C: 1 Week\nV: 1 Day\nE: 65 mins\nE micro: 2-15 mins\n\nList of Confluences:\n\n1. EVC timeframes alignment (alignment of mmbs and accmbs on Higher/Lower Timeframes)\n2. Cycle alignment across EVC\n3. Demand Validation through Ment Blocks (MBs)\n4. Containment and Supply Line - Free Money Zone (FMZ)\n5. Moving Averages\n6. Stages and Structures\n7. Relative Strength`;
+      document.getElementById('plan2').value = `Context Criteria:\n\n1. clear unidirectional movement\n2. price must not be in a choppy Stage 1 action on C\n3. enter only after 10 MA > 20 MA on C and both 10 MA and 20 MA are sloping up after the start of a new cycle\n4. do not enter overextended cycle - enter only with accmb to mmb 3 on C\n\nRelative Strength Criteria:\n\n1. only enter those markets that show relatively the max. strength\n2. Enter only after comparing the market with its parent index/etf and other competing markets of similar nature\n\nValidation Criteria when price action goes above 50 MA on V:\n\n1. clear unidirectional movement\n2. price must be => 50 MA on V\n3. enter only when 5, 10 & 20 MA on V have started or are sloping up\n4. do not enter: when price is too far from 5-10 MAs on V; when price is at its peak; when sudden huge demand came in close to validation as supply might follow before true price validation\n5. enter only when supply came in and now gradual demand is validating the supply close to 5-10 MA on the V\n6. enter only through an MB within the FMZ on V by taking reference from the E\n7. enter only when price is not > 2x1D ATR away from 10 MA on V`;
+      document.getElementById('plan3').value = `Entry Criteria when price action goes above 50 MA on V:\n\n- enter through an MB only after the price has flushed at least to 10 MA on E\n\n- ideally enter through an MB after +ve 20 MA DTC on E at the DV of the previous intersection of 10-20 MA on E`;
+      document.getElementById('plan4').value = `Risk: 1 RR = variable USD per trade (set in each trade row)\n\nStop Loss: (0.6-1) x 1D ATR\n\nBreakeven: Trail 10 MA on V through E timeframe until breakeven\n\nClose/Trail: 100% when price touches 50 MA on V\n\nAccount Doubling Rule:\n- $5k → $10k: Risk = $50/trade\n- $10k → $20k: Risk = $100/trade\n- Switch only after closing previous positions`;
+    }
+  } catch(e) {}
+}
+
+async function savePlan() {
+  const row = {
+    timeframes: document.getElementById('plan1').value,
+    context_validations: document.getElementById('plan2').value,
+    entry_criteria: document.getElementById('plan3').value,
+    management: document.getElementById('plan4').value
+  };
+  try {
+    const existing = await sb('trading_plan?select=id&limit=1');
+    if (existing && existing.length > 0) {
+      await sb(`trading_plan?id=eq.${existing[0].id}`, 'PATCH', row);
+    } else {
+      await sb('trading_plan', 'POST', row);
+    }
+    toast('Trading plan saved', 'success');
+  } catch(e) { toast('Save failed: ' + e.message, 'error'); console.error('Plan error:', e); }
+}
+
+// ══ TRADE MODAL ══
+function openAddTrade() {
+  document.getElementById('tradeModalTitle').textContent = 'ADD TRADE';
+  document.getElementById('tradeModalSub').textContent = 'Log a new trade entry';
+  document.getElementById('tradeEditId').value = '';
+  ['fSymbol','fRR','fRiskUSD','fDuration','fMaxRR','fEntry','fValidation','fContext','fNotes'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('fInclude').checked = true;
+  document.getElementById('tradeModal').classList.add('show');
+  setTimeout(() => document.getElementById('fSymbol').focus(), 100);
+}
+
+function editTrade(id) {
+  const t = allTrades.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('tradeModalTitle').textContent = 'EDIT TRADE';
+  document.getElementById('tradeModalSub').textContent = `Editing ${t.symbol} — ${t.trade_date}`;
+  document.getElementById('tradeEditId').value = id;
+  document.getElementById('fSymbol').value = t.symbol || '';
+  document.getElementById('fDate').value = t.trade_date || '';
+  document.getElementById('fRR').value = t.rr_secured || '';
+  document.getElementById('fRiskUSD').value = t.risk_usd || '';
+  document.getElementById('fDuration').value = t.duration_candles || '';
+  document.getElementById('fMaxRR').value = t.max_rr || '';
+  document.getElementById('fEntry').value = t.screenshot_entry || '';
+  document.getElementById('fValidation').value = t.screenshot_validation || '';
+  document.getElementById('fContext').value = t.screenshot_context || '';
+  document.getElementById('fNotes').value = t.notes || '';
+  document.getElementById('fInclude').checked = t.include_analysis !== false;
+  document.getElementById('tradeModal').classList.add('show');
+}
+
+function closeTradeModal() { document.getElementById('tradeModal').classList.remove('show'); }
+
+async function saveTrade() {
+  const symbol = document.getElementById('fSymbol').value.trim().toUpperCase();
+  const date = document.getElementById('fDate').value;
+  const rr = document.getElementById('fRR').value;
+  const risk = document.getElementById('fRiskUSD').value;
+  if (!symbol || !date || rr === '' || !risk) return toast('Symbol, Date, RR and Risk USD are required', 'error');
+
+  const row = {
+    symbol,
+    trade_date: date,
+    rr_secured: parseFloat(rr),
+    risk_usd: parseFloat(risk),
+    duration_candles: document.getElementById('fDuration').value ? parseInt(document.getElementById('fDuration').value) : null,
+    max_rr: document.getElementById('fMaxRR').value ? parseFloat(document.getElementById('fMaxRR').value) : null,
+    screenshot_entry: document.getElementById('fEntry').value.trim() || null,
+    screenshot_validation: document.getElementById('fValidation').value.trim() || null,
+    screenshot_context: document.getElementById('fContext').value.trim() || null,
+    notes: document.getElementById('fNotes').value.trim() || null,
+    include_analysis: document.getElementById('fInclude').checked
+  };
+
+  const btn = document.getElementById('tradeSubmitBtn');
+  btn.innerHTML = '<span class="spin"></span> Saving...';
+  btn.disabled = true;
+
+  const editId = document.getElementById('tradeEditId').value;
+  try {
+    if (editId) {
+      await sb(`trades?id=eq.${editId}`, 'PATCH', row);
+      toast(`${symbol} updated`, 'success');
+    } else {
+      await sb('trades', 'POST', row);
+      toast(`${symbol} added`, 'success');
+    }
+    closeTradeModal();
+    await loadData();
+  } catch(e) {
+    toast('Save failed: ' + e.message, 'error');
+    console.error('Trade save error:', e);
+  } finally { btn.innerHTML = 'Save Trade'; btn.disabled = false; }
+}
+
+// ══ FUND MODAL ══
+function openAddFund() {
+  document.getElementById('fundEditId').value = '';
+  document.getElementById('fFundDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('fFundAmount').value = '';
+  document.getElementById('fFundNote').value = '';
+  document.getElementById('fundModal').classList.add('show');
+}
+
+function editFund(id) {
+  const f = allFunds.find(x => x.id === id);
+  if (!f) return;
+  document.getElementById('fundEditId').value = id;
+  document.getElementById('fFundDate').value = f.fund_date || '';
+  document.getElementById('fFundAmount').value = f.amount_usd || '';
+  document.getElementById('fFundNote').value = f.note || '';
+  document.getElementById('fundModal').classList.add('show');
+}
+
+function closeFundModal() { document.getElementById('fundModal').classList.remove('show'); }
+
+async function saveFund() {
+  const date = document.getElementById('fFundDate').value;
+  const amt = document.getElementById('fFundAmount').value;
+  if (!date || amt === '') return toast('Date and Amount are required', 'error');
+
+  const row = {
+    fund_date: date,
+    amount_usd: parseFloat(amt),
+    note: document.getElementById('fFundNote').value.trim() || null
+  };
+
+  const editId = document.getElementById('fundEditId').value;
+  try {
+    if (editId) {
+      await sb(`funds?id=eq.${editId}`, 'PATCH', row);
+      toast('Entry updated', 'success');
+    } else {
+      await sb('funds', 'POST', row);
+      toast('Fund entry saved', 'success');
+    }
+    closeFundModal();
+    await loadData();
+    renderFunds();
+  } catch(e) { toast('Save failed: ' + e.message, 'error'); console.error('Fund save error:', e); }
+}
+
+// ══ DELETE ══
+function openDelete(id, table) {
+  deleteTarget = { id, table };
+  document.getElementById('deleteModal').classList.add('show');
+}
+function closeDeleteModal() { document.getElementById('deleteModal').classList.remove('show'); deleteTarget = { id:null, table:null }; }
+async function confirmDelete() {
+  const { id, table } = deleteTarget;
+  if (!id || !table) return;
+  try {
+    await sb(`${table}?id=eq.${id}`, 'DELETE');
+    closeDeleteModal();
+    await loadData();
+    if (table === 'funds') renderFunds();
+    toast('Entry deleted', 'info');
+  } catch(e) { toast('Delete failed', 'error'); }
+}
+
+// ══ EXPORT / IMPORT ══
+async function exportAllData() {
+  try {
+    toast('Preparing export...', 'info');
+
+    // Fetch all four tables fresh
+    const [trades, funds, fundsSettings, plan] = await Promise.all([
+      sb('trades?select=*&order=trade_date.asc'),
+      sb('funds?select=*&order=fund_date.asc'),
+      sb('settings?select=*&limit=1'),
+      sb('trading_plan?select=*&limit=1')
+    ]);
+
+    const exportData = {
+      exportDate: new Date().toISOString(),
+      exportVersion: '1.0',
+      description: 'TradeLOG Trading Journal — Full Backup',
+      data: {
+        trades:       trades       || [],
+        funds:        funds        || [],
+        settings:     fundsSettings || [],
+        trading_plan: plan         || []
+      },
+      counts: {
+        trades:  (trades       || []).length,
+        funds:   (funds        || []).length
+      }
+    };
+
+    // Create and trigger download
+    const json     = JSON.stringify(exportData, null, 2);
+    const blob     = new Blob([json], { type: 'application/json' });
+    const url      = URL.createObjectURL(blob);
+    const dateStr  = new Date().toISOString().split('T')[0];
+    const a        = document.createElement('a');
+    a.href         = url;
+    a.download     = `TradeLOG_Backup_${dateStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast(`✓ Exported ${exportData.counts.trades} trades + ${exportData.counts.funds} fund entries`, 'success');
+  } catch(e) {
+    toast('Export failed: ' + e.message, 'error');
+    console.error('Export error:', e);
+  }
+}
+
+async function importAllData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // Reset input so same file can be re-selected if needed
+  event.target.value = '';
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+
+      // Validate it is a genuine TradeLOG export
+      if (!parsed.data || !parsed.exportVersion) {
+        toast('Invalid backup file — not a TradeLOG export', 'error');
+        return;
+      }
+
+      const { trades, funds, settings: settingsArr, trading_plan } = parsed.data;
+
+      const tradeCount = (trades  || []).length;
+      const fundCount  = (funds   || []).length;
+
+      if (!confirm(
+        `Restore from backup dated ${parsed.exportDate?.split('T')[0] || 'unknown'}?\n\n` +
+        `This will ADD ${tradeCount} trades and ${fundCount} fund entries.\n` +
+        `Existing data will NOT be deleted — duplicates may appear.\n\n` +
+        `Click OK to proceed.`
+      )) return;
+
+      toast('Restoring data...', 'info');
+      let restored = 0;
+
+      // Restore trades
+      for (const t of (trades || [])) {
+        try {
+          const { id, created_at, ...row } = t;
+          await sb('trades', 'POST', row);
+          restored++;
+        } catch(err) { console.warn('Skipped trade:', err.message); }
+      }
+
+      // Restore funds
+      for (const f of (funds || [])) {
+        try {
+          const { id, created_at, ...row } = f;
+          await sb('funds', 'POST', row);
+          restored++;
+        } catch(err) { console.warn('Skipped fund:', err.message); }
+      }
+
+      // Restore settings if none exist
+      const existingSettings = await sb('settings?select=id&limit=1');
+      if ((!existingSettings || existingSettings.length === 0) && settingsArr?.length > 0) {
+        const { id, created_at, ...row } = settingsArr[0];
+        await sb('settings', 'POST', row);
+      }
+
+      // Restore trading plan if none exists
+      const existingPlan = await sb('trading_plan?select=id&limit=1');
+      if ((!existingPlan || existingPlan.length === 0) && trading_plan?.length > 0) {
+        const { id, updated_at, ...row } = trading_plan[0];
+        await sb('trading_plan', 'POST', row);
+      }
+
+      await loadData();
+      toast(`✓ Restored ${restored} records successfully`, 'success');
+
+    } catch(err) {
+      toast('Import failed: ' + err.message, 'error');
+      console.error('Import error:', err);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ══ UTILS ══
+function fmtNum(n) {
+  return parseFloat(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+let toastTimer;
+function toast(msg, type='info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeTradeModal();
+    closeFundModal();
+    closeDeleteModal();
+    closeSettings();
+  }
+});
+
+// ══ INIT ══
+document.getElementById('lockInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') unlock();
+});
+
+// Test connection on page load and show status
+(async () => {
+  try {
+    await fetch(`${SB_URL}/rest/v1/settings?select=id&limit=1`, {
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+    }).then(r => {
+      if (!r.ok) {
+        document.getElementById('lockError').textContent = r.status === 403
+          ? '⚠ Database not set up yet — run supabase_setup_FIXED.sql first'
+          : `⚠ DB error ${r.status} — check setup`;
+      }
+    });
+  } catch(e) {}
+})();
+</script>
+<script>
+// Load Chart.js with fallback CDNs
+(function() {
+  var cdns = [
+    'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js',
+    'https://unpkg.com/chart.js@4.4.1/dist/chart.umd.min.js'
+  ];
+  var loaded = false;
+  function tryLoad(i) {
+    if (i >= cdns.length) { console.error('All Chart.js CDNs failed'); return; }
+    var s = document.createElement('script');
+    s.src = cdns[i];
+    s.onload = function() {
+      loaded = true;
+      console.log('Chart.js loaded from:', cdns[i]);
+      // Trigger re-render if analysis page is active
+      if (typeof renderAnalysis === 'function' && 
+          document.getElementById('page-analysis') && 
+          document.getElementById('page-analysis').classList.contains('active')) {
+        setTimeout(renderAnalysis, 100);
+      }
+    };
+    s.onerror = function() { tryLoad(i + 1); };
+    document.head.appendChild(s);
+  }
+  tryLoad(0);
+})();
+</script>
+
+
+<script>
+/* ====================== RS SCORING MODULE (isolated) ====================== */
+(function(){
+  const RS_SB_URL = "https://jpkniqmqoizscqdkaxag.supabase.co";
+  const RS_SB_KEY = "sb_publishable_SKiVUnE0b4BkDh9JPRT0Ng_pYgjLErJ";
+  const RS_TABLE  = "rs_dataset";
+  const TFS = ["1W","1M","3M","6M","1Y","5Y"];
+  const DEFAULT_WEIGHTS = {"1W":12,"1M":22,"3M":26,"6M":22,"1Y":13,"5Y":5};
+
+  let RAW=[], HEADERS=[], MAP={}, WEIGHTS={...DEFAULT_WEIGHTS}, CAP=2, MODEL=[];
+  let activeTab="z", weighted=true, sortState={col:"total",dir:"desc"}, inited=false;
+
+  const $=id=>document.getElementById(id);
+  function num(v){
+    if(v===null||v===undefined) return null;
+    let s=String(v).trim();
+    if(s===""||/^(n\/?a|--|—|-)$/i.test(s)) return null;
+    let neg=false;
+    if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1);}
+    s=s.replace(/[%,\s]/g,"").replace(/[\u2212\u2013\u2014]/g,"-");
+    let f=parseFloat(s); if(isNaN(f)) return null; return neg?-f:f;
+  }
+  function mean(a){return a.reduce((x,y)=>x+y,0)/a.length;}
+  function stdev(a){const m=mean(a);return Math.sqrt(a.reduce((x,y)=>x+(y-m)*(y-m),0)/a.length);}
+
+  const TF_RX={
+    "1W":/(\b1\s*-?\s*w[a-z]*\b)|(\bweek)/i,
+    "1M":/\b1\s*-?\s*m[a-z]*\b/i,
+    "3M":/(\b3\s*-?\s*m[a-z]*\b)|(\bquarter)/i,
+    "6M":/\b6\s*-?\s*m[a-z]*\b/i,
+    "1Y":/(\b1\s*-?\s*y[a-z]*\b)|(\b12\s*-?\s*m[a-z]*\b)|(\bannual)|(\byearly)/i,
+    "5Y":/(\b5\s*-?\s*y[a-z]*\b)|(\b60\s*-?\s*m[a-z]*\b)/i
+  };
+  function autodetect(){
+    const used=new Set();
+    let tk=HEADERS.find(h=>/symbol|ticker/i.test(h))||HEADERS[0];
+    MAP.ticker=tk; used.add(tk);
+    let ex=HEADERS.find(h=>/exchange/i.test(h)); MAP.exchange=ex||""; if(ex)used.add(ex);
+    const order=["1W","5Y","1Y","6M","3M","1M"];
+    for(const tf of order){const hit=HEADERS.find(h=>!used.has(h)&&TF_RX[tf].test(h));MAP[tf]=hit||"";if(hit)used.add(hit);}
+  }
+  function parseCSV(text){
+    const rows=[];let i=0,field="",row=[],q=false;
+    while(i<text.length){const c=text[i];
+      if(q){if(c==='"'){if(text[i+1]==='"'){field+='"';i++;}else q=false;}else field+=c;}
+      else{if(c==='"')q=true;else if(c===','){row.push(field);field="";}else if(c==='\n'){row.push(field);rows.push(row);row=[];field="";}else if(c==='\r'){}else field+=c;}
+      i++;}
+    if(field!==""||row.length){row.push(field);rows.push(row);}
+    return rows.filter(r=>r.length&&!(r.length===1&&r[0].trim()===""));
+  }
+  function ingest(matrix){
+    HEADERS=matrix[0].map(h=>String(h).trim());
+    RAW=matrix.slice(1).map(r=>{const o={};HEADERS.forEach((h,j)=>o[h]=r[j]);return o;});
+    autodetect(); renderMapping(); compute();
+    setStatus("Loaded "+RAW.length+" rows.","ok");
+  }
+  function loadFile(file){
+    const ext=file.name.split(".").pop().toLowerCase();
+    const rd=new FileReader();
+    if(ext==="csv"){
+      rd.onload=e=>{const txt=e.target.result; ingest(parseCSV(txt)); cloudSave(txt,file.name);};
+      rd.readAsText(file);
+    }else{
+      rd.onload=e=>{
+        try{
+          const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"});
+          const ws=wb.Sheets[wb.SheetNames[0]];
+          const m=XLSX.utils.sheet_to_json(ws,{header:1,raw:false});
+          ingest(m.filter(r=>r.length));
+          cloudSave(XLSX.utils.sheet_to_csv(ws), file.name.replace(/\.(xlsx|xls)$/i,".csv"));
+        }catch(err){setStatus("Excel read failed: "+err.message,"err");}
+      };
+      rd.readAsArrayBuffer(file);
+    }
+  }
+  /* ---- cloud (separate table; does not touch journal data) ---- */
+  async function cloudLoad(){
+    try{
+      const res=await fetch(RS_SB_URL+"/rest/v1/"+RS_TABLE+"?id=eq.1&select=csv_text,filename,uploaded_at",
+        {headers:{apikey:RS_SB_KEY,Authorization:"Bearer "+RS_SB_KEY}});
+      if(!res.ok) throw new Error("["+res.status+"] "+(await res.text()));
+      const arr=await res.json();
+      if(arr&&arr[0]&&arr[0].csv_text){
+        ingest(parseCSV(arr[0].csv_text));
+        const when=arr[0].uploaded_at? new Date(arr[0].uploaded_at).toLocaleString():"";
+        setStatus("Loaded from cloud"+(arr[0].filename?(" — "+arr[0].filename):"")+(when?(" · updated "+when):""),"ok");
+      }else{
+        setStatus("Cloud is empty. Drag a CSV/Excel here to publish the first dataset.","warn");
+      }
+    }catch(e){ setStatus("Cloud read failed: "+(e.message||e)+". You can still drag a file to load locally.","err"); }
+  }
+  async function cloudSave(csvText,filename){
+    try{
+      setStatus("Saving to cloud (replacing previous dataset)…","");
+      const res=await fetch(RS_SB_URL+"/rest/v1/"+RS_TABLE,{
+        method:"POST",
+        headers:{apikey:RS_SB_KEY,Authorization:"Bearer "+RS_SB_KEY,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates,return=minimal"},
+        body:JSON.stringify({id:1,csv_text:csvText,filename:filename||"",uploaded_at:new Date().toISOString()})
+      });
+      if(!res.ok) throw new Error("["+res.status+"] "+(await res.text()));
+      setStatus("Saved to cloud — previous dataset replaced. Live on every device.","ok");
+    }catch(e){ setStatus("Cloud save failed: "+(e.message||e)+" (data still loaded locally).","err"); }
+  }
+  /* ---- compute ---- */
+  function normWeights(){const sum=TFS.reduce((s,t)=>s+(parseFloat(WEIGHTS[t])||0),0)||1;const o={};TFS.forEach(t=>o[t]=(parseFloat(WEIGHTS[t])||0)/sum*100);return o;}
+  function rankBy(key,rk){const idx=MODEL.map((r,i)=>i).sort((a,b)=>MODEL[b][key]-MODEL[a][key]);idx.forEach((mi,pos)=>MODEL[mi][rk]=pos+1);}
+  function compute(){
+    if(!RAW.length)return;
+    CAP=parseFloat($("rsCap").value)||2;
+    const stats={};
+    for(const tf of TFS){
+      const col=MAP[tf];const vals=[];
+      RAW.forEach(r=>{const v=col?num(r[col]):null;if(v!==null)vals.push(v);});
+      if(vals.length){stats[tf]={m:mean(vals),sd:stdev(vals),sorted:[...vals].sort((a,b)=>a-b),has:!!col};}
+      else{stats[tf]={m:0,sd:0,sorted:[],has:!!col};}
+    }
+    const Wn=normWeights();
+    MODEL=RAW.map(r=>{
+      const tk=String(r[MAP.ticker]||"").trim();
+      const exVal=MAP.exchange?String(r[MAP.exchange]||"").trim():"";
+      let exportSym=tk;
+      if(tk.includes(":"))exportSym=tk; else if(exVal)exportSym=exVal+":"+tk;
+      const cells={};let totZ=0,totP=0;
+      for(const tf of TFS){
+        const st=stats[tf];const raw=st.has?num(r[MAP[tf]]):null;
+        let s01=0.5;
+        if(raw!==null&&st.sd>0){let z=(raw-st.m)/st.sd;let zc=CAP*Math.tanh(z/CAP);s01=(zc+CAP)/(2*CAP);}
+        let pc=50;
+        if(raw!==null&&st.sorted.length){let below=0,equal=0;for(const v of st.sorted){if(v<raw)below++;else if(v===raw)equal++;}pc=(below+0.5*equal)/st.sorted.length*100;}
+        cells[tf]={raw,s01,zDisp:s01*100,p:pc};
+        totZ+=Wn[tf]*s01; totP+=Wn[tf]*(pc/100);
+      }
+      return {ticker:tk,exportSym,cells,totZ,totP};
+    });
+    rankBy("totZ","rankZ"); rankBy("totP","rankP");
+    render();
+  }
+  /* ---- render ---- */
+  function setStatus(msg,cls){const s=$("rsStatus");if(s){s.innerHTML=msg;s.className="rs-status "+(cls||"");}}
+  function renderWeights(){
+    const g=$("rsWeights");g.innerHTML="";
+    TFS.forEach(tf=>{const d=document.createElement("div");d.innerHTML='<label>'+tf+'</label><input type="number" step="1" data-w="'+tf+'" value="'+WEIGHTS[tf]+'">';g.appendChild(d);});
+    g.querySelectorAll("input").forEach(inp=>inp.addEventListener("input",e=>{WEIGHTS[e.target.dataset.w]=e.target.value;updateWsum();if(MODEL.length)compute();}));
+    updateWsum();
+  }
+  function updateWsum(){
+    const sum=TFS.reduce((s,t)=>s+(parseFloat(WEIGHTS[t])||0),0);
+    const active=TFS.filter(t=>(parseFloat(WEIGHTS[t])||0)>0);
+    const dropped=TFS.filter(t=>!((parseFloat(WEIGHTS[t])||0)>0));
+    let msg="Active timeframes: "+active.length+" of "+TFS.length+"  ·  Sum: "+sum.toFixed(0);
+    if(dropped.length)msg+="  ·  Excluded (0): "+dropped.join(", ");
+    if(Math.round(sum)!==100)msg+="   ⚠ not 100 — still works (auto-normalised), but set to 100 for a clean 0–100 score";
+    $("rsWsum").textContent=msg;
+  }
+  function renderMapping(){
+    const box=$("rsMapping");
+    const opts=h=>HEADERS.map(o=>'<option value="'+o+'" '+(o===h?"selected":"")+'>'+o+'</option>').join("");
+    let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+    html+='<div><label>Ticker</label><select data-m="ticker"><option value="">—</option>'+opts(MAP.ticker)+'</select></div>';
+    html+='<div><label>Exchange (optional)</label><select data-m="exchange"><option value="">—</option>'+opts(MAP.exchange)+'</select></div>';
+    TFS.forEach(tf=>{html+='<div><label>'+tf+'</label><select data-m="'+tf+'"><option value="">—</option>'+opts(MAP[tf])+'</select></div>';});
+    html+='</div>';
+    box.innerHTML=html;
+    box.querySelectorAll("select").forEach(sel=>sel.addEventListener("change",e=>{MAP[e.target.dataset.m]=e.target.value;compute();}));
+  }
+  function fmt(n){return (Math.round(n*10)/10).toFixed(1);}
+  function rsHeat(v){const t=Math.max(0,Math.min(100,v))/100;const r=Math.round(240+(61-240)*t),g=Math.round(82+(214-82)*t),b=Math.round(82+(140-82)*t);return "rgba("+r+","+g+","+b+",0.16)";}
+  function currentRows(){
+    const Wn=normWeights();
+    const rows=MODEL.map(m=>{
+      const o={ticker:m.ticker,exportSym:m.exportSym};
+      if(activeTab==="z"){o.total=m.totZ;o.rank=m.rankZ;}else{o.total=m.totP;o.rank=m.rankP;}
+      TFS.forEach(tf=>{
+        const excluded=!((parseFloat(WEIGHTS[tf])||0)>0);
+        if(excluded){o[tf]=null;return;}
+        const c=m.cells[tf];
+        if(activeTab==="z")o[tf]=weighted?Wn[tf]*c.s01:c.zDisp;
+        else o[tf]=weighted?Wn[tf]*(c.p/100):c.p;
+      });
+      return o;
+    });
+    const col=sortState.col,dir=sortState.dir==="asc"?1:-1;
+    rows.sort((a,b)=>{let x=a[col],y=b[col];if(col==="ticker")return x.localeCompare(y)*dir;if(x===null||x===undefined)x=-Infinity;if(y===null||y===undefined)y=-Infinity;return (x-y)*dir;});
+    return rows;
+  }
+  function render(){
+    const thead=$("rsThead"),tbody=$("rsTbody");
+    if(!MODEL.length){tbody.innerHTML='<tr><td class="rs-empty" colspan="9">No data yet.</td></tr>';thead.innerHTML="";return;}
+    const cols=[{k:"ticker",t:"Ticker"},...TFS.map(t=>({k:t,t:t})),{k:"total",t:"Total"},{k:"rank",t:"Rank"}];
+    thead.innerHTML="<tr>"+cols.map(c=>{const arr=sortState.col===c.k?(sortState.dir==="asc"?"▲":"▼"):"";return '<th data-c="'+c.k+'">'+c.t+'<span class="rs-arr">'+arr+'</span></th>';}).join("")+"</tr>";
+    thead.querySelectorAll("th").forEach(th=>th.addEventListener("click",()=>{const c=th.dataset.c;if(sortState.col===c)sortState.dir=sortState.dir==="asc"?"desc":"asc";else{sortState.col=c;sortState.dir=(c==="ticker")?"asc":"desc";}render();}));
+    const Wn=normWeights();
+    const rows=currentRows();
+    tbody.innerHTML=rows.map(r=>{
+      let tds='<td class="rs-tk">'+r.ticker+'</td>';
+      TFS.forEach(tf=>{
+        if(r[tf]===null||r[tf]===undefined){tds+='<td style="color:var(--text3)">—</td>';return;}
+        const heatVal=weighted?(r[tf]/(Wn[tf]||1))*100:r[tf];
+        tds+='<td style="background:'+rsHeat(heatVal)+'">'+fmt(r[tf])+'</td>';
+      });
+      tds+='<td class="rs-tot" style="background:'+rsHeat(r.total)+'">'+fmt(r.total)+'</td>';
+      tds+='<td class="rs-rk">'+r.rank+'</td>';
+      return "<tr>"+tds+"</tr>";
+    }).join("");
+    $("rsTopn").max=MODEL.length;
+  }
+  function exportTxt(){
+    if(!MODEL.length){setStatus("Nothing to export — load a file first.","warn");return;}
+    let n=parseInt($("rsTopn").value)||0; n=Math.max(1,Math.min(n,MODEL.length));
+    const rows=currentRows().slice(0,n);
+    const syms=rows.map(r=>r.exportSym).filter(Boolean);
+    const blob=new Blob([syms.join(",")],{type:"text/plain"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="tv_watchlist_top"+n+".txt";a.click();
+    const tabName=activeTab==="z"?"Z-Score":"Percentile";
+    $("rsExportNote").textContent="Exported top "+n+" from the "+tabName+" tab in current sort order ("+sortState.col+" "+sortState.dir+"). Import via TradingView → watchlist name → Upload list.";
+  }
+  /* ---- init (lazy, on first tab open) ---- */
+  function init(){
+    if(inited)return; inited=true;
+    renderWeights();
+    const drop=$("rsDrop"),file=$("rsFile");
+    drop.addEventListener("click",()=>file.click());
+    file.addEventListener("change",e=>{if(e.target.files[0])loadFile(e.target.files[0]);});
+    ["dragover","dragenter"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over");}));
+    ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over");}));
+    drop.addEventListener("drop",e=>{if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);});
+    document.querySelectorAll("#page-rs .rs-tab").forEach(t=>t.addEventListener("click",()=>{
+      document.querySelectorAll("#page-rs .rs-tab").forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");activeTab=t.dataset.rstab;sortState={col:"total",dir:"desc"};render();
+    }));
+    $("rsModeTog").addEventListener("click",function(){weighted=!weighted;this.classList.toggle("on",weighted);$("rsModeLbl").textContent=weighted?"Weighted":"Unweighted";render();});
+    $("rsResetW").addEventListener("click",()=>{WEIGHTS={...DEFAULT_WEIGHTS};renderWeights();compute();});
+    $("rsRecalc").addEventListener("click",()=>compute());
+    $("rsCap").addEventListener("change",()=>compute());
+    $("rsExportBtn").addEventListener("click",exportTxt);
+    $("rsReload").addEventListener("click",()=>{setStatus("Reloading from cloud…","");cloudLoad();});
+    $("rsCloudState").textContent="Cloud: connected (rs_dataset)";
+    setStatus("Connecting to cloud…","");
+    cloudLoad();
+  }
+  window.RS={ensureInit:init};
+})();
+</script>
+</body></html>
