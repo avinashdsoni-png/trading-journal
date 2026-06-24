@@ -847,7 +847,7 @@ td {
 #page-rs .rs-note{font-size:12px;color:var(--text2);margin-top:6px}
 #page-rs code{background:var(--surface);padding:1px 5px;border-radius:4px;font-size:12px;color:var(--text)}
 </style>
-<script src="./index_files/chart.umd.min.js.download"></script><script src="./index_files/chart.umd.min(1).js.download"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="./index_files/chart.umd.min.js.download"></script><script src="./index_files/chart.umd.min(1).js.download"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
 <body>
 
@@ -930,6 +930,7 @@ td {
       <button class="nav-btn" onclick="showPage(&#39;funds&#39;,this)">💰 Funds</button>
       <button class="nav-btn" onclick="showPage(&#39;plan&#39;,this)">📐 Trading Plan</button>
       <button class="nav-btn" onclick="showPage(&#39;rs&#39;,this); if(window.RS) RS.ensureInit();">📈 RS Score</button>
+      <button class="nav-btn" onclick="showPage(&#39;tj&#39;,this); if(window.TJ) TJ.ensureInit();">📒 P&amp;L Journal</button>
     </div>
     <div class="topbar-right">
       <div class="balance-chip">Balance: <strong id="topbarBalance">$10,764.09</strong></div>
@@ -1697,6 +1698,82 @@ td {
           </table>
         </div>
         <div class="rs-note" id="rsExportNote"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ P&L JOURNAL PAGE ══ -->
+  <div class="page" id="page-tj">
+    <style>
+      #page-tj .tj-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px}
+      #page-tj .tj-h{font-weight:700;color:var(--accent);margin-bottom:10px;font-size:14px}
+      #page-tj .tj-drop{border:2px dashed var(--accent);border-radius:10px;padding:24px;text-align:center;cursor:pointer;color:var(--accent);background:var(--bg3);transition:.15s}
+      #page-tj .tj-drop:hover,#page-tj .tj-drop.over{background:var(--surface)}
+      #page-tj .tj-status{font-size:12px;margin-top:8px;color:var(--text2)}
+      #page-tj .tj-status.ok{color:var(--green)} #page-tj .tj-status.warn{color:var(--accent)} #page-tj .tj-status.err{color:var(--red)}
+      #page-tj .tj-ghost{background:transparent;color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px 12px;font-size:12px;cursor:pointer;font-weight:600}
+      #page-tj .tj-ghost:hover{background:var(--surface)}
+      #page-tj .tj-year{background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:13px;margin-left:6px}
+      #page-tj .tj-yearlbl{font-size:12px;color:var(--text2);display:flex;align-items:center}
+      #page-tj .tj-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+      #page-tj .tj-kpi{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px}
+      #page-tj .tj-kl{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
+      #page-tj .tj-kv{font-size:22px;font-weight:800;margin-top:6px;color:var(--text)}
+      #page-tj .tj-seg{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+      #page-tj .tj-seg button{padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg3);cursor:pointer;font-weight:600;color:var(--text2);font-size:12px}
+      #page-tj .tj-seg button.active{background:var(--surface);color:var(--accent);border-color:var(--accent)}
+      #page-tj .tj-tablewrap{max-height:560px;overflow:auto;border:1px solid var(--border);border-radius:8px}
+      #page-tj table.tj-table{border-collapse:collapse;width:100%;font-size:13px;min-width:680px}
+      #page-tj table.tj-table th,#page-tj table.tj-table td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text)}
+      #page-tj table.tj-table th:first-child,#page-tj table.tj-table td:first-child{text-align:left}
+      #page-tj table.tj-table th{position:sticky;top:0;background:var(--surface);color:var(--accent);font-size:12px}
+      #page-tj td.tj-tk{font-weight:700;color:var(--text)}
+      #page-tj .tj-win{color:var(--green);font-weight:600} #page-tj .tj-lose{color:var(--red);font-weight:600}
+      #page-tj .tj-dim{color:var(--text2)}
+      #page-tj tr.tj-mhead td{background:var(--bg3);color:var(--accent2);font-weight:700;text-align:left;font-size:12px;letter-spacing:.03em}
+      #page-tj tr.tj-sub td{background:var(--surface2);font-weight:700;border-top:1px solid var(--border2)}
+      #page-tj .tj-empty{padding:34px;text-align:center;color:var(--text2)}
+    </style>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">P&amp;L <span>JOURNAL</span></div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <label class="tj-yearlbl">Year<select id="tjYear" class="tj-year"></select></label>
+          <button class="tj-ghost" id="tjReload">↻ Reload</button>
+        </div>
+      </div>
+
+      <div class="tj-card">
+        <div id="tjDrop" class="tj-drop">
+          <div style="font-size:15px;font-weight:600">Drop Wealthsimple activities CSV here, or click to choose</div>
+          <div style="font-size:12px;margin-top:4px">Trades matched FIFO &middot; partial sells split into per-lot entries &middot; duplicates ignored &middot; stored in your cloud</div>
+          <input id="tjFile" type="file" accept=".csv" style="display:none">
+        </div>
+        <div id="tjStatus" class="tj-status">Open this tab to load your stored trades&hellip;</div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="tj-ghost" id="tjClear">Clear all stored trades</button>
+        </div>
+      </div>
+
+      <div class="tj-kpis" id="tjKpis"></div>
+
+      <div class="tj-card">
+        <div class="tj-h">Monthly Breakdown &middot; <span id="tjYearLab"></span></div>
+        <div class="tj-tablewrap"><table class="tj-table" id="tjMonthly"></table></div>
+      </div>
+
+      <div class="tj-seg" id="tjSeg">
+        <button data-f="all" class="active">All Closed</button>
+        <button data-f="profit">Profit</button>
+        <button data-f="loss">Loss</button>
+        <button data-f="active">Active</button>
+      </div>
+      <div class="tj-tablewrap"><table class="tj-table" id="tjMain"></table></div>
+
+      <div class="tj-card" style="margin-top:16px">
+        <div class="tj-h">Current Holdings</div>
+        <div class="tj-tablewrap"><table class="tj-table" id="tjHold"></table></div>
       </div>
     </div>
   </div>
@@ -2973,5 +3050,220 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   }
   window.RS={ensureInit:init};
 })();
+</script>
+<script>
+/* ══ P&L JOURNAL (TJ) — FIFO lot engine, scoped, mirrors RS module ══ */
+(function(){
+  const TJ_SB_URL="https://jpkniqmqoizscqdkaxag.supabase.co";
+  const TJ_SB_KEY="sb_publishable_SKiVUnE0b4BkDh9JPRT0Ng_pYgjLErJ";
+  const TBL="journal_executions";
+  const HDR ={apikey:TJ_SB_KEY,Authorization:"Bearer "+TJ_SB_KEY};
+  const HDRJ={apikey:TJ_SB_KEY,Authorization:"Bearer "+TJ_SB_KEY,"Content-Type":"application/json"};
+  const EPS=1e-6;
+  let inited=false, EXECS=[], CLOSED=[], ACTIVE=[], YEAR=null, FILTER='all';
+
+  const $=id=>document.getElementById(id);
+  const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function setStatus(m,c){const e=$('tjStatus');if(e){e.textContent=m;e.className='tj-status '+(c||'');}}
+  function money(v){v=+v||0;const s=v<0?'-':'';return s+'$'+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function qf(q){return (Math.round((+q)*10000)/10000).toString();}
+  function df(d){if(!d)return '—';const p=String(d).slice(0,10).split('-');if(p.length<3)return d;return MN[(+p[1])-1]+' '+p[2]+', '+p[0];}
+  function mf(ym){const p=ym.split('-');return MN[(+p[1])-1]+' '+p[0];}
+
+  /* ---------- parse + executions ---------- */
+  function parseCSV(text){const r=Papa.parse(text,{header:true,skipEmptyLines:true});return r.data||[];}
+  function toExecs(rows){
+    const ex=[];
+    rows.forEach((r,i)=>{
+      if(((r.activity_type||'').trim())!=='Trade')return;
+      const side=((r.activity_sub_type||'').trim().toUpperCase());
+      if(side!=='BUY'&&side!=='SELL')return;
+      const qty=Math.abs(parseFloat(r.quantity));
+      const px=parseFloat(r.unit_price);
+      if(!(qty>0)||!isFinite(px))return;
+      const comm=parseFloat(r.commission||'0')||0;
+      const date=(r.transaction_date||'').trim();
+      const sym=(r.symbol||'').trim();
+      const net=(r.net_cash_amount||'').trim();
+      const acct=(r.account_id||'').trim();
+      const cur=(r.currency||'').trim();
+      const sig=[acct,date,sym,side,qty,px,net].join('|');
+      ex.push({date,sym,side,qty,px,comm,cur,acct,sig,fidx:i});
+    });
+    const cnt={};
+    ex.forEach(e=>{cnt[e.sig]=(cnt[e.sig]||0)+1;e.key=e.sig+'#'+cnt[e.sig];});
+    return ex;
+  }
+
+  /* ---------- supabase ---------- */
+  async function upsert(execs){
+    const rows=execs.map(e=>({exec_key:e.key,txn_date:e.date,symbol:e.sym,side:e.side,qty:e.qty,price:e.px,commission:e.comm,currency:e.cur,account_id:e.acct,raw_idx:e.fidx}));
+    for(let i=0;i<rows.length;i+=400){
+      const chunk=rows.slice(i,i+400);
+      const res=await fetch(TJ_SB_URL+"/rest/v1/"+TBL,{method:'POST',headers:{...HDRJ,Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify(chunk)});
+      if(!res.ok)throw new Error("Upsert "+res.status+": "+(await res.text()));
+    }
+  }
+  async function fetchAll(){
+    let all=[],from=0;const page=1000;
+    while(true){
+      const res=await fetch(TJ_SB_URL+"/rest/v1/"+TBL+"?select=*&order=txn_date.asc,raw_idx.asc",{headers:{...HDR,"Range-Unit":"items",Range:from+"-"+(from+page-1)}});
+      if(!res.ok)throw new Error("Fetch "+res.status+": "+(await res.text()));
+      const d=await res.json();all=all.concat(d);
+      if(d.length<page)break;from+=page;
+    }
+    return all;
+  }
+  async function clearAll(){
+    if(!confirm('Delete ALL stored trade executions from the cloud? This cannot be undone.'))return;
+    try{
+      const res=await fetch(TJ_SB_URL+"/rest/v1/"+TBL+"?exec_key=neq.__none__",{method:'DELETE',headers:{...HDR,Prefer:'return=minimal'}});
+      if(!res.ok)throw new Error(res.status+": "+(await res.text()));
+      await load();setStatus('All stored trades cleared.','ok');
+    }catch(e){setStatus('Clear error: '+e.message,'err');}
+  }
+
+  /* ---------- FIFO engine ---------- */
+  function compute(execs){
+    const arr=execs.slice().sort((a,b)=>{
+      const ad=(a.txn_date||''),bd=(b.txn_date||'');
+      if(ad!==bd)return ad<bd?-1:1;
+      const ar=a.side==='BUY'?0:1,br=b.side==='BUY'?0:1;
+      if(ar!==br)return ar-br;
+      return (+a.raw_idx||0)-(+b.raw_idx||0);
+    });
+    const lots={},closed=[];
+    for(const e of arr){
+      const s=e.symbol,qty=+e.qty,px=+e.price,comm=+e.commission||0;
+      if(!lots[s])lots[s]=[];
+      if(e.side==='BUY'){
+        lots[s].push({qty,px,date:e.txn_date,cps:qty?comm/qty:0});
+      }else{
+        let remain=qty;const scps=qty?comm/qty:0;
+        while(remain>EPS&&lots[s].length){
+          const lot=lots[s][0];
+          const take=Math.min(remain,lot.qty);
+          const pnl=(px-lot.px)*take-scps*take-lot.cps*take;
+          closed.push({sym:s,bdate:lot.date,sdate:e.txn_date,qty:take,bpx:lot.px,spx:px,pnl});
+          lot.qty-=take;remain-=take;
+          if(lot.qty<=EPS)lots[s].shift();
+        }
+      }
+    }
+    const active=[];
+    for(const s in lots)for(const lot of lots[s])if(lot.qty>EPS)active.push({sym:s,bdate:lot.date,qty:lot.qty,bpx:lot.px});
+    return {closed,active};
+  }
+
+  /* ---------- render ---------- */
+  function fillYears(){
+    const sel=$('tjYear');const ys=new Set();
+    CLOSED.forEach(c=>ys.add(String(c.sdate).slice(0,4)));
+    ACTIVE.forEach(a=>ys.add(String(a.bdate).slice(0,4)));
+    ys.add(String(new Date().getFullYear()));
+    const arr=[...ys].filter(Boolean).sort();
+    if(!YEAR||!ys.has(YEAR))YEAR=arr[arr.length-1];
+    sel.innerHTML=arr.map(y=>'<option value="'+y+'"'+(y===YEAR?' selected':'')+'>'+y+'</option>').join('');
+  }
+  function renderKpis(){
+    const yr=CLOSED.filter(c=>String(c.sdate).slice(0,4)===YEAR);
+    const gp=yr.filter(c=>c.pnl>0).reduce((s,c)=>s+c.pnl,0);
+    const gl=yr.filter(c=>c.pnl<=0).reduce((s,c)=>s+c.pnl,0);
+    const net=gp+gl;
+    $('tjKpis').innerHTML=
+      '<div class="tj-kpi"><div class="tj-kl">Closed Trades · '+YEAR+'</div><div class="tj-kv">'+yr.length+'</div></div>'+
+      '<div class="tj-kpi"><div class="tj-kl">Gross Profit</div><div class="tj-kv tj-win">'+money(gp)+'</div></div>'+
+      '<div class="tj-kpi"><div class="tj-kl">Gross Loss</div><div class="tj-kv tj-lose">'+money(gl)+'</div></div>'+
+      '<div class="tj-kpi"><div class="tj-kl">Net P&amp;L · '+YEAR+'</div><div class="tj-kv '+(net>=0?'tj-win':'tj-lose')+'">'+money(net)+'</div></div>';
+  }
+  function renderMonthly(){
+    $('tjYearLab').textContent=YEAR;
+    const yr=CLOSED.filter(c=>String(c.sdate).slice(0,4)===YEAR);
+    const byM={};
+    yr.forEach(c=>{const m=String(c.sdate).slice(5,7);const o=byM[m]=byM[m]||{n:0,p:0,l:0};o.n++;if(c.pnl>0)o.p+=c.pnl;else o.l+=c.pnl;});
+    let h='<thead><tr><th>Month</th><th>Trades</th><th>Profit</th><th>Loss</th><th>Net</th></tr></thead><tbody>';
+    let TN=0,TP=0,TL=0;
+    for(let i=1;i<=12;i++){const mm=String(i).padStart(2,'0');const o=byM[mm];if(!o)continue;TN+=o.n;TP+=o.p;TL+=o.l;
+      h+='<tr><td>'+MN[i-1]+'</td><td>'+o.n+'</td><td class="tj-win">'+money(o.p)+'</td><td class="tj-lose">'+money(o.l)+'</td><td class="'+((o.p+o.l)>=0?'tj-win':'tj-lose')+'">'+money(o.p+o.l)+'</td></tr>';}
+    if(TN===0)h+='<tr><td colspan="5" class="tj-empty">No closed trades this year.</td></tr>';
+    else h+='<tr class="tj-sub"><td>TOTAL</td><td>'+TN+'</td><td class="tj-win">'+money(TP)+'</td><td class="tj-lose">'+money(TL)+'</td><td class="'+((TP+TL)>=0?'tj-win':'tj-lose')+'">'+money(TP+TL)+'</td></tr>';
+    $('tjMonthly').innerHTML=h+'</tbody>';
+  }
+  function renderMain(){
+    const t=$('tjMain');
+    if(FILTER==='active'){
+      let h='<thead><tr><th>Symbol</th><th>Date Bought</th><th>Date Sold</th><th>Qty</th><th>Buy Price</th><th>Cost</th></tr></thead><tbody>';
+      const list=ACTIVE.slice().sort((a,b)=>a.sym!==b.sym?(a.sym<b.sym?-1:1):(a.bdate<b.bdate?-1:1));
+      if(!list.length)h+='<tr><td colspan="6" class="tj-empty">No open positions.</td></tr>';
+      list.forEach(a=>{h+='<tr><td class="tj-tk">'+a.sym+'</td><td>'+df(a.bdate)+'</td><td class="tj-dim">—</td><td>'+qf(a.qty)+'</td><td>'+money(a.bpx)+'</td><td>'+money(a.qty*a.bpx)+'</td></tr>';});
+      t.innerHTML=h+'</tbody>';return;
+    }
+    let rows=CLOSED.filter(c=>String(c.sdate).slice(0,4)===YEAR);
+    if(FILTER==='profit')rows=rows.filter(c=>c.pnl>0);
+    if(FILTER==='loss')rows=rows.filter(c=>c.pnl<=0);
+    const byM={};rows.forEach(c=>{const m=String(c.sdate).slice(0,7);(byM[m]=byM[m]||[]).push(c);});
+    const months=Object.keys(byM).sort();
+    let h='<thead><tr><th>Symbol</th><th>Date Bought</th><th>Date Sold</th><th>Qty</th><th>Buy</th><th>Sell</th><th>P&amp;L</th></tr></thead><tbody>';
+    if(!months.length)h+='<tr><td colspan="7" class="tj-empty">No '+(FILTER==='all'?'closed':FILTER)+' trades for '+YEAR+'.</td></tr>';
+    months.forEach(m=>{
+      const list=byM[m].slice().sort((a,b)=>a.sdate!==b.sdate?(a.sdate<b.sdate?-1:1):(a.sym<b.sym?-1:1));
+      h+='<tr class="tj-mhead"><td colspan="7">'+mf(m)+'</td></tr>';
+      let mp=0,ml=0;
+      list.forEach(c=>{const cls=c.pnl>0?'tj-win':'tj-lose';if(c.pnl>0)mp+=c.pnl;else ml+=c.pnl;
+        h+='<tr><td class="tj-tk">'+c.sym+'</td><td>'+df(c.bdate)+'</td><td>'+df(c.sdate)+'</td><td>'+qf(c.qty)+'</td><td>'+money(c.bpx)+'</td><td>'+money(c.spx)+'</td><td class="'+cls+'">'+money(c.pnl)+'</td></tr>';});
+      h+='<tr class="tj-sub"><td colspan="3">'+list.length+' trade'+(list.length!==1?'s':'')+'</td><td colspan="2" class="tj-win">'+money(mp)+'</td><td class="tj-lose">'+money(ml)+'</td><td class="'+((mp+ml)>=0?'tj-win':'tj-lose')+'">'+money(mp+ml)+'</td></tr>';
+    });
+    t.innerHTML=h+'</tbody>';
+  }
+  function renderHold(){
+    const agg={};ACTIVE.forEach(a=>{const o=agg[a.sym]=agg[a.sym]||{q:0,c:0};o.q+=a.qty;o.c+=a.qty*a.bpx;});
+    const syms=Object.keys(agg).sort();
+    let h='<thead><tr><th>Symbol</th><th>Shares Held</th><th>Avg Cost</th><th>Cost Basis</th></tr></thead><tbody>';
+    if(!syms.length)h+='<tr><td colspan="4" class="tj-empty">No open positions.</td></tr>';
+    let TC=0;syms.forEach(s=>{const o=agg[s];TC+=o.c;h+='<tr><td class="tj-tk">'+s+'</td><td>'+qf(o.q)+'</td><td>'+money(o.c/o.q)+'</td><td>'+money(o.c)+'</td></tr>';});
+    if(syms.length)h+='<tr class="tj-sub"><td colspan="3">Total cost basis</td><td>'+money(TC)+'</td></tr>';
+    $('tjHold').innerHTML=h+'</tbody>';
+  }
+  function renderAll(){fillYears();renderKpis();renderMonthly();renderMain();renderHold();}
+
+  /* ---------- flow ---------- */
+  async function load(){
+    setStatus('Loading stored trades…');
+    try{
+      EXECS=await fetchAll();
+      const r=compute(EXECS);CLOSED=r.closed;ACTIVE=r.active;
+      renderAll();
+      setStatus(EXECS.length?('Loaded '+EXECS.length+' executions · '+CLOSED.length+' closed · '+ACTIVE.length+' open lots'):'No stored trades yet — upload a CSV to begin.', EXECS.length?'ok':'warn');
+    }catch(e){setStatus('Load error: '+e.message+'  (run the journal_executions SQL?)','err');}
+  }
+  async function handleFile(file){
+    try{
+      setStatus('Parsing '+file.name+'…');
+      const text=await file.text();
+      const execs=toExecs(parseCSV(text));
+      if(!execs.length){setStatus('No "Trade" rows found in this CSV.','warn');return;}
+      setStatus('Uploading '+execs.length+' trade rows (deduplicating)…');
+      await upsert(execs);
+      await load();
+      setStatus('Imported '+file.name+' · '+execs.length+' trade rows processed (duplicates skipped)','ok');
+    }catch(e){setStatus('Import error: '+e.message,'err');}
+  }
+  function init(){
+    if(inited)return;inited=true;
+    const drop=$('tjDrop'),file=$('tjFile');
+    drop.addEventListener('click',()=>file.click());
+    file.addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0]);file.value='';});
+    ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+    ['dragleave'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
+    drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');const f=e.dataTransfer.files[0];if(f)handleFile(f);});
+    $('tjYear').addEventListener('change',e=>{YEAR=e.target.value;renderKpis();renderMonthly();renderMain();});
+    $('tjReload').addEventListener('click',load);
+    $('tjClear').addEventListener('click',clearAll);
+    $('tjSeg').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{$('tjSeg').querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active');FILTER=b.dataset.f;renderMain();}));
+    load();
+  }
+  window.TJ={ensureInit:init};
+})();
+
 </script>
 </body></html>
