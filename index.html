@@ -1716,22 +1716,37 @@ td {
       #page-tj .tj-ghost:hover{background:var(--surface)}
       #page-tj .tj-year{background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:13px;margin-left:6px}
       #page-tj .tj-yearlbl{font-size:12px;color:var(--text2);display:flex;align-items:center}
-      #page-tj .tj-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+      #page-tj .tj-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
       #page-tj .tj-kpi{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px}
       #page-tj .tj-kl{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
       #page-tj .tj-kv{font-size:22px;font-weight:800;margin-top:6px;color:var(--text)}
-      #page-tj .tj-seg{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+      #page-tj .tj-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+      #page-tj .tj-seg{display:flex;gap:6px;flex-wrap:wrap}
       #page-tj .tj-seg button{padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg3);cursor:pointer;font-weight:600;color:var(--text2);font-size:12px}
       #page-tj .tj-seg button.active{background:var(--surface);color:var(--accent);border-color:var(--accent)}
-      #page-tj .tj-tablewrap{max-height:560px;overflow:auto;border:1px solid var(--border);border-radius:8px}
+      #page-tj .tj-search{background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;min-width:150px}
+      #page-tj .tj-search:focus{border-color:var(--accent);outline:none}
+      #page-tj .tj-tablewrap{max-height:580px;overflow:auto;border:1px solid var(--border);border-radius:8px}
       #page-tj table.tj-table{border-collapse:collapse;width:100%;font-size:13px;min-width:680px}
       #page-tj table.tj-table th,#page-tj table.tj-table td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text)}
       #page-tj table.tj-table th:first-child,#page-tj table.tj-table td:first-child{text-align:left}
       #page-tj table.tj-table th{position:sticky;top:0;background:var(--surface);color:var(--accent);font-size:12px}
-      #page-tj td.tj-tk{font-weight:700;color:var(--text)}
+      #page-tj table.tj-table th[data-sort]{cursor:pointer;user-select:none}
+      #page-tj table.tj-table th[data-sort]:hover{background:var(--surface2)}
+      #page-tj th .tj-sarr{font-size:9px;color:var(--accent);margin-left:3px}
+      #page-tj td.tj-tk{font-weight:700;color:var(--text);cursor:pointer}
+      #page-tj td.tj-tk:hover{color:var(--accent)}
       #page-tj .tj-win{color:var(--green);font-weight:600} #page-tj .tj-lose{color:var(--red);font-weight:600}
       #page-tj .tj-dim{color:var(--text2)}
-      #page-tj tr.tj-mhead td{background:var(--bg3);color:var(--accent2);font-weight:700;text-align:left;font-size:12px;letter-spacing:.03em}
+      #page-tj tr.tj-rw td{background:rgba(61,214,140,.055)} #page-tj tr.tj-rl td{background:rgba(240,82,82,.055)}
+      #page-tj tbody tr.tj-data:hover td{background:var(--surface)}
+      #page-tj tr.tj-mhead{cursor:pointer}
+      #page-tj tr.tj-mhead td{background:var(--bg3);padding:0;border-bottom:1px solid var(--border2)}
+      #page-tj tr.tj-mhead:hover td{background:var(--surface)}
+      #page-tj .tj-mh{display:flex;align-items:center;gap:10px;padding:9px 10px;color:var(--accent2);font-weight:700;font-size:12px;letter-spacing:.02em}
+      #page-tj .tj-arrow{display:inline-block;width:12px;text-align:center;color:var(--accent)}
+      #page-tj .tj-mtot{margin-left:auto;display:flex;gap:16px;font-size:12px;font-weight:600;align-items:center}
+      #page-tj .tj-mtot .tj-dim{font-weight:500}
       #page-tj tr.tj-sub td{background:var(--surface2);font-weight:700;border-top:1px solid var(--border2)}
       #page-tj .tj-empty{padding:34px;text-align:center;color:var(--text2)}
     </style>
@@ -1763,11 +1778,18 @@ td {
         <div class="tj-tablewrap"><table class="tj-table" id="tjMonthly"></table></div>
       </div>
 
-      <div class="tj-seg" id="tjSeg">
-        <button data-f="all" class="active">All Closed</button>
-        <button data-f="profit">Profit</button>
-        <button data-f="loss">Loss</button>
-        <button data-f="active">Active</button>
+      <div class="tj-toolbar">
+        <div class="tj-seg" id="tjSeg">
+          <button data-f="all" class="active">All Closed</button>
+          <button data-f="profit">Profit</button>
+          <button data-f="loss">Loss</button>
+          <button data-f="active">Active</button>
+        </div>
+        <input id="tjSearch" class="tj-search" type="text" placeholder="Filter symbol&hellip;">
+        <div style="display:flex;gap:6px;margin-left:auto">
+          <button class="tj-ghost" id="tjCollapseAll">&#8863; Collapse all</button>
+          <button class="tj-ghost" id="tjExpandAll">&#8862; Expand all</button>
+        </div>
       </div>
       <div class="tj-tablewrap"><table class="tj-table" id="tjMain"></table></div>
 
@@ -2815,7 +2837,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   const RS_SB_KEY = "sb_publishable_SKiVUnE0b4BkDh9JPRT0Ng_pYgjLErJ";
   const RS_TABLE  = "rs_dataset";
   const TFS = ["1W","1M","3M","6M","1Y","5Y"];
-  const DEFAULT_WEIGHTS = {"1W":8,"1M":28,"3M":26,"6M":24,"1Y":10,"5Y":4};
+  const DEFAULT_WEIGHTS = {"1W":10,"1M":20,"3M":30,"6M":25,"1Y":10,"5Y":5};
 
   let RAW=[], HEADERS=[], MAP={}, WEIGHTS={...DEFAULT_WEIGHTS}, CAP=2, MODEL=[];
   let activeTab="z", weighted=true, sortState={col:"total",dir:"desc"}, inited=false;
@@ -3061,6 +3083,8 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   const HDRJ={apikey:TJ_SB_KEY,Authorization:"Bearer "+TJ_SB_KEY,"Content-Type":"application/json"};
   const EPS=1e-6;
   let inited=false, EXECS=[], CLOSED=[], ACTIVE=[], YEAR=null, FILTER='all';
+  let SEARCH='', SORT={col:null,dir:'asc'}, HSORT={col:null,dir:'asc'};
+  const COLLAPSED=new Set();
 
   const $=id=>document.getElementById(id);
   const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -3069,6 +3093,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   function qf(q){return (Math.round((+q)*10000)/10000).toString();}
   function df(d){if(!d)return '—';const p=String(d).slice(0,10).split('-');if(p.length<3)return d;return MN[(+p[1])-1]+' '+p[2]+', '+p[0];}
   function mf(ym){const p=ym.split('-');return MN[(+p[1])-1]+' '+p[0];}
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
   /* ---------- parse + executions ---------- */
   function parseCSV(text){const r=Papa.parse(text,{header:true,skipEmptyLines:true});return r.data||[];}
@@ -3155,6 +3180,31 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     return {closed,active};
   }
 
+  /* ---------- helpers for sort/filter/render ---------- */
+  function matchSearch(sym){return !SEARCH || String(sym).toUpperCase().includes(SEARCH);}
+  function headHTML(cols,sort){
+    return '<thead><tr>'+cols.map(c=>{
+      const arr=sort.col===c.k?('<span class="tj-sarr">'+(sort.dir==='asc'?'▲':'▼')+'</span>'):'';
+      return '<th data-sort="'+c.k+'">'+c.l+arr+'</th>';
+    }).join('')+'</tr></thead>';
+  }
+  function sortBy(rows,sort,deflt){
+    const c=sort.col,d=sort.dir,arr=rows.slice();
+    arr.sort((a,b)=>{
+      if(!c)return deflt(a,b);
+      let x=a[c],y=b[c];
+      if(c==='cost'){x=a.qty*a.bpx;y=b.qty*b.bpx;}
+      let r=(typeof x==='number'&&typeof y==='number')?x-y:String(x==null?'':x).localeCompare(String(y==null?'':y));
+      return d==='asc'?r:-r;
+    });
+    return arr;
+  }
+  function monthsForYear(){
+    const set=new Set();
+    CLOSED.forEach(c=>{if(String(c.sdate).slice(0,4)===YEAR)set.add(String(c.sdate).slice(0,7));});
+    return [...set];
+  }
+
   /* ---------- render ---------- */
   function fillYears(){
     const sel=$('tjYear');const ys=new Set();
@@ -3167,14 +3217,18 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   }
   function renderKpis(){
     const yr=CLOSED.filter(c=>String(c.sdate).slice(0,4)===YEAR);
-    const gp=yr.filter(c=>c.pnl>0).reduce((s,c)=>s+c.pnl,0);
-    const gl=yr.filter(c=>c.pnl<=0).reduce((s,c)=>s+c.pnl,0);
-    const net=gp+gl;
+    const wins=yr.filter(c=>c.pnl>0),loss=yr.filter(c=>c.pnl<=0);
+    const gp=wins.reduce((s,c)=>s+c.pnl,0),gl=loss.reduce((s,c)=>s+c.pnl,0),net=gp+gl;
+    const wr=yr.length?(wins.length/yr.length*100):0;
+    const pf=gl!==0?(gp/Math.abs(gl)):(gp>0?Infinity:0);
+    const pfTxt=pf===Infinity?'∞':pf.toFixed(2);
     $('tjKpis').innerHTML=
       '<div class="tj-kpi"><div class="tj-kl">Closed Trades · '+YEAR+'</div><div class="tj-kv">'+yr.length+'</div></div>'+
+      '<div class="tj-kpi"><div class="tj-kl">Win Rate</div><div class="tj-kv '+(wr>=50?'tj-win':'tj-lose')+'">'+wr.toFixed(1)+'%</div></div>'+
       '<div class="tj-kpi"><div class="tj-kl">Gross Profit</div><div class="tj-kv tj-win">'+money(gp)+'</div></div>'+
       '<div class="tj-kpi"><div class="tj-kl">Gross Loss</div><div class="tj-kv tj-lose">'+money(gl)+'</div></div>'+
-      '<div class="tj-kpi"><div class="tj-kl">Net P&amp;L · '+YEAR+'</div><div class="tj-kv '+(net>=0?'tj-win':'tj-lose')+'">'+money(net)+'</div></div>';
+      '<div class="tj-kpi"><div class="tj-kl">Net P&amp;L · '+YEAR+'</div><div class="tj-kv '+(net>=0?'tj-win':'tj-lose')+'">'+money(net)+'</div></div>'+
+      '<div class="tj-kpi"><div class="tj-kl">Profit Factor</div><div class="tj-kv '+(pf>=1?'tj-win':'tj-lose')+'">'+pfTxt+'</div></div>';
   }
   function renderMonthly(){
     $('tjYearLab').textContent=YEAR;
@@ -3189,39 +3243,50 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     else h+='<tr class="tj-sub"><td>TOTAL</td><td>'+TN+'</td><td class="tj-win">'+money(TP)+'</td><td class="tj-lose">'+money(TL)+'</td><td class="'+((TP+TL)>=0?'tj-win':'tj-lose')+'">'+money(TP+TL)+'</td></tr>';
     $('tjMonthly').innerHTML=h+'</tbody>';
   }
+  const CLOSED_COLS=[{k:'sym',l:'Symbol'},{k:'bdate',l:'Date Bought'},{k:'sdate',l:'Date Sold'},{k:'qty',l:'Qty'},{k:'bpx',l:'Buy'},{k:'spx',l:'Sell'},{k:'pnl',l:'P&amp;L'}];
+  const ACTIVE_COLS=[{k:'sym',l:'Symbol'},{k:'bdate',l:'Date Bought'},{k:'sdate',l:'Date Sold'},{k:'qty',l:'Qty'},{k:'bpx',l:'Buy Price'},{k:'cost',l:'Cost'}];
   function renderMain(){
     const t=$('tjMain');
     if(FILTER==='active'){
-      let h='<thead><tr><th>Symbol</th><th>Date Bought</th><th>Date Sold</th><th>Qty</th><th>Buy Price</th><th>Cost</th></tr></thead><tbody>';
-      const list=ACTIVE.slice().sort((a,b)=>a.sym!==b.sym?(a.sym<b.sym?-1:1):(a.bdate<b.bdate?-1:1));
-      if(!list.length)h+='<tr><td colspan="6" class="tj-empty">No open positions.</td></tr>';
-      list.forEach(a=>{h+='<tr><td class="tj-tk">'+a.sym+'</td><td>'+df(a.bdate)+'</td><td class="tj-dim">—</td><td>'+qf(a.qty)+'</td><td>'+money(a.bpx)+'</td><td>'+money(a.qty*a.bpx)+'</td></tr>';});
+      let rows=ACTIVE.filter(a=>matchSearch(a.sym));
+      rows=sortBy(rows,SORT,(a,b)=>a.sym!==b.sym?(a.sym<b.sym?-1:1):(a.bdate<b.bdate?-1:1));
+      let h=headHTML(ACTIVE_COLS,SORT)+'<tbody>';
+      if(!rows.length)h+='<tr><td colspan="6" class="tj-empty">No open positions'+(SEARCH?' match "'+esc(SEARCH)+'"':'')+'.</td></tr>';
+      rows.forEach(a=>{h+='<tr class="tj-data tj-rw"><td class="tj-tk" data-sym="'+esc(a.sym)+'">'+esc(a.sym)+'</td><td>'+df(a.bdate)+'</td><td class="tj-dim">—</td><td>'+qf(a.qty)+'</td><td>'+money(a.bpx)+'</td><td>'+money(a.qty*a.bpx)+'</td></tr>';});
       t.innerHTML=h+'</tbody>';return;
     }
-    let rows=CLOSED.filter(c=>String(c.sdate).slice(0,4)===YEAR);
+    let rows=CLOSED.filter(c=>String(c.sdate).slice(0,4)===YEAR && matchSearch(c.sym));
     if(FILTER==='profit')rows=rows.filter(c=>c.pnl>0);
     if(FILTER==='loss')rows=rows.filter(c=>c.pnl<=0);
     const byM={};rows.forEach(c=>{const m=String(c.sdate).slice(0,7);(byM[m]=byM[m]||[]).push(c);});
     const months=Object.keys(byM).sort();
-    let h='<thead><tr><th>Symbol</th><th>Date Bought</th><th>Date Sold</th><th>Qty</th><th>Buy</th><th>Sell</th><th>P&amp;L</th></tr></thead><tbody>';
-    if(!months.length)h+='<tr><td colspan="7" class="tj-empty">No '+(FILTER==='all'?'closed':FILTER)+' trades for '+YEAR+'.</td></tr>';
+    let h=headHTML(CLOSED_COLS,SORT)+'<tbody>';
+    if(!months.length)h+='<tr><td colspan="7" class="tj-empty">No '+(FILTER==='all'?'closed':FILTER)+' trades for '+YEAR+(SEARCH?' / "'+esc(SEARCH)+'"':'')+'.</td></tr>';
     months.forEach(m=>{
-      const list=byM[m].slice().sort((a,b)=>a.sdate!==b.sdate?(a.sdate<b.sdate?-1:1):(a.sym<b.sym?-1:1));
-      h+='<tr class="tj-mhead"><td colspan="7">'+mf(m)+'</td></tr>';
-      let mp=0,ml=0;
-      list.forEach(c=>{const cls=c.pnl>0?'tj-win':'tj-lose';if(c.pnl>0)mp+=c.pnl;else ml+=c.pnl;
-        h+='<tr><td class="tj-tk">'+c.sym+'</td><td>'+df(c.bdate)+'</td><td>'+df(c.sdate)+'</td><td>'+qf(c.qty)+'</td><td>'+money(c.bpx)+'</td><td>'+money(c.spx)+'</td><td class="'+cls+'">'+money(c.pnl)+'</td></tr>';});
-      h+='<tr class="tj-sub"><td colspan="3">'+list.length+' trade'+(list.length!==1?'s':'')+'</td><td colspan="2" class="tj-win">'+money(mp)+'</td><td class="tj-lose">'+money(ml)+'</td><td class="'+((mp+ml)>=0?'tj-win':'tj-lose')+'">'+money(mp+ml)+'</td></tr>';
+      const list=sortBy(byM[m],SORT,(a,b)=>a.sdate!==b.sdate?(a.sdate<b.sdate?-1:1):(a.sym<b.sym?-1:1));
+      let mp=0,ml=0;list.forEach(c=>{if(c.pnl>0)mp+=c.pnl;else ml+=c.pnl;});
+      const collapsed=COLLAPSED.has(m);
+      h+='<tr class="tj-mhead" data-m="'+m+'"><td colspan="7"><div class="tj-mh">'+
+         '<span class="tj-arrow">'+(collapsed?'▸':'▾')+'</span>'+mf(m)+
+         '<span class="tj-mtot"><span class="tj-dim">'+list.length+' trade'+(list.length!==1?'s':'')+'</span>'+
+         '<span class="tj-win">'+money(mp)+'</span><span class="tj-lose">'+money(ml)+'</span>'+
+         '<span class="'+((mp+ml)>=0?'tj-win':'tj-lose')+'">net '+money(mp+ml)+'</span></span></div></td></tr>';
+      if(!collapsed){
+        list.forEach(c=>{const cls=c.pnl>0?'tj-win':'tj-lose';const rcls=c.pnl>0?'tj-rw':'tj-rl';
+          h+='<tr class="tj-data '+rcls+'"><td class="tj-tk" data-sym="'+esc(c.sym)+'">'+esc(c.sym)+'</td><td>'+df(c.bdate)+'</td><td>'+df(c.sdate)+'</td><td>'+qf(c.qty)+'</td><td>'+money(c.bpx)+'</td><td>'+money(c.spx)+'</td><td class="'+cls+'">'+money(c.pnl)+'</td></tr>';});
+      }
     });
     t.innerHTML=h+'</tbody>';
   }
+  const HOLD_COLS=[{k:'sym',l:'Symbol'},{k:'q',l:'Shares Held'},{k:'avg',l:'Avg Cost'},{k:'cost',l:'Cost Basis'}];
   function renderHold(){
-    const agg={};ACTIVE.forEach(a=>{const o=agg[a.sym]=agg[a.sym]||{q:0,c:0};o.q+=a.qty;o.c+=a.qty*a.bpx;});
-    const syms=Object.keys(agg).sort();
-    let h='<thead><tr><th>Symbol</th><th>Shares Held</th><th>Avg Cost</th><th>Cost Basis</th></tr></thead><tbody>';
-    if(!syms.length)h+='<tr><td colspan="4" class="tj-empty">No open positions.</td></tr>';
-    let TC=0;syms.forEach(s=>{const o=agg[s];TC+=o.c;h+='<tr><td class="tj-tk">'+s+'</td><td>'+qf(o.q)+'</td><td>'+money(o.c/o.q)+'</td><td>'+money(o.c)+'</td></tr>';});
-    if(syms.length)h+='<tr class="tj-sub"><td colspan="3">Total cost basis</td><td>'+money(TC)+'</td></tr>';
+    const agg={};ACTIVE.forEach(a=>{if(!matchSearch(a.sym))return;const o=agg[a.sym]=agg[a.sym]||{sym:a.sym,q:0,cost:0};o.q+=a.qty;o.cost+=a.qty*a.bpx;});
+    let rows=Object.values(agg).map(o=>({...o,avg:o.cost/o.q}));
+    rows=sortBy(rows,HSORT,(a,b)=>a.sym<b.sym?-1:a.sym>b.sym?1:0);
+    let h=headHTML(HOLD_COLS,HSORT)+'<tbody>';
+    if(!rows.length)h+='<tr><td colspan="4" class="tj-empty">No open positions'+(SEARCH?' match "'+esc(SEARCH)+'"':'')+'.</td></tr>';
+    let TC=0;rows.forEach(o=>{TC+=o.cost;h+='<tr class="tj-data"><td class="tj-tk" data-sym="'+esc(o.sym)+'">'+esc(o.sym)+'</td><td>'+qf(o.q)+'</td><td>'+money(o.avg)+'</td><td>'+money(o.cost)+'</td></tr>';});
+    if(rows.length)h+='<tr class="tj-sub"><td colspan="3">Total cost basis</td><td>'+money(TC)+'</td></tr>';
     $('tjHold').innerHTML=h+'</tbody>';
   }
   function renderAll(){fillYears();renderKpis();renderMonthly();renderMain();renderHold();}
@@ -3248,6 +3313,22 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       setStatus('Imported '+file.name+' · '+execs.length+' trade rows processed (duplicates skipped)','ok');
     }catch(e){setStatus('Import error: '+e.message,'err');}
   }
+
+  /* ---------- interactions ---------- */
+  function onMainClick(e){
+    const th=e.target.closest('th[data-sort]');
+    if(th){const k=th.getAttribute('data-sort');if(SORT.col===k)SORT.dir=SORT.dir==='asc'?'desc':'asc';else{SORT.col=k;SORT.dir='asc';}renderMain();return;}
+    const mh=e.target.closest('tr.tj-mhead');
+    if(mh){const m=mh.getAttribute('data-m');if(COLLAPSED.has(m))COLLAPSED.delete(m);else COLLAPSED.add(m);renderMain();return;}
+    const tk=e.target.closest('td.tj-tk');
+    if(tk){const sym=tk.getAttribute('data-sym')||tk.textContent.trim();const box=$('tjSearch');box.value=sym;SEARCH=sym.toUpperCase();renderMain();renderHold();return;}
+  }
+  function onHoldClick(e){
+    const th=e.target.closest('th[data-sort]');
+    if(th){const k=th.getAttribute('data-sort');if(HSORT.col===k)HSORT.dir=HSORT.dir==='asc'?'desc':'asc';else{HSORT.col=k;HSORT.dir='asc';}renderHold();return;}
+    const tk=e.target.closest('td.tj-tk');
+    if(tk){const sym=tk.getAttribute('data-sym')||tk.textContent.trim();const box=$('tjSearch');box.value=sym;SEARCH=sym.toUpperCase();renderMain();renderHold();}
+  }
   function init(){
     if(inited)return;inited=true;
     const drop=$('tjDrop'),file=$('tjFile');
@@ -3256,10 +3337,15 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
     ['dragleave'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
     drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');const f=e.dataTransfer.files[0];if(f)handleFile(f);});
-    $('tjYear').addEventListener('change',e=>{YEAR=e.target.value;renderKpis();renderMonthly();renderMain();});
+    $('tjYear').addEventListener('change',e=>{YEAR=e.target.value;COLLAPSED.clear();renderKpis();renderMonthly();renderMain();});
     $('tjReload').addEventListener('click',load);
     $('tjClear').addEventListener('click',clearAll);
+    $('tjSearch').addEventListener('input',e=>{SEARCH=(e.target.value||'').trim().toUpperCase();renderMain();renderHold();});
+    $('tjCollapseAll').addEventListener('click',()=>{monthsForYear().forEach(m=>COLLAPSED.add(m));renderMain();});
+    $('tjExpandAll').addEventListener('click',()=>{COLLAPSED.clear();renderMain();});
     $('tjSeg').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{$('tjSeg').querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active');FILTER=b.dataset.f;renderMain();}));
+    $('tjMain').addEventListener('click',onMainClick);
+    $('tjHold').addEventListener('click',onHoldClick);
     load();
   }
   window.TJ={ensureInit:init};
