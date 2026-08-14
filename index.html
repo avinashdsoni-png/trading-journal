@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src &#39;self&#39; &#39;unsafe-inline&#39; &#39;unsafe-eval&#39; https: data: blob:;">
 <title>Trading Journal</title>
-<link href="./index_files/css2" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0d0f12;
@@ -847,7 +847,22 @@ td {
 #page-rs .rs-note{font-size:12px;color:var(--text2);margin-top:6px}
 #page-rs code{background:var(--surface);padding:1px 5px;border-radius:4px;font-size:12px;color:var(--text)}
 </style>
-<script src="./index_files/chart.umd.min.js.download"></script><script src="./index_files/chart.umd.min(1).js.download"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+#page-rs .rs2-steptag{margin:26px 0 12px;padding:10px 14px;border-left:3px solid var(--accent);background:var(--bg2);border-radius:0 8px 8px 0;font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:.06em;color:var(--accent)}
+#page-rs .rs2-steptag span{display:block;font-family:'Barlow',sans-serif;font-size:12px;letter-spacing:0;color:var(--text2);font-weight:400;margin-top:2px}
+#page-rs .rs2-steptag.rs2-s2{border-left-color:#4da3ff;color:#4da3ff}
+#page-rs .rs2-steptag.rs2-s3{border-left-color:#c084fc;color:#c084fc}
+#page-rs .rs2-fresh{margin-top:10px;font-size:12px;line-height:1.5}
+#page-rs .rs2-fresh.ok{color:var(--text2)}
+#page-rs .rs2-fresh.warn{color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.35);border-radius:8px;padding:9px 12px}
+#page-rs .rs2-chk{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;color:var(--text)}
+#page-rs .rs2-chk input{width:auto;margin:0}
+#page-rs .rs2-explain{margin-top:14px;padding:12px 14px;background:var(--bg3);border-radius:8px;font-size:13px;line-height:1.65;color:var(--text2)}
+#page-rs .rs2-explain b{color:var(--text)}
+#page-rs td.rs2-idx{color:var(--text3);font-size:11px}
+</style>
 </head>
 <body>
 
@@ -929,8 +944,7 @@ td {
       <button class="nav-btn" onclick="showPage(&#39;analysis&#39;,this)">📊 Analysis</button>
       <button class="nav-btn" onclick="showPage(&#39;funds&#39;,this)">💰 Funds</button>
       <button class="nav-btn" onclick="showPage(&#39;plan&#39;,this)">📐 Trading Plan</button>
-      <button class="nav-btn" onclick="showPage(&#39;rs&#39;,this); if(window.RS) RS.ensureInit();">📈 RS Score</button>
-      <button class="nav-btn" onclick="showPage(&#39;tj&#39;,this); if(window.TJ) TJ.ensureInit();">📒 P&amp;L Journal</button>
+      <button class="nav-btn" onclick="showPage(&#39;rs&#39;,this); if(window.RS) RS.ensureInit(); if(window.RS2) RS2.ensureInit();">📈 RS Score</button>
     </div>
     <div class="topbar-right">
       <div class="balance-chip">Balance: <strong id="topbarBalance">$10,764.09</strong></div>
@@ -1629,6 +1643,8 @@ td {
       </div>
       <p class="rs-sub">Composite relative-strength ranking across six timeframes &middot; Z-Score (soft-capped) and Percentile &middot; dataset shared via your cloud (rs_dataset)</p>
 
+      <div class="rs2-steptag">STEP 1 · PEER RANKING <span>each stock vs every other stock in your list</span></div>
+
       <div class="rs-card">
         <div class="rs-row">
           <div class="rs-col">
@@ -1699,106 +1715,135 @@ td {
         </div>
         <div class="rs-note" id="rsExportNote"></div>
       </div>
+
+      <!-- ══════════════ STEP 2 ══════════════ -->
+      <div class="rs2-steptag rs2-s2">STEP 2 · INDEX-RELATIVE <span>each stock vs the index &mdash; 50 means it matched the index exactly</span></div>
+
+      <div class="rs-card">
+        <div class="rs-row">
+          <div class="rs-col">
+            <div id="rs2Drop" class="rs-drop">
+              <div style="font-size:15px;font-weight:600">Drop the INDEX csv / excel here, or click to choose</div>
+              <div style="font-size:12px;margin-top:4px">One index exported from the TradingView Screener &middot; replaces the cloud copy</div>
+              <input id="rs2File" type="file" accept=".csv,.xlsx,.xls" style="display:none">
+            </div>
+            <div id="rs2Status" class="rs-status">Open this tab to load the latest index file&hellip;</div>
+            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <button class="rs-ghost" id="rs2Reload">&#8635; Reload from cloud</button>
+              <span class="rs-note" id="rs2CloudState" style="align-self:center"></span>
+            </div>
+          </div>
+          <div class="rs-col">
+            <label>Index name</label>
+            <input id="rs2Ticker" type="text" value="QQQ" placeholder="QQQ">
+            <div class="rs-note">Just a label for the columns and export file. Change it whenever you upload a different index.</div>
+            <div id="rs2Vals" class="rs-note" style="margin-top:10px"></div>
+          </div>
+        </div>
+        <div id="rs2Fresh" class="rs2-fresh"></div>
+      </div>
+
+      <div class="rs-card">
+        <details>
+          <summary>Weights for Step 2</summary>
+          <div style="margin-top:12px">
+            <label class="rs2-chk"><input type="checkbox" id="rs2Override"> Use different weights for Step 2</label>
+            <div class="rs-note">Off = inherit the Step 1 weights above, so both steps stay in sync.</div>
+            <div id="rs2WWrap" style="display:none;margin-top:10px">
+              <div class="rs-wgrid" id="rs2Weights"></div>
+              <div class="rs-wsum" id="rs2Wsum"></div>
+              <button class="rs-ghost" id="rs2ResetW" style="margin-top:8px">Reset to Step 1 weights</button>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="rs-tabs">
+        <div class="rs-tab active" data-rs2tab="z">Z-Score vs Index</div>
+        <div class="rs-tab" data-rs2tab="p">Percentile</div>
+      </div>
+      <div class="rs-panel">
+        <div class="rs-toolbar">
+          <div class="rs-switch">
+            <span>Display:</span><span id="rs2ModeLbl">Weighted</span>
+            <div class="rs-toggle on" id="rs2ModeTog" title="Toggle weighted / unweighted display"></div>
+            <span class="rs-note">(Total &amp; Rank always weighted)</span>
+          </div>
+          <div class="rs-exp">
+            <label style="margin:0">Top</label>
+            <input id="rs2Topn" type="number" min="1" value="20">
+            <button class="rs-btn" id="rs2ExportBtn">Export .txt for TradingView</button>
+          </div>
+        </div>
+        <div class="rs-tablewrap">
+          <table class="rs-table" id="rs2Table">
+            <thead id="rs2Thead"></thead>
+            <tbody id="rs2Tbody"><tr><td class="rs-empty" colspan="10">Waiting for the index file&hellip;</td></tr></tbody>
+          </table>
+        </div>
+        <div class="rs-note" id="rs2ExportNote"></div>
+      </div>
+
+      <!-- ══════════════ STEP 3 ══════════════ -->
+      <div class="rs2-steptag rs2-s3">STEP 3 · COMBINED <span>Step 1 and Step 2 merged into one ranking &mdash; nothing to upload</span></div>
+
+      <div class="rs-card">
+        <label>How should the two steps be combined?</label>
+        <select id="rs3Mode">
+          <option value="blend">Blend &mdash; average the two (adjustable)</option>
+          <option value="balanced">Balanced &mdash; punish lopsided stocks</option>
+          <option value="strict">Strict &mdash; only as good as the weaker half</option>
+        </select>
+        <div id="rs3BlendWrap" style="margin-top:12px;max-width:420px">
+          <label>Blend: <span id="rs3BlendLbl">50% Step 1 / 50% Step 2</span></label>
+          <input id="rs3Blend" type="range" min="0" max="100" step="5" value="50" style="width:100%">
+        </div>
+        <div id="rs3Explain" class="rs2-explain"></div>
+      </div>
+
+      <div class="rs-card">
+        <details>
+          <summary>Weights for Step 3</summary>
+          <div style="margin-top:12px">
+            <label class="rs2-chk"><input type="checkbox" id="rs3Override"> Use different weights for Step 3</label>
+            <div class="rs-note">Off = inherit the Step 1 weights.</div>
+            <div id="rs3WWrap" style="display:none;margin-top:10px">
+              <div class="rs-wgrid" id="rs3Weights"></div>
+              <div class="rs-wsum" id="rs3Wsum"></div>
+              <button class="rs-ghost" id="rs3ResetW" style="margin-top:8px">Reset to Step 1 weights</button>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="rs-tabs">
+        <div class="rs-tab active" data-rs3tab="z">Z-Score (combined)</div>
+        <div class="rs-tab" data-rs3tab="p">Percentile (combined)</div>
+      </div>
+      <div class="rs-panel">
+        <div class="rs-toolbar">
+          <div class="rs-switch">
+            <span>Display:</span><span id="rs3ModeLbl">Weighted</span>
+            <div class="rs-toggle on" id="rs3ModeTog" title="Toggle weighted / unweighted display"></div>
+            <span class="rs-note">(Total &amp; Rank always weighted)</span>
+          </div>
+          <div class="rs-exp">
+            <label style="margin:0">Top</label>
+            <input id="rs3Topn" type="number" min="1" value="20">
+            <button class="rs-btn" id="rs3ExportBtn">Export .txt for TradingView</button>
+          </div>
+        </div>
+        <div class="rs-tablewrap">
+          <table class="rs-table" id="rs3Table">
+            <thead id="rs3Thead"></thead>
+            <tbody id="rs3Tbody"><tr><td class="rs-empty" colspan="10">Needs Step 1 and Step 2 loaded&hellip;</td></tr></tbody>
+          </table>
+        </div>
+        <div class="rs-note" id="rs3ExportNote"></div>
+      </div>
     </div>
   </div>
 
-
-  <!-- ══ P&L JOURNAL PAGE ══ -->
-  <div class="page" id="page-tj">
-    <style>
-      #page-tj .tj-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px}
-      #page-tj .tj-h{font-weight:700;color:var(--accent);margin-bottom:10px;font-size:14px}
-      #page-tj .tj-drop{border:2px dashed var(--accent);border-radius:10px;padding:24px;text-align:center;cursor:pointer;color:var(--accent);background:var(--bg3);transition:.15s}
-      #page-tj .tj-drop:hover,#page-tj .tj-drop.over{background:var(--surface)}
-      #page-tj .tj-status{font-size:12px;margin-top:8px;color:var(--text2)}
-      #page-tj .tj-status.ok{color:var(--green)} #page-tj .tj-status.warn{color:var(--accent)} #page-tj .tj-status.err{color:var(--red)}
-      #page-tj .tj-ghost{background:transparent;color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px 12px;font-size:12px;cursor:pointer;font-weight:600}
-      #page-tj .tj-ghost:hover{background:var(--surface)}
-      #page-tj .tj-year{background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:13px;margin-left:6px}
-      #page-tj .tj-yearlbl{font-size:12px;color:var(--text2);display:flex;align-items:center}
-      #page-tj .tj-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
-      #page-tj .tj-kpi{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px}
-      #page-tj .tj-kl{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
-      #page-tj .tj-kv{font-size:22px;font-weight:800;margin-top:6px;color:var(--text)}
-      #page-tj .tj-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
-      #page-tj .tj-seg{display:flex;gap:6px;flex-wrap:wrap}
-      #page-tj .tj-seg button{padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--bg3);cursor:pointer;font-weight:600;color:var(--text2);font-size:12px}
-      #page-tj .tj-seg button.active{background:var(--surface);color:var(--accent);border-color:var(--accent)}
-      #page-tj .tj-search{background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;min-width:150px}
-      #page-tj .tj-search:focus{border-color:var(--accent);outline:none}
-      #page-tj .tj-tablewrap{max-height:580px;overflow:auto;border:1px solid var(--border);border-radius:8px}
-      #page-tj table.tj-table{border-collapse:collapse;width:100%;font-size:13px;min-width:680px}
-      #page-tj table.tj-table th,#page-tj table.tj-table td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text)}
-      #page-tj table.tj-table th:first-child,#page-tj table.tj-table td:first-child{text-align:left}
-      #page-tj table.tj-table th{position:sticky;top:0;background:var(--surface);color:var(--accent);font-size:12px}
-      #page-tj table.tj-table th[data-sort]{cursor:pointer;user-select:none}
-      #page-tj table.tj-table th[data-sort]:hover{background:var(--surface2)}
-      #page-tj th .tj-sarr{font-size:9px;color:var(--accent);margin-left:3px}
-      #page-tj td.tj-tk{font-weight:700;color:var(--text);cursor:pointer}
-      #page-tj td.tj-tk:hover{color:var(--accent)}
-      #page-tj .tj-win{color:var(--green);font-weight:600} #page-tj .tj-lose{color:var(--red);font-weight:600}
-      #page-tj .tj-dim{color:var(--text2)}
-      #page-tj tr.tj-rw td{background:rgba(61,214,140,.055)} #page-tj tr.tj-rl td{background:rgba(240,82,82,.055)}
-      #page-tj tbody tr.tj-data:hover td{background:var(--surface)}
-      #page-tj tr.tj-mhead{cursor:pointer}
-      #page-tj tr.tj-mhead td{background:var(--bg3);padding:0;border-bottom:1px solid var(--border2)}
-      #page-tj tr.tj-mhead:hover td{background:var(--surface)}
-      #page-tj .tj-mh{display:flex;align-items:center;gap:10px;padding:9px 10px;color:var(--accent2);font-weight:700;font-size:12px;letter-spacing:.02em}
-      #page-tj .tj-arrow{display:inline-block;width:12px;text-align:center;color:var(--accent)}
-      #page-tj .tj-mtot{margin-left:auto;display:flex;gap:16px;font-size:12px;font-weight:600;align-items:center}
-      #page-tj .tj-mtot .tj-dim{font-weight:500}
-      #page-tj tr.tj-sub td{background:var(--surface2);font-weight:700;border-top:1px solid var(--border2)}
-      #page-tj .tj-empty{padding:34px;text-align:center;color:var(--text2)}
-    </style>
-    <div class="section">
-      <div class="section-header">
-        <div class="section-title">P&amp;L <span>JOURNAL</span></div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <label class="tj-yearlbl">Year<select id="tjYear" class="tj-year"></select></label>
-          <button class="tj-ghost" id="tjReload">↻ Reload</button>
-        </div>
-      </div>
-
-      <div class="tj-card">
-        <div id="tjDrop" class="tj-drop">
-          <div style="font-size:15px;font-weight:600">Drop Wealthsimple activities CSV here, or click to choose</div>
-          <div style="font-size:12px;margin-top:4px">Trades matched FIFO &middot; partial sells split into per-lot entries &middot; duplicates ignored &middot; stored in your cloud</div>
-          <input id="tjFile" type="file" accept=".csv" style="display:none">
-        </div>
-        <div id="tjStatus" class="tj-status">Open this tab to load your stored trades&hellip;</div>
-        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-          <button class="tj-ghost" id="tjClear">Clear all stored trades</button>
-        </div>
-      </div>
-
-      <div class="tj-kpis" id="tjKpis"></div>
-
-      <div class="tj-card">
-        <div class="tj-h">Monthly Breakdown &middot; <span id="tjYearLab"></span></div>
-        <div class="tj-tablewrap"><table class="tj-table" id="tjMonthly"></table></div>
-      </div>
-
-      <div class="tj-toolbar">
-        <div class="tj-seg" id="tjSeg">
-          <button data-f="all" class="active">All Closed</button>
-          <button data-f="profit">Profit</button>
-          <button data-f="loss">Loss</button>
-          <button data-f="active">Active</button>
-        </div>
-        <input id="tjSearch" class="tj-search" type="text" placeholder="Filter symbol&hellip;">
-        <div style="display:flex;gap:6px;margin-left:auto">
-          <button class="tj-ghost" id="tjCollapseAll">&#8863; Collapse all</button>
-          <button class="tj-ghost" id="tjExpandAll">&#8862; Expand all</button>
-        </div>
-      </div>
-      <div class="tj-tablewrap"><table class="tj-table" id="tjMain"></table></div>
-
-      <div class="tj-card" style="margin-top:16px">
-        <div class="tj-h">Current Holdings</div>
-        <div class="tj-tablewrap"><table class="tj-table" id="tjHold"></table></div>
-      </div>
-    </div>
-  </div>
 
 </div><!-- end app -->
 
@@ -2966,6 +3011,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     });
     rankBy("totZ","rankZ"); rankBy("totP","rankP");
     render();
+    if(window.RS&&typeof window.RS.onChange==="function")window.RS.onChange();
   }
   /* ---- render ---- */
   function setStatus(msg,cls){const s=$("rsStatus");if(s){s.innerHTML=msg;s.className="rs-status "+(cls||"");}}
@@ -3070,285 +3116,416 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     setStatus("Connecting to cloud…","");
     cloudLoad();
   }
-  window.RS={ensureInit:init};
+  /* additive: read-only snapshot + change hook for Steps 2 & 3. Does not alter any Step 1 computation. */
+  window.RS={ensureInit:init, getState:()=>({RAW,MAP,MODEL,WEIGHTS,CAP,TFS,activeTab,weighted}), onChange:null};
 })();
 </script>
+
 <script>
-/* ══ P&L JOURNAL (TJ) — FIFO lot engine, scoped, mirrors RS module ══ */
+/* ============ RS STEP 2 (index-relative) + STEP 3 (combined) — isolated ============ */
 (function(){
-  const TJ_SB_URL="https://jpkniqmqoizscqdkaxag.supabase.co";
-  const TJ_SB_KEY="sb_publishable_SKiVUnE0b4BkDh9JPRT0Ng_pYgjLErJ";
-  const TBL="journal_executions";
-  const HDR ={apikey:TJ_SB_KEY,Authorization:"Bearer "+TJ_SB_KEY};
-  const HDRJ={apikey:TJ_SB_KEY,Authorization:"Bearer "+TJ_SB_KEY,"Content-Type":"application/json"};
-  const EPS=1e-6;
-  let inited=false, EXECS=[], CLOSED=[], ACTIVE=[], YEAR=null, FILTER='all';
-  let SEARCH='', SORT={col:null,dir:'asc'}, HSORT={col:null,dir:'asc'};
-  const COLLAPSED=new Set();
+  const SB_URL="https://jpkniqmqoizscqdkaxag.supabase.co";
+  const SB_KEY="sb_publishable_SKiVUnE0b4BkDh9JPRT0Ng_pYgjLErJ";
+  const T_STOCK="rs_dataset";        // Step 1 dataset (read timestamp only)
+  const T_INDEX="rs_index_dataset";  // Step 2 index file
+  const TFS=["1W","1M","3M","6M","1Y","5Y"];
+  const HDR={apikey:SB_KEY,Authorization:"Bearer "+SB_KEY};
+  const HDRJ={apikey:SB_KEY,Authorization:"Bearer "+SB_KEY,"Content-Type":"application/json"};
+  const MS24=24*60*60*1000;
+
+  let IDXROW=null, IDXVALS={}, IDXNAME="QQQ", IDXMAP={};
+  let stockAt=null, indexAt=null, overrideStale=false, inited=false;
+  let M2=[], M3=[];
+  let tab2="z", w2=true, sort2={col:"total",dir:"desc"}, W2=null;
+  let tab3="z", w3=true, sort3={col:"total",dir:"desc"}, W3=null;
 
   const $=id=>document.getElementById(id);
-  const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  function setStatus(m,c){const e=$('tjStatus');if(e){e.textContent=m;e.className='tj-status '+(c||'');}}
-  function money(v){v=+v||0;const s=v<0?'-':'';return s+'$'+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
-  function qf(q){return (Math.round((+q)*10000)/10000).toString();}
-  function df(d){if(!d)return '—';const p=String(d).slice(0,10).split('-');if(p.length<3)return d;return MN[(+p[1])-1]+' '+p[2]+', '+p[0];}
-  function mf(ym){const p=ym.split('-');return MN[(+p[1])-1]+' '+p[0];}
-  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-  /* ---------- parse + executions ---------- */
-  function parseCSV(text){const r=Papa.parse(text,{header:true,skipEmptyLines:true});return r.data||[];}
-  function toExecs(rows){
-    const ex=[];
-    rows.forEach((r,i)=>{
-      if(((r.activity_type||'').trim())!=='Trade')return;
-      const side=((r.activity_sub_type||'').trim().toUpperCase());
-      if(side!=='BUY'&&side!=='SELL')return;
-      const qty=Math.abs(parseFloat(r.quantity));
-      const px=parseFloat(r.unit_price);
-      if(!(qty>0)||!isFinite(px))return;
-      const comm=parseFloat(r.commission||'0')||0;
-      const date=(r.transaction_date||'').trim();
-      const sym=(r.symbol||'').trim();
-      const net=(r.net_cash_amount||'').trim();
-      const acct=(r.account_id||'').trim();
-      const cur=(r.currency||'').trim();
-      const sig=[acct,date,sym,side,qty,px,net].join('|');
-      ex.push({date,sym,side,qty,px,comm,cur,acct,sig,fidx:i});
-    });
-    const cnt={};
-    ex.forEach(e=>{cnt[e.sig]=(cnt[e.sig]||0)+1;e.key=e.sig+'#'+cnt[e.sig];});
-    return ex;
+  function num(v){
+    if(v===null||v===undefined)return null;
+    let s=String(v).trim();
+    if(s===""||/^(n\/?a|--|—|-)$/i.test(s))return null;
+    let neg=false;
+    if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1);}
+    s=s.replace(/[%,\s]/g,"").replace(/[\u2212\u2013\u2014]/g,"-");
+    let f=parseFloat(s); if(isNaN(f))return null; return neg?-f:f;
+  }
+  const TF_RX={
+    "1W":/(\b1\s*-?\s*w[a-z]*\b)|(\bweek)/i,
+    "1M":/\b1\s*-?\s*m[a-z]*\b/i,
+    "3M":/(\b3\s*-?\s*m[a-z]*\b)|(\bquarter)/i,
+    "6M":/\b6\s*-?\s*m[a-z]*\b/i,
+    "1Y":/(\b1\s*-?\s*y[a-z]*\b)|(\b12\s*-?\s*m[a-z]*\b)|(\bannual)|(\byearly)/i,
+    "5Y":/(\b5\s*-?\s*y[a-z]*\b)|(\b60\s*-?\s*m[a-z]*\b)/i
+  };
+  function parseCSV(text){
+    const rows=[];let i=0,field="",row=[],q=false;
+    while(i<text.length){const c=text[i];
+      if(q){if(c==='"'){if(text[i+1]==='"'){field+='"';i++;}else q=false;}else field+=c;}
+      else{if(c==='"')q=true;else if(c===','){row.push(field);field="";}else if(c==='\n'){row.push(field);rows.push(row);row=[];field="";}else if(c==='\r'){}else field+=c;}
+      i++;}
+    if(field!==""||row.length){row.push(field);rows.push(row);}
+    return rows.filter(r=>r.length&&!(r.length===1&&r[0].trim()===""));
+  }
+  function setStatus(m,c){const e=$("rs2Status");if(e){e.innerHTML=m;e.className="rs-status "+(c||"");}}
+  function fmt(n){return (Math.round(n*10)/10).toFixed(1);}
+  function heat(v){ // 0..100 with 50 = neutral grey (matches the index)
+    if(v===null||v===undefined)return "transparent";
+    const t=Math.max(0,Math.min(100,v));
+    if(Math.abs(t-50)<0.05)return "rgba(140,140,150,0.14)";
+    if(t>50){const k=(t-50)/50;return "rgba(61,214,140,"+(0.04+0.24*k).toFixed(3)+")";}
+    const k=(50-t)/50;return "rgba(240,82,82,"+(0.04+0.24*k).toFixed(3)+")";
   }
 
-  /* ---------- supabase ---------- */
-  async function upsert(execs){
-    const rows=execs.map(e=>({exec_key:e.key,txn_date:e.date,symbol:e.sym,side:e.side,qty:e.qty,price:e.px,commission:e.comm,currency:e.cur,account_id:e.acct,raw_idx:e.fidx}));
-    for(let i=0;i<rows.length;i+=400){
-      const chunk=rows.slice(i,i+400);
-      const res=await fetch(TJ_SB_URL+"/rest/v1/"+TBL,{method:'POST',headers:{...HDRJ,Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify(chunk)});
-      if(!res.ok)throw new Error("Upsert "+res.status+": "+(await res.text()));
+  /* ---------- index file ---------- */
+  function ingestIndex(matrix){
+    const heads=matrix[0].map(h=>String(h).trim());
+    const rows=matrix.slice(1).map(r=>{const o={};heads.forEach((h,j)=>o[h]=r[j]);return o;});
+    if(!rows.length){setStatus("That file has no data rows.","err");return false;}
+    const used=new Set();
+    let tk=heads.find(h=>/symbol|ticker/i.test(h))||heads[0];
+    IDXMAP={ticker:tk}; used.add(tk);
+    const order=["1W","5Y","1Y","6M","3M","1M"];
+    for(const tf of order){const hit=heads.find(h=>!used.has(h)&&TF_RX[tf].test(h));IDXMAP[tf]=hit||"";if(hit)used.add(hit);}
+    const typed=($("rs2Ticker").value||"").trim().toUpperCase();
+    let pick=rows.find(r=>String(r[tk]||"").trim().toUpperCase().includes(typed)&&typed!=="")||rows[0];
+    IDXROW=pick;
+    IDXVALS={}; TFS.forEach(tf=>{IDXVALS[tf]=IDXMAP[tf]?num(pick[IDXMAP[tf]]):null;});
+    const miss=TFS.filter(tf=>IDXVALS[tf]===null);
+    let note='<b>'+(String(pick[tk]||"index")).trim()+'</b> &nbsp; '+TFS.map(tf=>tf+": "+(IDXVALS[tf]===null?"—":IDXVALS[tf].toFixed(2)+"%")).join(" &nbsp;·&nbsp; ");
+    if(miss.length)note+='<br><span style="color:#f5a623">Missing: '+miss.join(", ")+' — those timeframes are skipped in Step 2.</span>';
+    $("rs2Vals").innerHTML=note;
+    return true;
+  }
+  function loadFile(file){
+    const ext=file.name.split(".").pop().toLowerCase();
+    const rd=new FileReader();
+    if(ext==="csv"){
+      rd.onload=e=>{const txt=e.target.result;if(ingestIndex(parseCSV(txt))){cloudSave(txt,file.name);compute();}};
+      rd.readAsText(file);
+    }else{
+      rd.onload=e=>{
+        try{
+          const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"});
+          const ws=wb.Sheets[wb.SheetNames[0]];
+          const m=XLSX.utils.sheet_to_json(ws,{header:1,raw:false});
+          if(ingestIndex(m)){cloudSave(XLSX.utils.sheet_to_csv(ws),file.name.replace(/\.(xlsx|xls)$/i,".csv"));compute();}
+        }catch(err){setStatus("Could not read that workbook: "+err.message,"err");}
+      };
+      rd.readAsArrayBuffer(file);
     }
   }
-  async function fetchAll(){
-    let all=[],from=0;const page=1000;
-    while(true){
-      const res=await fetch(TJ_SB_URL+"/rest/v1/"+TBL+"?select=*&order=txn_date.asc,raw_idx.asc",{headers:{...HDR,"Range-Unit":"items",Range:from+"-"+(from+page-1)}});
-      if(!res.ok)throw new Error("Fetch "+res.status+": "+(await res.text()));
-      const d=await res.json();all=all.concat(d);
-      if(d.length<page)break;from+=page;
-    }
-    return all;
-  }
-  async function clearAll(){
-    if(!confirm('Delete ALL stored trade executions from the cloud? This cannot be undone.'))return;
+  async function cloudSave(csvText,filename){
     try{
-      const res=await fetch(TJ_SB_URL+"/rest/v1/"+TBL+"?exec_key=neq.__none__",{method:'DELETE',headers:{...HDR,Prefer:'return=minimal'}});
-      if(!res.ok)throw new Error(res.status+": "+(await res.text()));
-      await load();setStatus('All stored trades cleared.','ok');
-    }catch(e){setStatus('Clear error: '+e.message,'err');}
+      const now=new Date().toISOString();
+      const res=await fetch(SB_URL+"/rest/v1/"+T_INDEX,{
+        method:"POST",headers:{...HDRJ,Prefer:"resolution=merge-duplicates,return=minimal"},
+        body:JSON.stringify({id:1,csv_text:csvText,filename:filename||"",ticker:($("rs2Ticker").value||"").trim(),uploaded_at:now})});
+      if(!res.ok)throw new Error(res.status+" "+(await res.text()));
+      indexAt=new Date(now);
+      setStatus("Index saved to your cloud.","ok");
+      $("rs2CloudState").textContent="Index uploaded "+indexAt.toLocaleString();
+      freshness();
+    }catch(e){setStatus("Cloud save failed: "+e.message,"err");}
   }
-
-  /* ---------- FIFO engine ---------- */
-  function compute(execs){
-    const arr=execs.slice().sort((a,b)=>{
-      const ad=(a.txn_date||''),bd=(b.txn_date||'');
-      if(ad!==bd)return ad<bd?-1:1;
-      const ar=a.side==='BUY'?0:1,br=b.side==='BUY'?0:1;
-      if(ar!==br)return ar-br;
-      return (+a.raw_idx||0)-(+b.raw_idx||0);
-    });
-    const lots={},closed=[];
-    for(const e of arr){
-      const s=e.symbol,qty=+e.qty,px=+e.price,comm=+e.commission||0;
-      if(!lots[s])lots[s]=[];
-      if(e.side==='BUY'){
-        lots[s].push({qty,px,date:e.txn_date,cps:qty?comm/qty:0});
-      }else{
-        let remain=qty;const scps=qty?comm/qty:0;
-        while(remain>EPS&&lots[s].length){
-          const lot=lots[s][0];
-          const take=Math.min(remain,lot.qty);
-          const pnl=(px-lot.px)*take-scps*take-lot.cps*take;
-          closed.push({sym:s,bdate:lot.date,sdate:e.txn_date,qty:take,bpx:lot.px,spx:px,pnl});
-          lot.qty-=take;remain-=take;
-          if(lot.qty<=EPS)lots[s].shift();
-        }
+  async function cloudLoad(){
+    try{
+      const res=await fetch(SB_URL+"/rest/v1/"+T_INDEX+"?id=eq.1&select=csv_text,filename,ticker,uploaded_at",{headers:HDR});
+      if(!res.ok)throw new Error(res.status+" "+(await res.text()));
+      const arr=await res.json();
+      if(arr.length&&arr[0].csv_text){
+        if(arr[0].ticker)$("rs2Ticker").value=arr[0].ticker;
+        indexAt=arr[0].uploaded_at?new Date(arr[0].uploaded_at):null;
+        $("rs2CloudState").textContent=indexAt?("Index uploaded "+indexAt.toLocaleString()):"";
+        if(ingestIndex(parseCSV(arr[0].csv_text)))setStatus("Loaded index from cloud"+(arr[0].filename?" ("+arr[0].filename+")":"")+".","ok");
+      }else{setStatus("No index file stored yet — drop one above.","warn");}
+    }catch(e){setStatus("Cloud load failed: "+e.message+" — has the rs_index_dataset table been created?","err");}
+    await stockStamp();
+    compute();
+  }
+  async function stockStamp(){
+    try{
+      const res=await fetch(SB_URL+"/rest/v1/"+T_STOCK+"?id=eq.1&select=uploaded_at",{headers:HDR});
+      if(res.ok){const a=await res.json();stockAt=(a.length&&a[0].uploaded_at)?new Date(a[0].uploaded_at):null;}
+    }catch(e){}
+    freshness();
+  }
+  function freshness(){
+    const el=$("rs2Fresh"); if(!el)return;
+    const s=stockAt?stockAt.toLocaleString():"never";
+    const i=indexAt?indexAt.toLocaleString():"never";
+    let html='Step 1 stocks uploaded: <b>'+s+'</b> &nbsp;·&nbsp; Step 2 index uploaded: <b>'+i+'</b>';
+    if(stockAt&&indexAt){
+      const gap=Math.abs(stockAt-indexAt);
+      const hrs=(gap/3600000).toFixed(1);
+      if(gap>MS24){
+        el.className="rs2-fresh warn";
+        const older=stockAt<indexAt?"Step 1 (stocks)":"Step 2 (index)";
+        html+='<br>⚠ These files are <b>'+hrs+' hours</b> apart. Re-upload '+older+' so both describe the same moment.'
+            +' <button class="rs-ghost" id="rs2Ovr" style="margin-left:6px">'+(overrideStale?"Stale override ON":"Use anyway")+'</button>';
+        el.innerHTML=html;
+        const b=$("rs2Ovr"); if(b)b.addEventListener("click",()=>{overrideStale=!overrideStale;freshness();compute();});
+        return;
       }
+      html+=' &nbsp;·&nbsp; <span style="color:var(--green)">'+hrs+'h apart — in sync</span>';
     }
-    const active=[];
-    for(const s in lots)for(const lot of lots[s])if(lot.qty>EPS)active.push({sym:s,bdate:lot.date,qty:lot.qty,bpx:lot.px});
-    return {closed,active};
+    el.className="rs2-fresh ok"; el.innerHTML=html;
   }
 
-  /* ---------- helpers for sort/filter/render ---------- */
-  function matchSearch(sym){return !SEARCH || String(sym).toUpperCase().includes(SEARCH);}
-  function headHTML(cols,sort){
-    return '<thead><tr>'+cols.map(c=>{
-      const arr=sort.col===c.k?('<span class="tj-sarr">'+(sort.dir==='asc'?'▲':'▼')+'</span>'):'';
-      return '<th data-sort="'+c.k+'">'+c.l+arr+'</th>';
-    }).join('')+'</tr></thead>';
+  /* ---------- weights ---------- */
+  function baseW(){const st=window.RS&&window.RS.getState?window.RS.getState():null;return st?st.WEIGHTS:{"1W":10,"1M":20,"3M":30,"6M":25,"1Y":10,"5Y":5};}
+  function normW(w){const sum=TFS.reduce((s,t)=>s+(parseFloat(w[t])||0),0)||1;const o={};TFS.forEach(t=>o[t]=(parseFloat(w[t])||0)/sum*100);return o;}
+  function wFor(step){
+    if(step===2&&$("rs2Override").checked&&W2)return W2;
+    if(step===3&&$("rs3Override").checked&&W3)return W3;
+    return baseW();
   }
-  function sortBy(rows,sort,deflt){
-    const c=sort.col,d=sort.dir,arr=rows.slice();
-    arr.sort((a,b)=>{
-      if(!c)return deflt(a,b);
-      let x=a[c],y=b[c];
-      if(c==='cost'){x=a.qty*a.bpx;y=b.qty*b.bpx;}
-      let r=(typeof x==='number'&&typeof y==='number')?x-y:String(x==null?'':x).localeCompare(String(y==null?'':y));
-      return d==='asc'?r:-r;
+  function renderWGrid(step){
+    const gid=step===2?"rs2Weights":"rs3Weights", sid=step===2?"rs2Wsum":"rs3Wsum";
+    const cur=step===2?(W2||{...baseW()}):(W3||{...baseW()});
+    if(step===2)W2=cur; else W3=cur;
+    const g=$(gid); g.innerHTML="";
+    TFS.forEach(tf=>{const d=document.createElement("div");
+      d.innerHTML='<label>'+tf+'</label><input type="number" step="1" data-w="'+tf+'" value="'+cur[tf]+'">';g.appendChild(d);});
+    g.querySelectorAll("input").forEach(inp=>inp.addEventListener("input",e=>{cur[e.target.dataset.w]=e.target.value;sumW(step);compute();}));
+    sumW(step);
+  }
+  function sumW(step){
+    const cur=step===2?W2:W3, sid=step===2?"rs2Wsum":"rs3Wsum";
+    const s=TFS.reduce((a,t)=>a+(parseFloat(cur[t])||0),0);
+    $(sid).textContent="Sum: "+s+(Math.abs(s-100)<0.001?" ✓":" (auto-normalised)");
+  }
+
+  /* ---------- compute ---------- */
+  function compute(){
+    const st=window.RS&&window.RS.getState?window.RS.getState():null;
+    if(!st||!st.MODEL||!st.MODEL.length){
+      $("rs2Tbody").innerHTML='<tr><td class="rs-empty" colspan="10">Load your stock list in Step 1 first.</td></tr>';
+      $("rs3Tbody").innerHTML='<tr><td class="rs-empty" colspan="10">Load your stock list in Step 1 first.</td></tr>';
+      M2=[];M3=[];return;
+    }
+    if(!IDXROW){
+      $("rs2Tbody").innerHTML='<tr><td class="rs-empty" colspan="10">Drop the index file above to build Step 2.</td></tr>';
+      $("rs3Tbody").innerHTML='<tr><td class="rs-empty" colspan="10">Step 3 needs Step 2 &mdash; drop the index file above.</td></tr>';
+      M2=[];M3=[];return;
+    }
+    if(stockAt&&indexAt&&Math.abs(stockAt-indexAt)>MS24&&!overrideStale){
+      const msg='<tr><td class="rs-empty" colspan="10">Files are more than 24 hours apart — re-upload the older one, or press &ldquo;Use anyway&rdquo; above.</td></tr>';
+      $("rs2Tbody").innerHTML=msg;$("rs3Tbody").innerHTML=msg;M2=[];M3=[];return;
+    }
+    const CAP=st.CAP||2, MAP=st.MAP, RAW=st.RAW;
+    // cross-sectional stdev per TF (the scale; the CENTRE is the index)
+    const sd={};
+    for(const tf of TFS){
+      const col=MAP[tf], vals=[];
+      RAW.forEach(r=>{const v=col?num(r[col]):null;if(v!==null)vals.push(v);});
+      if(vals.length>1){const m=vals.reduce((a,b)=>a+b,0)/vals.length;
+        sd[tf]=Math.sqrt(vals.reduce((a,b)=>a+(b-m)*(b-m),0)/vals.length);}
+      else sd[tf]=0;
+    }
+    // spreads vs the index
+    const spreads={};
+    for(const tf of TFS){
+      spreads[tf]=[];
+      if(IDXVALS[tf]===null)continue;
+      RAW.forEach(r=>{const v=MAP[tf]?num(r[MAP[tf]]):null;if(v!==null)spreads[tf].push(v-IDXVALS[tf]);});
+      spreads[tf].sort((a,b)=>a-b);
+    }
+    const W2n=normW(wFor(2));
+    M2=st.MODEL.map((m,i)=>{
+      const r=RAW[i], cells={}; let totZ=0,totP=0,beatW=0,beatDen=0;
+      for(const tf of TFS){
+        const raw=MAP[tf]?num(r[MAP[tf]]):null, q=IDXVALS[tf];
+        if(raw===null||q===null||sd[tf]<=0){cells[tf]={sp:null,s01:null,p:null};continue;}
+        const sp=raw-q;
+        const z=sp/sd[tf], zc=CAP*Math.tanh(z/CAP), s01=(zc+CAP)/(2*CAP);
+        let below=0,equal=0;const arr=spreads[tf];
+        for(const v of arr){if(v<sp)below++;else if(v===sp)equal++;}
+        const p=arr.length?(below+0.5*equal)/arr.length*100:50;
+        cells[tf]={sp,s01,p};
+        totZ+=W2n[tf]*s01; totP+=W2n[tf]*(p/100);
+        beatW+=W2n[tf]*(sp>0?1:sp<0?0:0.5); beatDen+=W2n[tf];
+      }
+      return {ticker:m.ticker,exportSym:m.exportSym,cells,totZ,totP,beat:beatDen?beatW/beatDen*100:null};
     });
-    return arr;
+    rank(M2,"totZ","rankZ"); rank(M2,"totP","rankP");
+
+    // ---- Step 3 : combine like-for-like, per timeframe ----
+    const W3n=normW(wFor(3));
+    const mode=$("rs3Mode").value, a=(parseFloat($("rs3Blend").value)||50)/100;
+    const cmb=(x,y)=>{
+      if(x===null||y===null)return null;
+      if(mode==="blend")return a*x+(1-a)*y;
+      if(mode==="balanced")return Math.sqrt(Math.max(0,x)*Math.max(0,y));
+      return Math.min(x,y);
+    };
+    M3=st.MODEL.map((m,i)=>{
+      const two=M2[i], cells={}; let totZ=0,totP=0;
+      for(const tf of TFS){
+        const c1=m.cells[tf], c2=two?two.cells[tf]:null;
+        const z1=(c1&&c1.raw!==null)?c1.s01*100:null;
+        const z2=(c2&&c2.s01!==null)?c2.s01*100:null;
+        const p1=(c1&&c1.raw!==null)?c1.p:null;
+        const p2=(c2&&c2.p!==null)?c2.p:null;
+        const zc=cmb(z1,z2), pc=cmb(p1,p2);
+        cells[tf]={z:zc,p:pc};
+        if(zc!==null)totZ+=W3n[tf]*(zc/100);
+        if(pc!==null)totP+=W3n[tf]*(pc/100);
+      }
+      return {ticker:m.ticker,exportSym:m.exportSym,cells,totZ,totP,s1:m.totZ,s2:two?two.totZ:null};
+    });
+    rank(M3,"totZ","rankZ"); rank(M3,"totP","rankP");
+    render2(); render3(); explain();
   }
-  function monthsForYear(){
-    const set=new Set();
-    CLOSED.forEach(c=>{if(String(c.sdate).slice(0,4)===YEAR)set.add(String(c.sdate).slice(0,7));});
-    return [...set];
-  }
+  function rank(M,key,rk){const idx=M.map((r,i)=>i).sort((x,y)=>M[y][key]-M[x][key]);idx.forEach((mi,pos)=>M[mi][rk]=pos+1);}
 
   /* ---------- render ---------- */
-  function fillYears(){
-    const sel=$('tjYear');const ys=new Set();
-    CLOSED.forEach(c=>ys.add(String(c.sdate).slice(0,4)));
-    ACTIVE.forEach(a=>ys.add(String(a.bdate).slice(0,4)));
-    ys.add(String(new Date().getFullYear()));
-    const arr=[...ys].filter(Boolean).sort();
-    if(!YEAR||!ys.has(YEAR))YEAR=arr[arr.length-1];
-    sel.innerHTML=arr.map(y=>'<option value="'+y+'"'+(y===YEAR?' selected':'')+'>'+y+'</option>').join('');
-  }
-  function renderKpis(){
-    const yr=CLOSED.filter(c=>String(c.sdate).slice(0,4)===YEAR);
-    const wins=yr.filter(c=>c.pnl>0),loss=yr.filter(c=>c.pnl<=0);
-    const gp=wins.reduce((s,c)=>s+c.pnl,0),gl=loss.reduce((s,c)=>s+c.pnl,0),net=gp+gl;
-    const wr=yr.length?(wins.length/yr.length*100):0;
-    const pf=gl!==0?(gp/Math.abs(gl)):(gp>0?Infinity:0);
-    const pfTxt=pf===Infinity?'∞':pf.toFixed(2);
-    $('tjKpis').innerHTML=
-      '<div class="tj-kpi"><div class="tj-kl">Closed Trades · '+YEAR+'</div><div class="tj-kv">'+yr.length+'</div></div>'+
-      '<div class="tj-kpi"><div class="tj-kl">Win Rate</div><div class="tj-kv '+(wr>=50?'tj-win':'tj-lose')+'">'+wr.toFixed(1)+'%</div></div>'+
-      '<div class="tj-kpi"><div class="tj-kl">Gross Profit</div><div class="tj-kv tj-win">'+money(gp)+'</div></div>'+
-      '<div class="tj-kpi"><div class="tj-kl">Gross Loss</div><div class="tj-kv tj-lose">'+money(gl)+'</div></div>'+
-      '<div class="tj-kpi"><div class="tj-kl">Net P&amp;L · '+YEAR+'</div><div class="tj-kv '+(net>=0?'tj-win':'tj-lose')+'">'+money(net)+'</div></div>'+
-      '<div class="tj-kpi"><div class="tj-kl">Profit Factor</div><div class="tj-kv '+(pf>=1?'tj-win':'tj-lose')+'">'+pfTxt+'</div></div>';
-  }
-  function renderMonthly(){
-    $('tjYearLab').textContent=YEAR;
-    const yr=CLOSED.filter(c=>String(c.sdate).slice(0,4)===YEAR);
-    const byM={};
-    yr.forEach(c=>{const m=String(c.sdate).slice(5,7);const o=byM[m]=byM[m]||{n:0,p:0,l:0};o.n++;if(c.pnl>0)o.p+=c.pnl;else o.l+=c.pnl;});
-    let h='<thead><tr><th>Month</th><th>Trades</th><th>Profit</th><th>Loss</th><th>Net</th></tr></thead><tbody>';
-    let TN=0,TP=0,TL=0;
-    for(let i=1;i<=12;i++){const mm=String(i).padStart(2,'0');const o=byM[mm];if(!o)continue;TN+=o.n;TP+=o.p;TL+=o.l;
-      h+='<tr><td>'+MN[i-1]+'</td><td>'+o.n+'</td><td class="tj-win">'+money(o.p)+'</td><td class="tj-lose">'+money(o.l)+'</td><td class="'+((o.p+o.l)>=0?'tj-win':'tj-lose')+'">'+money(o.p+o.l)+'</td></tr>';}
-    if(TN===0)h+='<tr><td colspan="5" class="tj-empty">No closed trades this year.</td></tr>';
-    else h+='<tr class="tj-sub"><td>TOTAL</td><td>'+TN+'</td><td class="tj-win">'+money(TP)+'</td><td class="tj-lose">'+money(TL)+'</td><td class="'+((TP+TL)>=0?'tj-win':'tj-lose')+'">'+money(TP+TL)+'</td></tr>';
-    $('tjMonthly').innerHTML=h+'</tbody>';
-  }
-  const CLOSED_COLS=[{k:'sym',l:'Symbol'},{k:'bdate',l:'Date Bought'},{k:'sdate',l:'Date Sold'},{k:'qty',l:'Qty'},{k:'bpx',l:'Buy'},{k:'spx',l:'Sell'},{k:'pnl',l:'P&amp;L'}];
-  const ACTIVE_COLS=[{k:'sym',l:'Symbol'},{k:'bdate',l:'Date Bought'},{k:'sdate',l:'Date Sold'},{k:'qty',l:'Qty'},{k:'bpx',l:'Buy Price'},{k:'cost',l:'Cost'}];
-  function renderMain(){
-    const t=$('tjMain');
-    if(FILTER==='active'){
-      let rows=ACTIVE.filter(a=>matchSearch(a.sym));
-      rows=sortBy(rows,SORT,(a,b)=>a.sym!==b.sym?(a.sym<b.sym?-1:1):(a.bdate<b.bdate?-1:1));
-      let h=headHTML(ACTIVE_COLS,SORT)+'<tbody>';
-      if(!rows.length)h+='<tr><td colspan="6" class="tj-empty">No open positions'+(SEARCH?' match "'+esc(SEARCH)+'"':'')+'.</td></tr>';
-      rows.forEach(a=>{h+='<tr class="tj-data tj-rw"><td class="tj-tk" data-sym="'+esc(a.sym)+'">'+esc(a.sym)+'</td><td>'+df(a.bdate)+'</td><td class="tj-dim">—</td><td>'+qf(a.qty)+'</td><td>'+money(a.bpx)+'</td><td>'+money(a.qty*a.bpx)+'</td></tr>';});
-      t.innerHTML=h+'</tbody>';return;
-    }
-    let rows=CLOSED.filter(c=>String(c.sdate).slice(0,4)===YEAR && matchSearch(c.sym));
-    if(FILTER==='profit')rows=rows.filter(c=>c.pnl>0);
-    if(FILTER==='loss')rows=rows.filter(c=>c.pnl<=0);
-    const byM={};rows.forEach(c=>{const m=String(c.sdate).slice(0,7);(byM[m]=byM[m]||[]).push(c);});
-    const months=Object.keys(byM).sort();
-    let h=headHTML(CLOSED_COLS,SORT)+'<tbody>';
-    if(!months.length)h+='<tr><td colspan="7" class="tj-empty">No '+(FILTER==='all'?'closed':FILTER)+' trades for '+YEAR+(SEARCH?' / "'+esc(SEARCH)+'"':'')+'.</td></tr>';
-    months.forEach(m=>{
-      const list=sortBy(byM[m],SORT,(a,b)=>a.sdate!==b.sdate?(a.sdate<b.sdate?-1:1):(a.sym<b.sym?-1:1));
-      let mp=0,ml=0;list.forEach(c=>{if(c.pnl>0)mp+=c.pnl;else ml+=c.pnl;});
-      const collapsed=COLLAPSED.has(m);
-      h+='<tr class="tj-mhead" data-m="'+m+'"><td colspan="7"><div class="tj-mh">'+
-         '<span class="tj-arrow">'+(collapsed?'▸':'▾')+'</span>'+mf(m)+
-         '<span class="tj-mtot"><span class="tj-dim">'+list.length+' trade'+(list.length!==1?'s':'')+'</span>'+
-         '<span class="tj-win">'+money(mp)+'</span><span class="tj-lose">'+money(ml)+'</span>'+
-         '<span class="'+((mp+ml)>=0?'tj-win':'tj-lose')+'">net '+money(mp+ml)+'</span></span></div></td></tr>';
-      if(!collapsed){
-        list.forEach(c=>{const cls=c.pnl>0?'tj-win':'tj-lose';const rcls=c.pnl>0?'tj-rw':'tj-rl';
-          h+='<tr class="tj-data '+rcls+'"><td class="tj-tk" data-sym="'+esc(c.sym)+'">'+esc(c.sym)+'</td><td>'+df(c.bdate)+'</td><td>'+df(c.sdate)+'</td><td>'+qf(c.qty)+'</td><td>'+money(c.bpx)+'</td><td>'+money(c.spx)+'</td><td class="'+cls+'">'+money(c.pnl)+'</td></tr>';});
-      }
+  function rows2(){
+    const Wn=normW(wFor(2));
+    const out=M2.map(m=>{
+      const o={ticker:m.ticker,exportSym:m.exportSym,beat:m.beat};
+      if(tab2==="z"){o.total=m.totZ;o.rank=m.rankZ;}else{o.total=m.totP;o.rank=m.rankP;}
+      TFS.forEach(tf=>{
+        const off=!((parseFloat(wFor(2)[tf])||0)>0), c=m.cells[tf];
+        if(off||!c||c.s01===null){o[tf]=null;return;}
+        if(tab2==="z")o[tf]=w2?Wn[tf]*c.s01:c.s01*100;
+        else o[tf]=w2?Wn[tf]*(c.p/100):c.p;
+      });
+      return o;
     });
-    t.innerHTML=h+'</tbody>';
+    const col=sort2.col,dir=sort2.dir==="asc"?1:-1;
+    out.sort((x,y)=>{let A=x[col],B=y[col];if(col==="ticker")return A.localeCompare(B)*dir;
+      if(A===null||A===undefined)A=-Infinity;if(B===null||B===undefined)B=-Infinity;return (A-B)*dir;});
+    return out;
   }
-  const HOLD_COLS=[{k:'sym',l:'Symbol'},{k:'q',l:'Shares Held'},{k:'avg',l:'Avg Cost'},{k:'cost',l:'Cost Basis'}];
-  function renderHold(){
-    const agg={};ACTIVE.forEach(a=>{if(!matchSearch(a.sym))return;const o=agg[a.sym]=agg[a.sym]||{sym:a.sym,q:0,cost:0};o.q+=a.qty;o.cost+=a.qty*a.bpx;});
-    let rows=Object.values(agg).map(o=>({...o,avg:o.cost/o.q}));
-    rows=sortBy(rows,HSORT,(a,b)=>a.sym<b.sym?-1:a.sym>b.sym?1:0);
-    let h=headHTML(HOLD_COLS,HSORT)+'<tbody>';
-    if(!rows.length)h+='<tr><td colspan="4" class="tj-empty">No open positions'+(SEARCH?' match "'+esc(SEARCH)+'"':'')+'.</td></tr>';
-    let TC=0;rows.forEach(o=>{TC+=o.cost;h+='<tr class="tj-data"><td class="tj-tk" data-sym="'+esc(o.sym)+'">'+esc(o.sym)+'</td><td>'+qf(o.q)+'</td><td>'+money(o.avg)+'</td><td>'+money(o.cost)+'</td></tr>';});
-    if(rows.length)h+='<tr class="tj-sub"><td colspan="3">Total cost basis</td><td>'+money(TC)+'</td></tr>';
-    $('tjHold').innerHTML=h+'</tbody>';
+  function render2(){
+    const th=$("rs2Thead"),tb=$("rs2Tbody");
+    if(!M2.length){tb.innerHTML='<tr><td class="rs-empty" colspan="10">No data yet.</td></tr>';th.innerHTML="";return;}
+    IDXNAME=($("rs2Ticker").value||"IDX").trim().toUpperCase();
+    const cols=[{k:"ticker",t:"Ticker"},...TFS.map(t=>({k:t,t:t})),{k:"beat",t:"Beat "+IDXNAME},{k:"total",t:"Total"},{k:"rank",t:"Rank"}];
+    th.innerHTML="<tr>"+cols.map(c=>{const ar=sort2.col===c.k?(sort2.dir==="asc"?"▲":"▼"):"";return '<th data-c="'+c.k+'">'+c.t+'<span class="rs-arr">'+ar+'</span></th>';}).join("")+"</tr>";
+    th.querySelectorAll("th").forEach(x=>x.addEventListener("click",()=>{const c=x.dataset.c;
+      if(sort2.col===c)sort2.dir=sort2.dir==="asc"?"desc":"asc";else{sort2.col=c;sort2.dir=(c==="ticker")?"asc":"desc";}render2();}));
+    const Wn=normW(wFor(2));
+    tb.innerHTML=rows2().map(r=>{
+      let td='<td class="rs-tk">'+r.ticker+'</td>';
+      TFS.forEach(tf=>{
+        if(r[tf]===null||r[tf]===undefined){td+='<td style="color:var(--text3)">—</td>';return;}
+        const hv=w2?(r[tf]/(Wn[tf]||1))*100:r[tf];
+        td+='<td style="background:'+heat(hv)+'">'+fmt(r[tf])+'</td>';
+      });
+      td+=(r.beat===null||r.beat===undefined)?'<td style="color:var(--text3)">—</td>':'<td style="background:'+heat(r.beat)+'">'+fmt(r.beat)+'%</td>';
+      td+='<td class="rs-tot" style="background:'+heat(r.total)+'">'+fmt(r.total)+'</td>';
+      td+='<td class="rs-rk">'+r.rank+'</td>';
+      return "<tr>"+td+"</tr>";
+    }).join("");
+    $("rs2Topn").max=M2.length;
   }
-  function renderAll(){fillYears();renderKpis();renderMonthly();renderMain();renderHold();}
+  function rows3(){
+    const Wn=normW(wFor(3));
+    const out=M3.map(m=>{
+      const o={ticker:m.ticker,exportSym:m.exportSym};
+      if(tab3==="z"){o.total=m.totZ;o.rank=m.rankZ;}else{o.total=m.totP;o.rank=m.rankP;}
+      TFS.forEach(tf=>{
+        const off=!((parseFloat(wFor(3)[tf])||0)>0), c=m.cells[tf];
+        const v=tab3==="z"?(c?c.z:null):(c?c.p:null);
+        if(off||v===null||v===undefined){o[tf]=null;return;}
+        o[tf]=w3?Wn[tf]*(v/100):v;
+      });
+      return o;
+    });
+    const col=sort3.col,dir=sort3.dir==="asc"?1:-1;
+    out.sort((x,y)=>{let A=x[col],B=y[col];if(col==="ticker")return A.localeCompare(B)*dir;
+      if(A===null||A===undefined)A=-Infinity;if(B===null||B===undefined)B=-Infinity;return (A-B)*dir;});
+    return out;
+  }
+  function render3(){
+    const th=$("rs3Thead"),tb=$("rs3Tbody");
+    if(!M3.length){tb.innerHTML='<tr><td class="rs-empty" colspan="10">No data yet.</td></tr>';th.innerHTML="";return;}
+    const cols=[{k:"ticker",t:"Ticker"},...TFS.map(t=>({k:t,t:t})),{k:"total",t:"Total"},{k:"rank",t:"Rank"}];
+    th.innerHTML="<tr>"+cols.map(c=>{const ar=sort3.col===c.k?(sort3.dir==="asc"?"▲":"▼"):"";return '<th data-c="'+c.k+'">'+c.t+'<span class="rs-arr">'+ar+'</span></th>';}).join("")+"</tr>";
+    th.querySelectorAll("th").forEach(x=>x.addEventListener("click",()=>{const c=x.dataset.c;
+      if(sort3.col===c)sort3.dir=sort3.dir==="asc"?"desc":"asc";else{sort3.col=c;sort3.dir=(c==="ticker")?"asc":"desc";}render3();}));
+    const Wn=normW(wFor(3));
+    tb.innerHTML=rows3().map(r=>{
+      let td='<td class="rs-tk">'+r.ticker+'</td>';
+      TFS.forEach(tf=>{
+        if(r[tf]===null||r[tf]===undefined){td+='<td style="color:var(--text3)">—</td>';return;}
+        const hv=w3?(r[tf]/(Wn[tf]||1))*100:r[tf];
+        td+='<td style="background:'+heat(hv)+'">'+fmt(r[tf])+'</td>';
+      });
+      td+='<td class="rs-tot" style="background:'+heat(r.total)+'">'+fmt(r.total)+'</td>';
+      td+='<td class="rs-rk">'+r.rank+'</td>';
+      return "<tr>"+td+"</tr>";
+    }).join("");
+    $("rs3Topn").max=M3.length;
+  }
+  function explain(){
+    const mode=$("rs3Mode").value, a=Math.round(parseFloat($("rs3Blend").value)||50);
+    $("rs3BlendWrap").style.display = mode==="blend" ? "block" : "none";
+    $("rs3BlendLbl").textContent = a+"% Step 1 / "+(100-a)+"% Step 2";
+    let h="";
+    if(mode==="blend"){
+      h='<b>Blend — an average of the two scores.</b> Whatever you set the slider to is how much each step counts. '
+       +'At 50/50, a stock scoring <b>80</b> in Step 1 and <b>60</b> in Step 2 ends up at (80 + 60) ÷ 2 = <b>70</b>. '
+       +'Because it is a plain average, being brilliant at one thing makes up for being ordinary at the other — a 100 and a 20 also average 60. '
+       +'Use this when you are happy to trust either signal on its own.';
+    }else if(mode==="balanced"){
+      h='<b>Balanced — quietly punishes lopsided stocks.</b> It multiplies the two scores and takes the square root. '
+       +'Our 80 / 60 stock becomes √(80 × 60) = <b>69</b>, just under the plain average. But a stock scoring 100 and 20 becomes √(100 × 20) = <b>45</b>, far below its average of 60. '
+       +'Being strong in both halves is worth more than being spectacular in one. Use this when you want genuinely well-rounded names.';
+    }else{
+      h='<b>Strict — you are only as good as your weaker half.</b> It simply takes the lower of the two scores. '
+       +'The 80 / 60 stock scores <b>60</b>; the 100 / 20 stock scores just <b>20</b>. Nothing gets a high score unless it passes both tests. '
+       +'This gives the shortest and most demanding list — use it when you want only the highest-conviction names.';
+    }
+    $("rs3Explain").innerHTML=h;
+  }
+  function exportTxt(step){
+    const M=step===2?M2:M3, rows=step===2?rows2():rows3();
+    const noteId=step===2?"rs2ExportNote":"rs3ExportNote", topId=step===2?"rs2Topn":"rs3Topn";
+    if(!M.length){$(noteId).textContent="Nothing to export yet.";return;}
+    let n=parseInt($(topId).value)||0; n=Math.max(1,Math.min(n,M.length));
+    const syms=rows.slice(0,n).map(r=>r.exportSym).filter(Boolean);
+    const blob=new Blob([syms.join(",")],{type:"text/plain"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+    a.download="tv_step"+step+"_top"+n+".txt";a.click();
+    const t=step===2?(tab2==="z"?"Z-Score vs Index":"Percentile"):(tab3==="z"?"Z-Score combined":"Percentile combined");
+    const st=step===2?sort2:sort3;
+    $(noteId).textContent="Exported top "+n+" from the "+t+" tab in current sort order ("+st.col+" "+st.dir+"). Import via TradingView → watchlist name → Upload list.";
+  }
 
-  /* ---------- flow ---------- */
-  async function load(){
-    setStatus('Loading stored trades…');
-    try{
-      EXECS=await fetchAll();
-      const r=compute(EXECS);CLOSED=r.closed;ACTIVE=r.active;
-      renderAll();
-      setStatus(EXECS.length?('Loaded '+EXECS.length+' executions · '+CLOSED.length+' closed · '+ACTIVE.length+' open lots'):'No stored trades yet — upload a CSV to begin.', EXECS.length?'ok':'warn');
-    }catch(e){setStatus('Load error: '+e.message+'  (run the journal_executions SQL?)','err');}
-  }
-  async function handleFile(file){
-    try{
-      setStatus('Parsing '+file.name+'…');
-      const text=await file.text();
-      const execs=toExecs(parseCSV(text));
-      if(!execs.length){setStatus('No "Trade" rows found in this CSV.','warn');return;}
-      setStatus('Uploading '+execs.length+' trade rows (deduplicating)…');
-      await upsert(execs);
-      await load();
-      setStatus('Imported '+file.name+' · '+execs.length+' trade rows processed (duplicates skipped)','ok');
-    }catch(e){setStatus('Import error: '+e.message,'err');}
-  }
-
-  /* ---------- interactions ---------- */
-  function onMainClick(e){
-    const th=e.target.closest('th[data-sort]');
-    if(th){const k=th.getAttribute('data-sort');if(SORT.col===k)SORT.dir=SORT.dir==='asc'?'desc':'asc';else{SORT.col=k;SORT.dir='asc';}renderMain();return;}
-    const mh=e.target.closest('tr.tj-mhead');
-    if(mh){const m=mh.getAttribute('data-m');if(COLLAPSED.has(m))COLLAPSED.delete(m);else COLLAPSED.add(m);renderMain();return;}
-    const tk=e.target.closest('td.tj-tk');
-    if(tk){const sym=tk.getAttribute('data-sym')||tk.textContent.trim();const box=$('tjSearch');box.value=sym;SEARCH=sym.toUpperCase();renderMain();renderHold();return;}
-  }
-  function onHoldClick(e){
-    const th=e.target.closest('th[data-sort]');
-    if(th){const k=th.getAttribute('data-sort');if(HSORT.col===k)HSORT.dir=HSORT.dir==='asc'?'desc':'asc';else{HSORT.col=k;HSORT.dir='asc';}renderHold();return;}
-    const tk=e.target.closest('td.tj-tk');
-    if(tk){const sym=tk.getAttribute('data-sym')||tk.textContent.trim();const box=$('tjSearch');box.value=sym;SEARCH=sym.toUpperCase();renderMain();renderHold();}
-  }
+  /* ---------- init ---------- */
   function init(){
-    if(inited)return;inited=true;
-    const drop=$('tjDrop'),file=$('tjFile');
-    drop.addEventListener('click',()=>file.click());
-    file.addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0]);file.value='';});
-    ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
-    ['dragleave'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
-    drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');const f=e.dataTransfer.files[0];if(f)handleFile(f);});
-    $('tjYear').addEventListener('change',e=>{YEAR=e.target.value;COLLAPSED.clear();renderKpis();renderMonthly();renderMain();});
-    $('tjReload').addEventListener('click',load);
-    $('tjClear').addEventListener('click',clearAll);
-    $('tjSearch').addEventListener('input',e=>{SEARCH=(e.target.value||'').trim().toUpperCase();renderMain();renderHold();});
-    $('tjCollapseAll').addEventListener('click',()=>{monthsForYear().forEach(m=>COLLAPSED.add(m));renderMain();});
-    $('tjExpandAll').addEventListener('click',()=>{COLLAPSED.clear();renderMain();});
-    $('tjSeg').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{$('tjSeg').querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active');FILTER=b.dataset.f;renderMain();}));
-    $('tjMain').addEventListener('click',onMainClick);
-    $('tjHold').addEventListener('click',onHoldClick);
-    load();
+    if(inited)return; inited=true;
+    const drop=$("rs2Drop"),file=$("rs2File");
+    drop.addEventListener("click",()=>file.click());
+    file.addEventListener("change",e=>{if(e.target.files[0])loadFile(e.target.files[0]);});
+    ["dragover","dragenter"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over");}));
+    drop.addEventListener("dragleave",e=>{e.preventDefault();drop.classList.remove("over");});
+    drop.addEventListener("drop",e=>{e.preventDefault();drop.classList.remove("over");if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);});
+    $("rs2Reload").addEventListener("click",()=>{setStatus("Reloading index from cloud…","");cloudLoad();});
+    $("rs2Ticker").addEventListener("input",()=>{render2();});
+    document.querySelectorAll("[data-rs2tab]").forEach(t=>t.addEventListener("click",()=>{
+      document.querySelectorAll("[data-rs2tab]").forEach(x=>x.classList.remove("active"));t.classList.add("active");
+      tab2=t.dataset.rs2tab;render2();}));
+    document.querySelectorAll("[data-rs3tab]").forEach(t=>t.addEventListener("click",()=>{
+      document.querySelectorAll("[data-rs3tab]").forEach(x=>x.classList.remove("active"));t.classList.add("active");
+      tab3=t.dataset.rs3tab;render3();}));
+    $("rs2ModeTog").addEventListener("click",()=>{w2=!w2;$("rs2ModeTog").classList.toggle("on",w2);$("rs2ModeLbl").textContent=w2?"Weighted":"Unweighted";render2();});
+    $("rs3ModeTog").addEventListener("click",()=>{w3=!w3;$("rs3ModeTog").classList.toggle("on",w3);$("rs3ModeLbl").textContent=w3?"Weighted":"Unweighted";render3();});
+    $("rs2ExportBtn").addEventListener("click",()=>exportTxt(2));
+    $("rs3ExportBtn").addEventListener("click",()=>exportTxt(3));
+    $("rs2Override").addEventListener("change",e=>{$("rs2WWrap").style.display=e.target.checked?"block":"none";if(e.target.checked){W2={...baseW()};renderWGrid(2);}compute();});
+    $("rs3Override").addEventListener("change",e=>{$("rs3WWrap").style.display=e.target.checked?"block":"none";if(e.target.checked){W3={...baseW()};renderWGrid(3);}compute();});
+    $("rs2ResetW").addEventListener("click",()=>{W2={...baseW()};renderWGrid(2);compute();});
+    $("rs3ResetW").addEventListener("click",()=>{W3={...baseW()};renderWGrid(3);compute();});
+    $("rs3Mode").addEventListener("change",()=>{explain();compute();});
+    $("rs3Blend").addEventListener("input",()=>{explain();compute();});
+    if(window.RS)window.RS.onChange=()=>{compute();};
+    explain();
+    cloudLoad();
   }
-  window.TJ={ensureInit:init};
+  window.RS2={ensureInit:init};
 })();
 
 </script>
