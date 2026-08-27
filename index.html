@@ -863,6 +863,121 @@ td {
 #page-rs .rs2-explain b{color:var(--text)}
 #page-rs td.rs2-idx{color:var(--text3);font-size:11px}
 </style>
+
+<style>
+/* ══ COMPLIANCE CHECKLIST ══ */
+.cl-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 0 8px;padding-top:14px;border-top:1px solid var(--border)}
+.cl-head-t{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.06em;color:var(--gold,#e8b84b)}
+#clHeadScore{font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--text2)}
+#clHeadScore b{font-size:14px;margin-left:2px}
+.cl-box{max-height:340px;overflow-y:auto;padding-right:6px}
+.cl-sec{margin-bottom:14px}
+.cl-sec-head{display:flex;align-items:center;gap:8px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.05em;color:var(--text);margin-bottom:6px}
+.cl-w{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--text3);letter-spacing:0}
+.cl-secpct{margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-size:13px}
+.cl-grp{margin:0 0 8px 0;padding:8px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px}
+.cl-grp-t{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:6px}
+.cl-item{display:flex;align-items:flex-start;gap:9px;padding:4px 0}
+.cl-tri{flex:0 0 auto;width:30px;height:22px;border-radius:5px;border:1px solid var(--border);cursor:pointer;font-size:11px;font-weight:700;font-family:'Barlow Condensed',sans-serif}
+.cl-tri.cl-n{background:transparent;color:var(--red,#f05252);border-color:rgba(240,82,82,.4)}
+.cl-tri.cl-y{background:rgba(61,214,140,.16);color:var(--green,#3dd68c);border-color:rgba(61,214,140,.5)}
+.cl-tri.cl-na{background:var(--bg3);color:var(--text3)}
+.cl-txt{font-size:12.5px;line-height:1.45;color:var(--text);padding-top:2px}
+.cl-txt.cl-nos{color:var(--text2)}
+.cl-txt em{color:var(--text3);font-size:11px}
+.cl-hi{color:var(--green,#3dd68c)} .cl-mid{color:#f5a623} .cl-lo{color:var(--red,#f05252)}
+.cl-na,.cl-dim{color:var(--text3)}
+/* settings editor */
+.cl-set-row{display:flex;gap:12px;margin-bottom:8px}
+.cl-set-row label{flex:1;font-size:11px;color:var(--text2);font-family:'Barlow Condensed',sans-serif}
+.cl-set-row input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:7px 9px;color:var(--text);font-size:13px}
+.cl-hint{font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:12px}
+.cl-set-sec{margin-bottom:14px}
+.cl-set-h{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.06em;color:var(--gold,#e8b84b);margin-bottom:6px}
+.cl-set-grp{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:8px}
+.cl-set-gt{display:flex;gap:6px;margin-bottom:6px}
+.cl-set-gt input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;font-weight:600}
+.cl-set-item{display:flex;gap:6px;align-items:center;margin-bottom:4px}
+.cl-set-item input[type=text]{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:11.5px}
+.cl-sc{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--text3);white-space:nowrap;cursor:pointer}
+.cl-sc input{width:auto;margin:0}
+.cl-x{background:transparent;border:1px solid var(--border);color:var(--text3);border-radius:5px;width:22px;height:22px;cursor:pointer;font-size:10px;flex:0 0 auto}
+.cl-x:hover{color:var(--red,#f05252);border-color:var(--red,#f05252)}
+/* table additions */
+td.cl-cell{font-family:'Barlow Condensed',sans-serif;font-size:12px;text-align:center;cursor:pointer;white-space:nowrap}
+td.cl-cell:hover{background:var(--surface,#1b1b1f)}
+tr.cl-detail td{background:var(--bg2);padding:10px 14px !important}
+.cl-dt{font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin:2px 0 4px}
+.cl-dl{margin:0 0 8px 16px;padding:0;font-size:12px;color:var(--text2);line-height:1.5}
+tr.flt-row th{padding:4px 6px !important;background:var(--bg2) !important}
+tr.flt-row input,tr.flt-row select{width:100%;min-width:52px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:10.5px;padding:3px 4px;font-family:'Barlow Condensed',sans-serif}
+tr.flt-row .flt2{display:flex;gap:3px}
+</style>
+
+<style>
+/* ══ ETF FLOW TAB ══ */
+#page-etf .ef-wrap{display:grid;grid-template-columns:minmax(340px,1fr) minmax(420px,1.15fr);gap:16px;align-items:start}
+@media(max-width:1100px){#page-etf .ef-wrap{grid-template-columns:1fr}}
+#page-etf .ef-pane{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;max-height:78vh;overflow:auto}
+#page-etf .ef-ph{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+#page-etf .ef-pt{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.06em;color:var(--gold,#e8b84b)}
+#page-etf .ef-err{color:var(--red,#f05252);font-size:12px;min-height:14px}
+#page-etf .ef-cb{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1px solid var(--border2,#37373f);border-radius:4px;font-size:10px;color:#0d0f12;background:transparent;cursor:pointer;flex:0 0 auto}
+#page-etf .ef-cb.on{background:var(--gold,#e8b84b);border-color:var(--gold,#e8b84b)}
+#page-etf .ef-arw{color:var(--text3);font-size:9px;width:9px;flex:0 0 auto}
+#page-etf .ef-sec{margin-bottom:8px;border:1px solid var(--border);border-radius:9px;overflow:hidden}
+#page-etf .ef-sech{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg3);cursor:pointer}
+#page-etf .ef-secn{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.03em;color:var(--text);flex:1}
+#page-etf .ef-cnt{font-size:10px;color:var(--text3);font-family:'Barlow Condensed',sans-serif}
+#page-etf .ef-etf{margin:4px 6px 4px 20px;border-left:2px solid var(--border);padding-left:8px}
+#page-etf .ef-etfh{display:flex;align-items:center;gap:8px;padding:5px 4px;cursor:pointer}
+#page-etf .ef-etfn{font-weight:600;font-size:13px;color:var(--text);flex:1}
+#page-etf .ef-mo{margin:3px 0 3px 18px}
+#page-etf .ef-moh{display:flex;align-items:center;gap:8px;padding:4px;cursor:pointer;font-size:12px;color:var(--text2);font-family:'Barlow Condensed',sans-serif}
+#page-etf .ef-dt{margin-left:18px}
+#page-etf .ef-dth{display:flex;align-items:center;gap:7px;padding:3px 4px;cursor:pointer;font-size:11.5px;color:var(--text2)}
+#page-etf .ef-badge{font-size:9px;padding:1px 5px;border-radius:4px;letter-spacing:.04em}
+#page-etf .ef-full{background:rgba(61,214,140,.15);color:var(--green,#3dd68c)}
+#page-etf .ef-part{background:rgba(245,166,35,.15);color:#f5a623}
+#page-etf .ef-mini{background:transparent;border:1px solid var(--border);color:var(--text2);border-radius:5px;padding:3px 8px;font-size:10.5px;cursor:pointer;font-family:'Barlow Condensed',sans-serif}
+#page-etf .ef-mini:hover{color:var(--gold,#e8b84b);border-color:var(--gold,#e8b84b)}
+#page-etf .ef-x{background:transparent;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:2px 4px}
+#page-etf .ef-x:hover{color:var(--red,#f05252)}
+#page-etf .ef-drop{border:1px dashed var(--border2,#37373f);border-radius:8px;padding:12px;text-align:center;font-size:11.5px;color:var(--text3);cursor:pointer;margin:5px 0}
+#page-etf .ef-drop:hover,#page-etf .ef-drop.over{border-color:var(--gold,#e8b84b);color:var(--gold,#e8b84b);background:var(--bg3)}
+#page-etf .ef-paste{margin:4px 0 6px}
+#page-etf .ef-paste summary{font-size:11px;color:var(--text3);cursor:pointer}
+#page-etf .ef-paste textarea{width:100%;min-height:70px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;padding:6px;margin:5px 0;font-family:monospace}
+#page-etf .ef-sub{margin:4px 0 8px 16px;padding:7px 9px;background:var(--bg3);border-radius:7px}
+#page-etf .ef-subt{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:5px}
+#page-etf table.ef-t{width:100%;border-collapse:collapse;font-size:11.5px}
+#page-etf table.ef-t th{text-align:right;color:var(--text3);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:3px 5px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2);cursor:pointer;white-space:nowrap}
+#page-etf table.ef-t td{text-align:right;padding:3px 5px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2);white-space:nowrap}
+#page-etf table.ef-t th:first-child,#page-etf table.ef-t td:first-child{text-align:left}
+#page-etf .ef-tk{color:var(--text);font-weight:600}
+#page-etf .ef-up{color:var(--green,#3dd68c)} #page-etf .ef-dn{color:var(--red,#f05252)} #page-etf .ef-flat{color:var(--text3)}
+#page-etf .ef-dim{color:var(--text3)}
+#page-etf .ef-sc{color:var(--gold,#e8b84b);font-weight:700}
+#page-etf .ef-rk{color:var(--text)}
+#page-etf .ef-arr{font-size:8px;margin-left:3px;color:var(--gold,#e8b84b)}
+#page-etf .ef-flag{font-size:9px;padding:1px 5px;border-radius:4px;letter-spacing:.04em}
+#page-etf .ef-new{background:rgba(61,214,140,.16);color:var(--green,#3dd68c)}
+#page-etf .ef-ex{background:rgba(240,82,82,.16);color:var(--red,#f05252)}
+#page-etf .ef-empty{text-align:center;color:var(--text3);padding:26px;font-size:12.5px;line-height:1.6}
+#page-etf .ef-hzc{font-size:10.5px;color:var(--text2);display:inline-flex;align-items:center;gap:3px;margin-right:9px;cursor:pointer}
+#page-etf .ef-hzc input{width:auto;margin:0}
+#page-etf .ef-cfgrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:7px}
+#page-etf .ef-cfgrow label{flex:1;min-width:74px;font-size:10px;color:var(--text3);font-family:'Barlow Condensed',sans-serif}
+#page-etf .ef-cfgrow input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 6px;color:var(--text);font-size:12px}
+#page-etf .ef-cfglbl{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);margin:8px 0 4px}
+#page-etf .ef-ta{width:100%;min-height:44px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:11px;padding:6px}
+#page-etf .ef-ok{color:var(--green,#3dd68c);font-size:11.5px;margin-top:6px;line-height:1.5}
+#page-etf .ef-warn{color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.3);border-radius:7px;padding:8px;font-size:11.5px;margin-top:6px;line-height:1.5}
+#efConfirm .modal{max-width:520px}
+#efConfirm .ef-rad{display:flex;gap:14px;margin:8px 0}
+#efConfirm .ef-rad label{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text);cursor:pointer}
+#efConfirm .ef-rad input{width:auto;margin:0}
+</style>
 </head>
 <body>
 
@@ -913,6 +1028,16 @@ td {
   </div>
 
   <div class="settings-section">
+    <div class="settings-section-title">Compliance Checklist</div>
+    <div id="clSetBox"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+      <button class="btn btn-gold btn-sm" onclick="clSaveTemplate()">Save Checklist</button>
+      <button class="btn btn-ghost btn-sm" onclick="clResetTemplate()">Restore defaults</button>
+      <button class="btn btn-ghost btn-sm" onclick="clRescoreAll()">Apply current rules to past trades</button>
+    </div>
+  </div>
+
+  <div class="settings-section">
     <div class="settings-section-title">Data Backup</div>
     <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="exportAllData()">📥 Export All Data</button>
     <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--text3);letter-spacing:0.5px;margin-bottom:12px;line-height:1.5">
@@ -945,6 +1070,7 @@ td {
       <button class="nav-btn" onclick="showPage(&#39;funds&#39;,this)">💰 Funds</button>
       <button class="nav-btn" onclick="showPage(&#39;plan&#39;,this)">📐 Trading Plan</button>
       <button class="nav-btn" onclick="showPage(&#39;rs&#39;,this); if(window.RS) RS.ensureInit(); if(window.RS2) RS2.ensureInit();">📈 RS Score</button>
+      <button class="nav-btn" onclick="showPage(&#39;etf&#39;,this); if(window.EF) EF.ensureInit();">🧭 ETF Flow</button>
     </div>
     <div class="topbar-right">
       <div class="balance-chip">Balance: <strong id="topbarBalance">$10,764.09</strong></div>
@@ -976,11 +1102,31 @@ td {
               <th>Duration (C)</th>
               <th>Max RR</th>
               <th>Outcome</th>
+              <th title="Entry Compliance %">Ent&nbsp;%</th>
+              <th title="Trade Management Compliance %">Mgt&nbsp;%</th>
+              <th title="Complete Trade Compliance %">Tot&nbsp;%</th>
               <th style="color:var(--blue2)">Entry</th>
               <th style="color:var(--purple)">Validation</th>
               <th style="color:var(--orange)">Context</th>
               <th>Notes</th>
               <th>Actions</th>
+            </tr>
+            <tr class="flt-row">
+              <th><select data-flt="inc"><option value="">all</option><option value="y">✓</option><option value="n">○</option></select></th>
+              <th><input data-flt="sym" placeholder="sym"></th>
+              <th><div class="flt2"><input data-flt="d1" type="date"><input data-flt="d2" type="date"></div></th>
+              <th><div class="flt2"><input data-flt="rr1" type="number" step="0.1" placeholder="min"><input data-flt="rr2" type="number" step="0.1" placeholder="max"></div></th>
+              <th><div class="flt2"><input data-flt="rk1" type="number" placeholder="min"><input data-flt="rk2" type="number" placeholder="max"></div></th>
+              <th><div class="flt2"><input data-flt="pl1" type="number" placeholder="min"><input data-flt="pl2" type="number" placeholder="max"></div></th>
+              <th><div class="flt2"><input data-flt="du1" type="number" placeholder="min"><input data-flt="du2" type="number" placeholder="max"></div></th>
+              <th><div class="flt2"><input data-flt="mx1" type="number" step="0.1" placeholder="min"><input data-flt="mx2" type="number" step="0.1" placeholder="max"></div></th>
+              <th><select data-flt="out"><option value="">all</option><option>Win</option><option>Loss</option><option>BE</option></select></th>
+              <th><div class="flt2"><input data-flt="ce1" type="number" placeholder="min"><input data-flt="ce2" type="number" placeholder="max"></div></th>
+              <th><div class="flt2"><input data-flt="cm1" type="number" placeholder="min"><input data-flt="cm2" type="number" placeholder="max"></div></th>
+              <th><div class="flt2"><input data-flt="ct1" type="number" placeholder="min"><input data-flt="ct2" type="number" placeholder="max"></div></th>
+              <th></th><th></th><th></th>
+              <th><input data-flt="note" placeholder="notes"></th>
+              <th><button class="btn btn-ghost btn-sm" onclick="clClearFilters()">clear</button></th>
             </tr>
           </thead>
           <tbody id="dataTableBody"><tr>
@@ -1845,7 +1991,88 @@ td {
   </div>
 
 
+
+  <!-- ══ ETF FLOW PAGE ══ -->
+  <div class="page" id="page-etf">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">ETF <span>FLOW</span></div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-gold btn-sm" id="efAddSec">+ Sector</button>
+        </div>
+      </div>
+      <div class="ef-err" id="efErr"></div>
+
+      <div class="ef-wrap">
+        <!-- LEFT : data -->
+        <div class="ef-pane">
+          <div class="ef-ph"><div class="ef-pt">SECTORS &amp; ETFs</div></div>
+          <div id="efTree"></div>
+        </div>
+
+        <!-- RIGHT : live calculation -->
+        <div class="ef-pane">
+          <div class="ef-ph"><div class="ef-pt">FLOW &amp; RANKING</div></div>
+          <div class="ef-dim" id="efCur" style="font-size:12px;margin-bottom:8px"></div>
+
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+            <span class="ef-dim" style="font-size:10px;text-transform:uppercase;letter-spacing:.05em">Show columns:</span>
+            <span id="efHz"></span>
+          </div>
+
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+            <label class="ef-dim" style="font-size:11px">Top</label>
+            <input id="efTopn" type="number" min="1" value="20" style="width:66px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 6px;color:var(--text);font-size:12px">
+            <button class="btn btn-ghost btn-sm" id="efExport">Export .txt for TradingView</button>
+            <span class="ef-dim" id="efExpNote" style="font-size:10.5px"></span>
+          </div>
+
+          <div style="overflow:auto;max-height:46vh"><table class="ef-t" id="efTable"></table></div>
+
+          <details style="margin-top:12px">
+            <summary style="font-size:11.5px;color:var(--text3);cursor:pointer">Sector rollup</summary>
+            <div id="efSector" style="margin-top:7px"></div>
+          </details>
+
+          <details style="margin-top:8px">
+            <summary style="font-size:11.5px;color:var(--text3);cursor:pointer">Ranking settings</summary>
+            <div id="efCfg" style="margin-top:8px"></div>
+            <div style="display:flex;gap:7px;margin-top:8px">
+              <button class="btn btn-gold btn-sm" id="efSaveCfg">Save</button>
+              <button class="btn btn-ghost btn-sm" id="efResetCfg">Defaults</button>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div><!-- end app -->
+
+<!-- ETF IMPORT CONFIRM -->
+<div class="modal-bg" id="efConfirm">
+  <div class="modal">
+    <h3 id="efCTitle">IMPORT HOLDINGS</h3>
+    <div class="modal-sub" id="efCSub"></div>
+    <div class="form-group" style="margin-bottom:12px">
+      <div class="form-label">Date this data represents *</div>
+      <input class="form-input" id="efCDate" type="date">
+    </div>
+    <div class="form-label">Is this the fund's complete holdings list?</div>
+    <div class="ef-rad">
+      <label><input type="radio" name="efComplete" id="efCFull"> <b>Full</b> — every holding is listed</label>
+      <label><input type="radio" name="efComplete" id="efCPart"> <b>Partial</b> — only some (e.g. top 10)</label>
+    </div>
+    <div class="ef-dim" style="font-size:11px;line-height:1.5;margin-bottom:8px">On a <b>Full</b> file a missing ticker counts as a genuine zero, so exits and new positions are detected. On a <b>Partial</b> file a missing ticker is treated as unknown and skipped, so it can never fake an exit.</div>
+    <div id="efCSum" style="font-size:12px;color:var(--text2);margin-bottom:8px"></div>
+    <div id="efCPrev" style="max-height:190px;overflow:auto"></div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" id="efCCancel">Cancel</button>
+      <button class="btn btn-gold" id="efCSave">Save snapshot</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- ADD TRADE MODAL -->
 <div class="modal-bg" id="tradeModal">
@@ -1899,6 +2126,12 @@ td {
         <label for="fInclude" style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:13px;color:var(--text2);cursor:pointer">Include in Analysis</label>
       </div>
     </div>
+    <div class="cl-head">
+      <div class="cl-head-t">COMPLIANCE CHECKLIST</div>
+      <div id="clHeadScore"></div>
+    </div>
+    <div class="cl-hint" style="margin-bottom:8px">Click a box to cycle: <b style="color:var(--red)">✗ missed</b> → <b style="color:var(--green)">✓ met</b> → <b>N/A</b> (doesn't apply — removed from the maths).</div>
+    <div class="cl-box" id="clBox"></div>
     <div class="modal-btns">
       <button class="btn btn-ghost" onclick="closeTradeModal()">Cancel</button>
       <button class="btn btn-gold" id="tradeSubmitBtn" onclick="saveTrade()">Save Trade</button>
@@ -1957,6 +2190,239 @@ const SB_KEY = 'sb_publishable_SKiVUnE0b4BkDh9JPRT0Ng_pYgjLErJ';
 let allTrades = [];
 let allFunds = [];
 let settings = { startBalance: 10000, password: 'trader123' };
+/* ═════════════ COMPLIANCE CHECKLIST (CL) ═════════════ */
+const CL_DEFAULT = {
+  entryWeight: 80,
+  mgmtWeight: 20,
+  entry: [
+    { id:"ctx", title:"Context TF", items:[
+      { id:"ctx1", text:"Clear unidirectional movement", score:true },
+      { id:"ctx2", text:"Price must NOT be in a choppy stage-1 price action", score:true },
+      { id:"ctx3", text:"10 MA > 20 MA or very close · both sloping up · cycle not overextended", score:true }
+    ]},
+    { id:"rsf", title:"Relative Strength & Fundamentals", items:[
+      { id:"rsf1", text:"Relatively strongest markets · outperforming their parent index · compared with markets of similar nature", score:true },
+      { id:"rsf2", text:"Filtered and ranked through RS Score", score:true },
+      { id:"rsf3", text:"Filtered for strong fundamentals", score:true }
+    ]},
+    { id:"val", title:"Validation TF", items:[
+      { id:"val1", text:"Clear unidirectional movement", score:true },
+      { id:"val2", text:"10 MA > 20 MA · both sloping up · cycle not overextended — never after mmb3 on V", score:true },
+      { id:"val3", text:"Did NOT enter: price too far from 10-20 MA · price at its peak · after a huge sudden demand · on earnings-release day", score:true },
+      { id:"val4", text:"Price ≥ 50 MA · not 2x 1D ATR from 10 MA · not more than 1D ATR from 5 MA", score:true },
+      { id:"val5", text:"Entered through an MB (accmb or mmb through E) inside the DV box + FMZ outside the containment line, or right after validation of the DV box high", score:true }
+    ]},
+    { id:"ent", title:"Entry TF", items:[
+      { id:"ent1", text:"ACCMB — entered at or after the DV of 10-20 MA intersection or 20 MA DTC", score:true },
+      { id:"ent2", text:"MMB — price had at least flushed below 10 MA · never after mmb3 on E", score:true }
+    ]},
+    { id:"emi", title:"Emicro", items:[
+      { id:"emi1", text:"Cycle not overextended — never entered after mmb3", score:true }
+    ]}
+  ],
+  mgmt: [
+    { id:"sys", title:"Trade System — mutually exclusive (not scored)", items:[
+      { id:"sys1", text:"FIRST TRADE — inside the DV box + FMZ outside the containment line", score:false },
+      { id:"sys2", text:"SECOND TRADE — soon after price validated the high of the DV box", score:false }
+    ]},
+    { id:"exe", title:"Execution", items:[
+      { id:"exe1", text:"Quantity = 1D ATR", score:true },
+      { id:"exe2", text:"Stoploss / Breakeven = Trail 10 MA on V", score:true },
+      { id:"exe3", text:"Profit = 50 MA on V (not scored)", score:false }
+    ]}
+  ]
+};
+let CL = JSON.parse(JSON.stringify(CL_DEFAULT));
+let clTicks = {};                     // itemId -> 'y' | 'n' | 'na'  (current modal)
+const clDeep = o => JSON.parse(JSON.stringify(o));
+function clAllItems(sec){ const o=[]; (CL[sec]||[]).forEach(g=>g.items.forEach(i=>o.push(i))); return o; }
+
+/* score one section: equal weight per scored item, N/A drops out entirely */
+function clSectionPct(sec, ticks){
+  const items = clAllItems(sec).filter(i=>i.score);
+  let met=0, applicable=0;
+  items.forEach(i=>{
+    const v = ticks[i.id] || 'n';
+    if(v==='na') return;
+    applicable++;
+    if(v==='y') met++;
+  });
+  if(!applicable) return null;
+  return met/applicable*100;
+}
+function clScores(ticks){
+  const e = clSectionPct('entry', ticks);
+  const m = clSectionPct('mgmt', ticks);
+  const ew = parseFloat(CL.entryWeight)||0, mw = parseFloat(CL.mgmtWeight)||0;
+  let tot=null;
+  if(e!==null||m!==null){
+    const parts=[], wts=[];
+    if(e!==null){parts.push(e*ew); wts.push(ew);}
+    if(m!==null){parts.push(m*mw); wts.push(mw);}
+    const wsum=wts.reduce((a,b)=>a+b,0);
+    tot = wsum? parts.reduce((a,b)=>a+b,0)/wsum : null;
+  }
+  return { entry:e, mgmt:m, total:tot };
+}
+function clPctClass(v){ if(v===null||v===undefined) return 'cl-na'; if(v>=90) return 'cl-hi'; if(v>=70) return 'cl-mid'; return 'cl-lo'; }
+function clPctTxt(v){ return (v===null||v===undefined) ? '—' : Math.round(v)+'%'; }
+
+/* ---------- modal checklist ---------- */
+function clRenderModal(){
+  const box = document.getElementById('clBox'); if(!box) return;
+  const sect = (sec,label,weight) => {
+    const p = clSectionPct(sec, clTicks);
+    let h = '<div class="cl-sec"><div class="cl-sec-head">'+label
+          + ' <span class="cl-w">'+weight+'% of total</span>'
+          + '<span class="cl-secpct '+clPctClass(p)+'">'+clPctTxt(p)+'</span></div>';
+    (CL[sec]||[]).forEach(g=>{
+      h += '<div class="cl-grp"><div class="cl-grp-t">'+clEsc(g.title)+'</div>';
+      g.items.forEach(i=>{
+        const v = clTicks[i.id] || 'n';
+        h += '<div class="cl-item">'
+           +   '<button type="button" class="cl-tri cl-'+v+'" data-cl="'+i.id+'" title="Click to cycle: missed → met → not applicable">'
+           +     (v==='y'?'✓':v==='na'?'N/A':'✗')
+           +   '</button>'
+           +   '<span class="cl-txt'+(i.score?'':' cl-nos')+'">'+clEsc(i.text)+(i.score?'':' <em>· no score</em>')+'</span>'
+           + '</div>';
+      });
+      h += '</div>';
+    });
+    return h+'</div>';
+  };
+  box.innerHTML = sect('entry','ENTRY COMPLIANCE', CL.entryWeight) + sect('mgmt','TRADE MANAGEMENT', CL.mgmtWeight);
+  box.querySelectorAll('[data-cl]').forEach(b=>b.addEventListener('click',()=>{
+    const id=b.dataset.cl, cur=clTicks[id]||'n';
+    clTicks[id] = cur==='n' ? 'y' : cur==='y' ? 'na' : 'n';
+    clRenderModal(); clUpdateHeader();
+  }));
+  clUpdateHeader();
+}
+function clUpdateHeader(){
+  const s = clScores(clTicks), el = document.getElementById('clHeadScore');
+  if(el) el.innerHTML = 'Entry <b class="'+clPctClass(s.entry)+'">'+clPctTxt(s.entry)+'</b>'
+                      + ' · Mgmt <b class="'+clPctClass(s.mgmt)+'">'+clPctTxt(s.mgmt)+'</b>'
+                      + ' · Total <b class="'+clPctClass(s.total)+'">'+clPctTxt(s.total)+'</b>';
+}
+function clEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ---------- settings editor ---------- */
+function clRenderSettings(){
+  const box=document.getElementById('clSetBox'); if(!box) return;
+  let h = '<div class="cl-set-row">'
+        + '<label>Entry weight %<input type="number" min="0" max="100" id="clWE" value="'+CL.entryWeight+'"></label>'
+        + '<label>Management weight %<input type="number" min="0" max="100" id="clWM" value="'+CL.mgmtWeight+'"></label>'
+        + '</div><div class="cl-hint">Inside each section every scored line is worth the same. Marking a line <b>N/A</b> on a trade removes it from that trade\'s maths, so the score stays fair.</div>';
+  ['entry','mgmt'].forEach(sec=>{
+    h += '<div class="cl-set-sec"><div class="cl-set-h">'+(sec==='entry'?'ENTRY COMPLIANCE':'TRADE MANAGEMENT')+'</div>';
+    (CL[sec]||[]).forEach((g,gi)=>{
+      h += '<div class="cl-set-grp">'
+         +   '<div class="cl-set-gt"><input type="text" data-gt="'+sec+'|'+gi+'" value="'+clEsc(g.title)+'">'
+         +   '<button class="cl-x" data-gdel="'+sec+'|'+gi+'" title="Delete this whole group">✕</button></div>';
+      g.items.forEach((i,ii)=>{
+        h += '<div class="cl-set-item">'
+           +   '<input type="text" data-it="'+sec+'|'+gi+'|'+ii+'" value="'+clEsc(i.text)+'">'
+           +   '<label class="cl-sc" title="Counts toward the score"><input type="checkbox" data-sc="'+sec+'|'+gi+'|'+ii+'" '+(i.score?'checked':'')+'>score</label>'
+           +   '<button class="cl-x" data-idel="'+sec+'|'+gi+'|'+ii+'">✕</button>'
+           + '</div>';
+      });
+      h += '<button class="btn btn-ghost btn-sm" data-iadd="'+sec+'|'+gi+'">+ line</button></div>';
+    });
+    h += '<button class="btn btn-ghost btn-sm" data-gadd="'+sec+'">+ group</button></div>';
+  });
+  box.innerHTML=h;
+  const re=()=>{clRenderSettings();};
+  box.querySelector('#clWE').addEventListener('input',e=>{CL.entryWeight=e.target.value;});
+  box.querySelector('#clWM').addEventListener('input',e=>{CL.mgmtWeight=e.target.value;});
+  box.querySelectorAll('[data-gt]').forEach(el=>el.addEventListener('input',e=>{const[s,g]=e.target.dataset.gt.split('|');CL[s][+g].title=e.target.value;}));
+  box.querySelectorAll('[data-it]').forEach(el=>el.addEventListener('input',e=>{const[s,g,i]=e.target.dataset.it.split('|');CL[s][+g].items[+i].text=e.target.value;}));
+  box.querySelectorAll('[data-sc]').forEach(el=>el.addEventListener('change',e=>{const[s,g,i]=e.target.dataset.sc.split('|');CL[s][+g].items[+i].score=e.target.checked;}));
+  box.querySelectorAll('[data-idel]').forEach(el=>el.addEventListener('click',e=>{const[s,g,i]=e.target.dataset.idel.split('|');CL[s][+g].items.splice(+i,1);re();}));
+  box.querySelectorAll('[data-gdel]').forEach(el=>el.addEventListener('click',e=>{const[s,g]=e.target.dataset.gdel.split('|');if(confirm('Delete this whole group and its lines?')){CL[s].splice(+g,1);re();}}));
+  box.querySelectorAll('[data-iadd]').forEach(el=>el.addEventListener('click',e=>{const[s,g]=e.target.dataset.iadd.split('|');CL[s][+g].items.push({id:'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),text:'New criterion',score:true});re();}));
+  box.querySelectorAll('[data-gadd]').forEach(el=>el.addEventListener('click',e=>{const s=e.target.dataset.gadd;CL[s].push({id:'g'+Date.now().toString(36),title:'New group',items:[]});re();}));
+}
+async function clSaveTemplate(){
+  try{
+    const ex = await sb('settings?select=id&limit=1');
+    if(ex && ex.length) await sb('settings?id=eq.'+ex[0].id,'PATCH',{ checklist: CL });
+    else await sb('settings','POST',{ startBalance: settings.startBalance||10000, password: settings.password||'trader123', checklist: CL });
+    toast('Checklist saved ✓','success');
+  }catch(e){ toast('Save failed: '+e.message+' — was the checklist column added?','error'); }
+}
+function clResetTemplate(){
+  if(!confirm('Restore the original default checklist? Your saved trades keep their scores.')) return;
+  CL = clDeep(CL_DEFAULT); clRenderSettings(); toast('Defaults restored — press Save Checklist to keep them','success');
+}
+async function clRescoreAll(){
+  if(!confirm('Recalculate every past trade using the CURRENT checklist and weights?\n\nTrades that were logged before the checklist existed have no ticks, so they will stay blank.')) return;
+  let n=0;
+  try{
+    for(const t of allTrades){
+      const c = t.compliance;
+      if(!c || !c.t) continue;
+      const s = clScores(c.t);
+      await sb('trades?id=eq.'+t.id,'PATCH',{ compliance:{ t:c.t, e:s.entry, m:s.mgmt, tot:s.total } });
+      n++;
+    }
+    toast('Rescored '+n+' trade'+(n===1?'':'s')+' ✓','success');
+    await loadData();
+  }catch(e){ toast('Rescore failed: '+e.message,'error'); }
+}
+
+/* ---------- column filters ---------- */
+let clFilters = {};
+function clFilterMatch(t){
+  const f = clFilters;
+  const rr = parseFloat(t.rr_secured)||0, risk = parseFloat(t.risk_usd)||0, pnl = rr*risk;
+  const outcome = rr>0.1?'Win':rr<-0.05?'Loss':'BE';
+  const c = t.compliance||{};
+  const txt=(v,q)=>!q||String(v==null?'':v).toLowerCase().includes(q.toLowerCase());
+  const rng=(v,lo,hi)=>{ if(lo!==''&&lo!=null&&!(parseFloat(v)>=parseFloat(lo)))return false;
+                         if(hi!==''&&hi!=null&&!(parseFloat(v)<=parseFloat(hi)))return false; return true; };
+  if(f.inc==='y'&&t.include_analysis===false)return false;
+  if(f.inc==='n'&&t.include_analysis!==false)return false;
+  if(!txt(t.symbol,f.sym))return false;
+  if(f.d1&&(!t.trade_date||t.trade_date<f.d1))return false;
+  if(f.d2&&(!t.trade_date||t.trade_date>f.d2))return false;
+  if(!rng(rr,f.rr1,f.rr2))return false;
+  if(!rng(risk,f.rk1,f.rk2))return false;
+  if(!rng(pnl,f.pl1,f.pl2))return false;
+  if(!rng(t.duration_candles,f.du1,f.du2))return false;
+  if(!rng(t.max_rr,f.mx1,f.mx2))return false;
+  if(f.out&&outcome!==f.out)return false;
+  if(!rng(c.e,f.ce1,f.ce2))return false;
+  if(!rng(c.m,f.cm1,f.cm2))return false;
+  if(!rng(c.tot,f.ct1,f.ct2))return false;
+  if(!txt(t.notes,f.note))return false;
+  return true;
+}
+function clBindFilters(){
+  document.querySelectorAll('[data-flt]').forEach(el=>{
+    const k=el.dataset.flt;
+    el.value = clFilters[k]==null?'':clFilters[k];
+    const ev = el.tagName==='SELECT'?'change':'input';
+    el.addEventListener(ev,e=>{ clFilters[k]=e.target.value; renderTrades(); });
+  });
+}
+function clClearFilters(){ clFilters={}; renderTrades(); }
+function clToggleDetail(id){
+  const r=document.getElementById('cld-'+id); if(r) r.style.display = r.style.display==='none'?'':'none';
+}
+function clDetailHtml(t){
+  const c=t.compliance; if(!c||!c.t) return '<span class="cl-dim">No checklist recorded for this trade.</span>';
+  const miss=[], na=[];
+  ['entry','mgmt'].forEach(sec=>clAllItems(sec).forEach(i=>{
+    if(!i.score) return;
+    const v=c.t[i.id]||'n';
+    if(v==='n') miss.push(i.text); else if(v==='na') na.push(i.text);
+  }));
+  let h='';
+  if(miss.length){ h+='<div class="cl-dt cl-lo">Missed ('+miss.length+')</div><ul class="cl-dl">'+miss.map(m=>'<li>'+clEsc(m)+'</li>').join('')+'</ul>'; }
+  else h+='<div class="cl-dt cl-hi">Every applicable rule was followed.</div>';
+  if(na.length) h+='<div class="cl-dt cl-dim">Not applicable ('+na.length+')</div><ul class="cl-dl cl-dim">'+na.map(m=>'<li>'+clEsc(m)+'</li>').join('')+'</ul>';
+  return h;
+}
 let deleteTarget = { id: null, table: null };
 let donutChart = null;
 let curveChart = null;
@@ -2024,6 +2490,13 @@ async function loadSettings() {
       settings.startBalance = row.startBalance || row["startBalance"] || 10000;
       settings.password = row.password || 'trader123';
       settings.id = row.id;
+      if (row.checklist) {
+        try {
+          const tpl = typeof row.checklist === 'string' ? JSON.parse(row.checklist) : row.checklist;
+          if (tpl && tpl.entry && tpl.mgmt) CL = tpl;
+        } catch(e) { console.warn('checklist parse', e); }
+      }
+      clRenderSettings();
     }
   } catch(e) {
     console.warn('loadSettings error:', e.message);
@@ -2121,11 +2594,18 @@ async function loadData() {
 function renderTrades() {
   const tbody = document.getElementById('dataTableBody');
   if (!allTrades.length) {
-    tbody.innerHTML = `<tr><td colspan="14"><div class="empty"><div class="empty-icon">📊</div><h3>No Trades Yet</h3><p>Click + Add Trade to start logging</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="17"><div class="empty"><div class="empty-icon">📊</div><h3>No Trades Yet</h3><p>Click + Add Trade to start logging</p></div></td></tr>`;
+    clBindFilters();
+    return;
+  }
+  const _shown = allTrades.filter(clFilterMatch);
+  if (!_shown.length) {
+    tbody.innerHTML = `<tr><td colspan="17"><div class="empty"><div class="empty-icon">🔍</div><h3>No Trades Match</h3><p>Adjust or clear the filters above</p></div></td></tr>`;
+    clBindFilters();
     return;
   }
 
-  tbody.innerHTML = allTrades.map(t => {
+  tbody.innerHTML = _shown.map(t => {
     const rr = parseFloat(t.rr_secured) || 0;
     const risk = parseFloat(t.risk_usd) || 0;
     const pnl = rr * risk;
@@ -2154,6 +2634,9 @@ function renderTrades() {
       <td style="font-family:'Barlow Condensed',sans-serif;color:var(--text2)">${t.duration_candles || '—'}</td>
       <td style="font-family:'Barlow Condensed',sans-serif;color:var(--text2)">${t.max_rr ? t.max_rr + 'r' : '—'}</td>
       <td><span class="outcome-badge ${obClass}">${outcome}</span></td>
+      <td class="cl-cell ${clPctClass((t.compliance||{}).e)}" onclick="clToggleDetail('${t.id}')" title="Click for detail">${clPctTxt((t.compliance||{}).e)}</td>
+      <td class="cl-cell ${clPctClass((t.compliance||{}).m)}" onclick="clToggleDetail('${t.id}')" title="Click for detail">${clPctTxt((t.compliance||{}).m)}</td>
+      <td class="cl-cell ${clPctClass((t.compliance||{}).tot)}" onclick="clToggleDetail('${t.id}')" title="Click for detail">${clPctTxt((t.compliance||{}).tot)}</td>
       <td>${entryLink}</td>
       <td>${valLink}</td>
       <td>${ctxLink}</td>
@@ -2164,8 +2647,10 @@ function renderTrades() {
           <button class="btn btn-danger btn-sm" onclick="openDelete('${t.id}','trades')">✕</button>
         </div>
       </td>
-    </tr>`;
+    </tr>
+    <tr class="cl-detail" id="cld-${t.id}" style="display:none"><td colspan="17">${clDetailHtml(t)}</td></tr>`;
   }).join('');
+  clBindFilters();
 }
 
 // ══ ANALYSIS ══
@@ -2543,6 +3028,8 @@ function openAddTrade() {
   });
   document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
   document.getElementById('fInclude').checked = true;
+  clTicks = {};
+  clRenderModal();
   document.getElementById('tradeModal').classList.add('show');
   setTimeout(() => document.getElementById('fSymbol').focus(), 100);
 }
@@ -2564,6 +3051,8 @@ function editTrade(id) {
   document.getElementById('fContext').value = t.screenshot_context || '';
   document.getElementById('fNotes').value = t.notes || '';
   document.getElementById('fInclude').checked = t.include_analysis !== false;
+  clTicks = (t.compliance && t.compliance.t) ? JSON.parse(JSON.stringify(t.compliance.t)) : {};
+  clRenderModal();
   document.getElementById('tradeModal').classList.add('show');
 }
 
@@ -2589,6 +3078,8 @@ async function saveTrade() {
     notes: document.getElementById('fNotes').value.trim() || null,
     include_analysis: document.getElementById('fInclude').checked
   };
+  const _cs = clScores(clTicks);
+  row.compliance = { t: clTicks, e: _cs.entry, m: _cs.mgmt, tot: _cs.total };
 
   const btn = document.getElementById('tradeSubmitBtn');
   btn.innerHTML = '<span class="spin"></span> Saving...';
@@ -3526,6 +4017,626 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     cloudLoad();
   }
   window.RS2={ensureInit:init};
+})();
+
+</script>
+<script>
+/* ═════════════ ETF FLOW (EF) — sectors · snapshots · flow maths ═════════════ */
+(function(){
+  const HZ=[1,2,3,4,5,6,12,36];
+  const DEF_CFG={
+    wHz:{1:20,2:15,3:15,4:10,5:10,6:15,12:10,36:5},
+    wMom:65,wBreadth:25,wLevel:10,
+    prior:2, cap:2, minAlloc:0.10,
+    alias:{}, exclude:"cash,usd,us dollar,dollar,repo,future,margin,net other,other assets,liabilit,swap,forward,t-bill,treasury bill,money market,deposit,collateral,receivable,payable"
+  };
+  let CFG=JSON.parse(JSON.stringify(DEF_CFG));
+  let NODES=[], SNAPS=[], SEL={}, OPEN={}, inited=false;
+  let hideHz={}, sortBy={c:"score",d:"desc"}, pending=null;
+
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  const MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const ym=d=>String(d).slice(0,7);
+  const ymLabel=k=>MN[+k.slice(5,7)-1]+" "+k.slice(0,4);
+  function monthsBetween(a,b){ // a,b = 'YYYY-MM'  -> a minus b in months
+    return (+a.slice(0,4)-+b.slice(0,4))*12 + (+a.slice(5,7)-+b.slice(5,7));
+  }
+  function addMonths(k,n){
+    let y=+k.slice(0,4), m=+k.slice(5,7)-1+n;
+    y+=Math.floor(m/12); m=((m%12)+12)%12;
+    return y+"-"+String(m+1).padStart(2,"0");
+  }
+
+  /* ───────── ticker hygiene ───────── */
+  function normT(t){
+    let s=String(t||"").trim().toUpperCase();
+    s=s.replace(/[\s\/]+/g,".").replace(/-/g,".");
+    s=s.replace(/\.(US|UW|UQ|UN|UA|UR|USD|EQUITY)$/,"");
+    s=s.replace(/\.+/g,".").replace(/^\.|\.$/g,"");
+    if(CFG.alias&&CFG.alias[s])s=CFG.alias[s];
+    return s;
+  }
+  function isExcluded(tk,name){
+    const list=(CFG.exclude||"").split(",").map(x=>x.trim().toLowerCase()).filter(Boolean);
+    const hay=((tk||"")+" "+(name||"")).toLowerCase();
+    if(!tk||/^[-—.]+$/.test(tk))return true;
+    return list.some(w=>hay.includes(w));
+  }
+
+  /* ───────── parsing: csv / tsv / clipboard / excel ───────── */
+  function splitRows(text){
+    const t=text.replace(/\r\n?/g,"\n");
+    const tabs=(t.match(/\t/g)||[]).length, commas=(t.match(/,/g)||[]).length;
+    const semis=(t.match(/;/g)||[]).length;
+    let d=","; if(tabs>commas&&tabs>semis)d="\t"; else if(semis>commas)d=";";
+    const out=[];let row=[],f="",q=false;
+    for(let i=0;i<t.length;i++){const c=t[i];
+      if(q){ if(c==='"'){ if(t[i+1]==='"'){f+='"';i++;} else q=false; } else f+=c; }
+      else { if(c==='"')q=true;
+             else if(c===d){row.push(f);f="";}
+             else if(c==="\n"){row.push(f);out.push(row);row=[];f="";}
+             else f+=c; } }
+    if(f!==""||row.length){row.push(f);out.push(row);}
+    return out.filter(r=>r.some(c=>String(c).trim()!==""));
+  }
+  function toNum(v){
+    if(v===null||v===undefined)return null;
+    let s=String(v).trim();
+    if(!s||/^(n\/?a|--|—|-)$/i.test(s))return null;
+    let neg=/^\(.*\)$/.test(s); if(neg)s=s.slice(1,-1);
+    s=s.replace(/[%,\s]/g,"").replace(/[\u2212\u2013\u2014]/g,"-");
+    const f=parseFloat(s); if(isNaN(f))return null;
+    return neg?-f:f;
+  }
+  const TICKISH=/^[A-Z][A-Z0-9.\-]{0,7}$/;
+  function detect(m){
+    // pass 1 — a real header row
+    for(let r=0;r<Math.min(20,m.length);r++){
+      const row=m[r].map(x=>String(x||"").trim().toLowerCase());
+      let tc=-1,wc=-1,nc=-1;
+      row.forEach((h,i)=>{
+        if(tc<0&&/(^|\b)(ticker|symbol|identifier|code)(\b|$)/.test(h))tc=i;
+        if(nc<0&&/(name|security|holding|company|description)/.test(h))nc=i;
+        if(wc<0&&/(weight|% of|percent|allocation|net asset|%net|portfolio|wt\.?|% wt)/.test(h))wc=i;
+      });
+      if(wc>=0&&(tc>=0||nc>=0))return {h:r,tc,wc,nc};
+    }
+    // pass 2 — statistics
+    const width=Math.max(...m.map(r=>r.length));
+    let best={score:-1};
+    for(let wc=0;wc<width;wc++){
+      let sum=0,n=0;
+      for(let r=0;r<m.length;r++){const v=toNum(m[r][wc]); if(v!==null&&v>=0&&v<=100){sum+=v;n++;}}
+      if(n<3)continue;
+      const score=-Math.abs(sum-100);
+      if(sum>=40&&sum<=140&&score>best.score)best={score,wc,sum};
+    }
+    if(best.wc===undefined)return null;
+    let tc=-1,tb=0,nc=-1,nb=0;
+    for(let c=0;c<width;c++){
+      if(c===best.wc)continue;
+      let tick=0,long=0,n=0;
+      for(let r=0;r<m.length;r++){const s=String(m[r][c]||"").trim();
+        if(!s)continue; n++;
+        if(TICKISH.test(s))tick++;
+        if(s.length>10)long++;}
+      if(n<3)continue;
+      if(tick/n>tb){tb=tick/n;tc=c;}
+      if(long/n>nb){nb=long/n;nc=c;}
+    }
+    return {h:-1,tc:tb>0.5?tc:-1,wc:best.wc,nc};
+  }
+  function ingest(matrix){
+    const d=detect(matrix);
+    if(!d)return {err:"Could not find a weight column. The file needs a column of percentages that adds up to roughly 100."};
+    const rows=[],seen={};
+    for(let r=(d.h<0?0:d.h+1);r<matrix.length;r++){
+      const line=matrix[r]; if(!line)continue;
+      const w=toNum(line[d.wc]); if(w===null||w<=0)continue;
+      let tk=d.tc>=0?String(line[d.tc]||"").trim():"";
+      const nm=d.nc>=0?String(line[d.nc]||"").trim():"";
+      if(!tk&&nm)tk=nm.split(/[\s,]+/)[0];
+      tk=normT(tk); if(!tk)continue;
+      if(isExcluded(tk,nm))continue;
+      if(seen[tk]!==undefined)rows[seen[tk]].w+=w;
+      else {seen[tk]=rows.length;rows.push({t:tk,w:w,n:nm});}
+    }
+    if(!rows.length)return {err:"No holdings rows were recognised in that file."};
+    const disclosed=rows.reduce((a,b)=>a+b.w,0);
+    return {rows,disclosed};
+  }
+
+  /* ───────── monthly maths ───────── */
+  // ETF-month vector honouring Full vs Partial
+  function etfMonth(etfId,mk){
+    const snaps=SNAPS.filter(s=>s.etf_id===etfId&&ym(s.as_of)===mk&&SEL["s"+s.id]!==false&&selOn(etfId));
+    if(!snaps.length)return null;
+    const sum={},den={};
+    const all=new Set(); snaps.forEach(s=>(s.holdings||[]).forEach(h=>all.add(h.t)));
+    all.forEach(t=>{sum[t]=0;den[t]=0;});
+    snaps.forEach(s=>{
+      const map={}; (s.holdings||[]).forEach(h=>map[h.t]=h.w);
+      all.forEach(t=>{
+        if(map[t]!==undefined){sum[t]+=map[t];den[t]++;}
+        else if(s.complete){den[t]++;}          // real zero
+        // partial + absent => unknown, skip entirely
+      });
+    });
+    const out={};
+    all.forEach(t=>{ if(den[t]>0)out[t]=sum[t]/den[t]; });
+    return {w:out,n:snaps.length};
+  }
+  function selOn(id){return SEL["n"+id]!==false;}
+  function selectedEtfs(){
+    return NODES.filter(n=>n.kind==="etf"&&selOn(n.id)&&(!n.parent_id||selOn(n.parent_id)));
+  }
+  // cross-ETF month: {ticker:{avg,holders}}, plus how many ETFs had data
+  function crossMonth(mk){
+    const etfs=selectedEtfs(), acc={}; let cover=0;
+    etfs.forEach(e=>{
+      const v=etfMonth(e.id,mk); if(!v)return;
+      cover++;
+      for(const t in v.w){
+        const w=v.w[t];
+        if(!acc[t])acc[t]={sum:0,holders:0};
+        if(w>0){acc[t].sum+=w;acc[t].holders++;}
+      }
+    });
+    const out={};
+    for(const t in acc){ if(acc[t].holders>0) out[t]={avg:acc[t].sum/acc[t].holders,holders:acc[t].holders}; }
+    return {map:out,cover};
+  }
+  function monthKeys(){
+    const set=new Set();
+    selectedEtfs().forEach(e=>SNAPS.filter(s=>s.etf_id===e.id&&SEL["s"+s.id]!==false).forEach(s=>set.add(ym(s.as_of))));
+    return [...set].sort();
+  }
+  const SRC=(a,b)=>{const m=(a+b)/2; return m===0?null:(a-b)/m;};   // −2 … +2
+
+  function buildModel(){
+    const mks=monthKeys();
+    if(!mks.length)return {rows:[],cur:null,mks:[]};
+    const cur=mks[mks.length-1];
+    const etfs=selectedEtfs();
+    // per-ETF monthly vectors
+    const vec={};
+    etfs.forEach(e=>{ vec[e.id]={}; mks.forEach(k=>{ const v=etfMonth(e.id,k); if(v)vec[e.id][k]=v.w; }); });
+    const nowEtfs=etfs.filter(e=>vec[e.id][cur]);
+    // LIKE-FOR-LIKE: a change is only measured across funds present in BOTH months,
+    // otherwise simply adding a new ETF makes all its holdings look like fresh buys.
+    function avgAmong(list,k,t){
+      let sum=0,n=0;
+      list.forEach(e=>{ const v=vec[e.id][k]; if(!v)return; const w=v[t]; if(w!==undefined&&w>0){sum+=w;n++;} });
+      return {avg:n?sum/n:0,holders:n};
+    }
+    const universe=new Set();
+    etfs.forEach(e=>mks.forEach(k=>{ const v=vec[e.id][k]; if(v)for(const t in v)universe.add(t); }));
+    const rows=[];
+    universe.forEach(t=>{
+      const cn=avgAmong(nowEtfs,cur,t);
+      const r={t,avg:cn.avg,holders:cn.holders,cover:nowEtfs.length,dpp:{},src:{},flag:""};
+      HZ.forEach(h=>{
+        const pk=addMonths(cur,-h);
+        if(!mks.includes(pk)){r.dpp[h]=null;r.src[h]=null;return;}
+        const common=etfs.filter(e=>vec[e.id][cur]&&vec[e.id][pk]);
+        if(!common.length){r.dpp[h]=null;r.src[h]=null;return;}
+        const a=avgAmong(common,cur,t), b=avgAmong(common,pk,t);
+        if(a.holders===0&&b.holders===0){r.dpp[h]=null;r.src[h]=null;return;}
+        r.dpp[h]=a.avg-b.avg;
+        r.src[h]=SRC(a.avg,b.avg);
+      });
+      const avail=HZ.filter(h=>r.src[h]!==null&&r.src[h]!==undefined);
+      if(avail.length){
+        const h0=avail[0];
+        if(r.src[h0]===2)r.flag="NEW";
+        else if(r.src[h0]===-2)r.flag="EXITED";
+      }
+      if(cn.holders===0&&!avail.length)return;
+      rows.push(r);
+    });
+    score(rows);
+    return {rows,cur,mks};
+  }
+
+  /* ───────── ranking ───────── */
+  function zstats(vals){
+    if(vals.length<2)return null;
+    const m=vals.reduce((a,b)=>a+b,0)/vals.length;
+    const sd=Math.sqrt(vals.reduce((a,b)=>a+(b-m)*(b-m),0)/vals.length);
+    return sd>0?{m,sd}:null;
+  }
+  function score(rows){
+    const cap=parseFloat(CFG.cap)||2, prior=parseFloat(CFG.prior)||2;
+    const minA=parseFloat(CFG.minAlloc)||0;
+    // eligibility: material size OR held by 2+ funds
+    rows.forEach(r=>{ r.elig = (r.avg>=minA)||(r.holders>=2); });
+    const pool=rows.filter(r=>r.elig);
+    // per-horizon z of the scale-free change
+    const zs={};
+    HZ.forEach(h=>{
+      const v=pool.map(r=>r.src[h]).filter(x=>x!==null&&x!==undefined);
+      zs[h]=zstats(v);
+    });
+    const bz=zstats(pool.map(r=>Math.log(1+r.holders)));
+    const lz=zstats(pool.map(r=>Math.log(1+Math.max(0,r.avg))));
+    const cf=x=>cap*Math.tanh(x/cap);
+    rows.forEach(r=>{
+      if(!r.elig){r.score=null;r.mom=null;r.cov=0;return;}
+      let num=0,den=0,navail=0;
+      HZ.forEach(h=>{
+        const v=r.src[h]; const st=zs[h];
+        if(v===null||v===undefined||!st)return;
+        const w=parseFloat((CFG.wHz||{})[h])||0; if(w<=0)return;
+        num+=w*cf((v-st.m)/st.sd); den+=w; navail++;
+      });
+      const mom=den>0?num/den:0;
+      const shrunk=mom*(navail/(navail+prior));
+      const bV=bz?cf((Math.log(1+r.holders)-bz.m)/bz.sd):0;
+      const lV=lz?cf((Math.log(1+Math.max(0,r.avg))-lz.m)/lz.sd):0;
+      const wm=parseFloat(CFG.wMom)||0, wb=parseFloat(CFG.wBreadth)||0, wl=parseFloat(CFG.wLevel)||0;
+      const tw=wm+wb+wl||1;
+      const raw=(wm*shrunk+wb*bV+wl*lV)/tw;
+      r.mom=mom; r.cov=navail;
+      r.score=(cf(raw)+cap)/(2*cap)*100;      // 0…100
+    });
+    const ranked=rows.filter(r=>r.score!==null).sort((a,b)=>b.score-a.score);
+    ranked.forEach((r,i)=>r.rank=i+1);
+    rows.filter(r=>r.score===null).forEach(r=>r.rank=null);
+  }
+
+  /* ───────── per-ETF month table ───────── */
+  function etfMonthTable(etfId,mk){
+    const cur=etfMonth(etfId,mk); if(!cur)return "<div class='ef-dim'>No selected snapshots this month.</div>";
+    const hzs=[1,2,3,6,12];
+    const rows=[];
+    for(const t in cur.w){
+      const o={t,w:cur.w[t]};
+      hzs.forEach(h=>{
+        const pk=addMonths(mk,-h), prev=etfMonth(etfId,pk);
+        if(!prev){o["d"+h]=null;return;}
+        o["d"+h]=cur.w[t]-(prev.w[t]||0);
+      });
+      rows.push(o);
+    }
+    rows.sort((a,b)=>b.w-a.w);
+    let h='<table class="ef-t"><thead><tr><th>Ticker</th><th>Alloc %</th>'
+        + hzs.map(x=>'<th>Δ'+x+'m</th>').join('')+'</tr></thead><tbody>';
+    rows.forEach(r=>{
+      h+='<tr><td class="ef-tk">'+esc(r.t)+'</td><td>'+r.w.toFixed(2)+'</td>'
+        + hzs.map(x=>{const v=r["d"+x];
+            return v===null?'<td class="ef-dim">TBD</td>'
+              :'<td class="'+(v>0.004?"ef-up":v<-0.004?"ef-dn":"ef-flat")+'">'+(v>0?"+":"")+v.toFixed(2)+'</td>';}).join('')
+        +'</tr>';
+    });
+    return h+'</tbody></table>';
+  }
+  function setData(n,s,sel){ NODES=n||[]; SNAPS=s||[]; SEL=sel||{}; }
+  window.EF_CORE={HZ,DEF_CFG,get CFG(){return CFG},set CFG(v){CFG=v},normT,ingest,splitRows,toNum,
+                  setData,buildModel,etfMonthTable,monthKeys,selectedEtfs,ym,ymLabel,addMonths,monthsBetween,esc};
+})();
+
+</script>
+<script>
+/* ═════════════ ETF FLOW — UI layer ═════════════ */
+(function(){
+  const K=window.EF_CORE, HZ=K.HZ;
+  let NODES=[], SNAPS=[], SEL={}, OPEN={}, inited=false, pending=null;
+  let hideHz={}, sortBy={c:"score",d:"desc"}, MODEL={rows:[],cur:null,mks:[]};
+  const $=id=>document.getElementById(id), esc=K.esc;
+
+  /* ── selection helpers ── */
+  const on=k=>SEL[k]!==false;
+  function setSub(node,val){
+    if(node.kind==="sector"){
+      NODES.filter(n=>n.parent_id===node.id).forEach(e=>{
+        SEL["n"+e.id]=val;
+        SNAPS.filter(s=>s.etf_id===e.id).forEach(s=>SEL["s"+s.id]=val);
+      });
+    } else SNAPS.filter(s=>s.etf_id===node.id).forEach(s=>SEL["s"+s.id]=val);
+  }
+  function toggleNode(id){
+    const n=NODES.find(x=>x.id===id); const v=!on("n"+id);
+    SEL["n"+id]=v; setSub(n,v); refresh();
+  }
+  function toggleSnap(id){ SEL["s"+id]=!on("s"+id); refresh(); }
+  function toggleMonth(etfId,mk){
+    const ss=SNAPS.filter(s=>s.etf_id===etfId&&K.ym(s.as_of)===mk);
+    const anyOff=ss.some(s=>!on("s"+s.id));
+    ss.forEach(s=>SEL["s"+s.id]=anyOff); refresh();
+  }
+
+  /* ── data ── */
+  async function load(){
+    try{
+      NODES=await sb("etf_nodes?select=*&order=sort.asc,id.asc")||[];
+      SNAPS=await sb("etf_snapshots?select=id,etf_id,as_of,complete,disclosed,holdings&order=as_of.asc")||[];
+      const st=await sb("settings?select=etf_cfg&limit=1");
+      if(st&&st[0]&&st[0].etf_cfg){ try{ K.CFG=Object.assign(JSON.parse(JSON.stringify(K.DEF_CFG)), typeof st[0].etf_cfg==="string"?JSON.parse(st[0].etf_cfg):st[0].etf_cfg); }catch(e){} }
+      $("efErr").textContent="";
+    }catch(e){ $("efErr").textContent="Load failed: "+e.message+"  — have the ETF tables been created?"; }
+    K.setData(NODES,SNAPS,SEL); renderTree(); refresh(); renderCfg();
+  }
+  async function addSector(){
+    const n=prompt("Main sector name (e.g. Benchmarks, AI, Energy):"); if(!n||!n.trim())return;
+    try{ await sb("etf_nodes","POST",{kind:"sector",name:n.trim(),sort:NODES.length}); await load(); }
+    catch(e){ toast("Could not add: "+e.message,"error"); }
+  }
+  async function addEtf(pid){
+    const n=prompt("ETF ticker / name (e.g. QQQ):"); if(!n||!n.trim())return;
+    try{ await sb("etf_nodes","POST",{kind:"etf",name:n.trim().toUpperCase(),parent_id:pid,sort:NODES.length}); await load(); }
+    catch(e){ toast("Could not add: "+e.message,"error"); }
+  }
+  async function delNode(id){
+    const n=NODES.find(x=>x.id===id);
+    if(!confirm('Delete "'+n.name+'"'+(n.kind==="sector"?" and every ETF inside it":"")+", including all its uploaded snapshots?"))return;
+    try{ await sb("etf_nodes?id=eq."+id,"DELETE"); await load(); toast("Deleted","success"); }
+    catch(e){ toast("Delete failed: "+e.message,"error"); }
+  }
+  async function delSnap(id){
+    if(!confirm("Delete this dated snapshot?"))return;
+    try{ await sb("etf_snapshots?id=eq."+id,"DELETE"); await load(); toast("Snapshot deleted","success"); }
+    catch(e){ toast("Delete failed: "+e.message,"error"); }
+  }
+  async function saveCfg(){
+    try{
+      const ex=await sb("settings?select=id&limit=1");
+      if(ex&&ex.length) await sb("settings?id=eq."+ex[0].id,"PATCH",{etf_cfg:K.CFG});
+      else await sb("settings","POST",{startBalance:10000,password:"trader123",etf_cfg:K.CFG});
+      toast("ETF settings saved ✓","success"); refresh();
+    }catch(e){ toast("Save failed: "+e.message,"error"); }
+  }
+
+  /* ── upload ── */
+  function handleFiles(etfId,files){
+    const f=files[0]; if(!f)return;
+    const ext=(f.name.split(".").pop()||"").toLowerCase();
+    const done=matrix=>{
+      const res=K.ingest(matrix);
+      if(res.err){ toast(res.err,"error"); return; }
+      openConfirm(etfId,f.name,res);
+    };
+    if(ext==="xlsx"||ext==="xls"){
+      const rd=new FileReader();
+      rd.onload=e=>{ try{
+        const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"});
+        done(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:false}));
+      }catch(err){ toast("Could not read workbook: "+err.message,"error"); } };
+      rd.readAsArrayBuffer(f);
+    }else{
+      const rd=new FileReader();
+      rd.onload=e=>done(K.splitRows(e.target.result));
+      rd.readAsText(f);
+    }
+  }
+  function pasteText(etfId){
+    const t=$("efPaste").value;
+    if(!t.trim()){ toast("Paste some rows first","error"); return; }
+    const res=K.ingest(K.splitRows(t));
+    if(res.err){ toast(res.err,"error"); return; }
+    openConfirm(etfId,"pasted text",res);
+  }
+  function openConfirm(etfId,fname,res){
+    pending={etfId,rows:res.rows,disclosed:res.disclosed};
+    const e=NODES.find(n=>n.id===etfId);
+    const auto=res.disclosed>=95;
+    $("efCTitle").textContent="Import into "+e.name;
+    $("efCSub").textContent=fname+" · "+res.rows.length+" holdings recognised";
+    $("efCDate").value=new Date().toISOString().slice(0,10);
+    $("efCFull").checked=auto; $("efCPart").checked=!auto;
+    const misc=Math.max(0,100-res.disclosed);
+    $("efCSum").innerHTML='Disclosed <b>'+res.disclosed.toFixed(2)+'%</b> · Misc <b>'+misc.toFixed(2)+'%</b> (excluded from every calculation)'
+      + (auto ? '<div class="ef-ok">Adds up to ~100% — detected as a FULL holdings file.</div>'
+              : '<div class="ef-warn">Only '+res.disclosed.toFixed(1)+'% is accounted for. Please confirm below whether this is the fund\'s complete list or just a partial one (e.g. top-10). This matters: on a FULL file a missing ticker means the fund truly holds none, on a PARTIAL file it just means "not disclosed".</div>');
+    $("efCPrev").innerHTML='<table class="ef-t"><thead><tr><th>Ticker</th><th>%</th><th>Name</th></tr></thead><tbody>'
+      + res.rows.slice(0,12).map(r=>'<tr><td class="ef-tk">'+esc(r.t)+'</td><td>'+r.w.toFixed(2)+'</td><td class="ef-dim">'+esc(r.n||"")+'</td></tr>').join('')
+      + '</tbody></table>'+(res.rows.length>12?'<div class="ef-dim" style="margin-top:4px">+ '+(res.rows.length-12)+' more</div>':'');
+    $("efConfirm").classList.add("show");
+  }
+  async function commitImport(){
+    if(!pending)return;
+    const d=$("efCDate").value; if(!d){ toast("Pick the date this data represents","error"); return; }
+    const complete=$("efCFull").checked;
+    const btn=$("efCSave"); btn.disabled=true; btn.textContent="Saving…";
+    try{
+      await sb("etf_snapshots?etf_id=eq."+pending.etfId+"&as_of=eq."+d,"DELETE");
+      await sb("etf_snapshots","POST",{etf_id:pending.etfId,as_of:d,complete,
+        disclosed:Math.round(pending.disclosed*100)/100,
+        holdings:pending.rows.map(r=>({t:r.t,w:Math.round(r.w*10000)/10000}))});
+      $("efConfirm").classList.remove("show"); pending=null;
+      await load(); toast("Snapshot saved ✓","success");
+    }catch(e){ toast("Save failed: "+e.message,"error"); }
+    finally{ btn.disabled=false; btn.textContent="Save snapshot"; }
+  }
+
+  /* ── tree ── */
+  function cb(checked,fn){ return '<span class="ef-cb'+(checked?" on":"")+'" onclick="event.stopPropagation();'+fn+'">'+(checked?"✓":"")+'</span>'; }
+  function renderTree(){
+    const box=$("efTree");
+    const sectors=NODES.filter(n=>n.kind==="sector");
+    if(!sectors.length){ box.innerHTML='<div class="ef-empty">No sectors yet.<br>Click <b>+ Sector</b> to create your first one (Benchmarks, AI, Energy…).</div>'; return; }
+    let h="";
+    sectors.forEach(sec=>{
+      const etfs=NODES.filter(n=>n.parent_id===sec.id);
+      const openS=OPEN["S"+sec.id]!==false;
+      h+='<div class="ef-sec"><div class="ef-sech" onclick="EF.tg(\'S'+sec.id+'\')">'
+        + cb(on("n"+sec.id),"EF.tn("+sec.id+")")
+        + '<span class="ef-arw">'+(openS?"▾":"▸")+'</span><span class="ef-secn">'+esc(sec.name)+'</span>'
+        + '<span class="ef-cnt">'+etfs.length+' etf</span>'
+        + '<button class="ef-mini" onclick="event.stopPropagation();EF.addEtf('+sec.id+')">+ ETF</button>'
+        + '<button class="ef-x" onclick="event.stopPropagation();EF.delNode('+sec.id+')">✕</button></div>';
+      if(openS){
+        etfs.forEach(e=>{
+          const snaps=SNAPS.filter(s=>s.etf_id===e.id);
+          const openE=OPEN["E"+e.id]===true;
+          const mks=[...new Set(snaps.map(s=>K.ym(s.as_of)))].sort().reverse();
+          const last=snaps.length?snaps[snaps.length-1].as_of:null;
+          h+='<div class="ef-etf"><div class="ef-etfh" onclick="EF.tg(\'E'+e.id+'\')">'
+            + cb(on("n"+e.id),"EF.tn("+e.id+")")
+            + '<span class="ef-arw">'+(openE?"▾":"▸")+'</span><span class="ef-etfn">'+esc(e.name)+'</span>'
+            + '<span class="ef-cnt">'+(last?("last "+last):"no data")+'</span>'
+            + '<button class="ef-x" onclick="event.stopPropagation();EF.delNode('+e.id+')">✕</button></div>';
+          if(openE){
+            h+='<div class="ef-drop" id="efd'+e.id+'" data-etf="'+e.id+'">Drop CSV / Excel / text here, or click to choose'
+              + '<input type="file" id="efi'+e.id+'" accept=".csv,.txt,.tsv,.xlsx,.xls" style="display:none"></div>'
+              + '<details class="ef-paste"><summary>or paste rows from a website / notepad</summary>'
+              + '<textarea id="efPaste" placeholder="Ticker  Weight&#10;NVDA  8.42&#10;AAPL  7.10"></textarea>'
+              + '<button class="ef-mini" onclick="EF.paste('+e.id+')">Read pasted rows</button></details>';
+            mks.forEach(mk=>{
+              const ms=snaps.filter(s=>K.ym(s.as_of)===mk);
+              const allOn=ms.every(s=>on("s"+s.id));
+              const openM=OPEN["M"+e.id+mk]===true;
+              h+='<div class="ef-mo"><div class="ef-moh" onclick="EF.tg(\'M'+e.id+mk+'\')">'
+                + cb(allOn,"EF.tm("+e.id+",'"+mk+"')")
+                + '<span class="ef-arw">'+(openM?"▾":"▸")+'</span>'+K.ymLabel(mk)
+                + '<span class="ef-cnt">'+ms.length+'</span></div>';
+              if(openM){
+                ms.forEach(s=>{
+                  const openD=OPEN["D"+s.id]===true;
+                  h+='<div class="ef-dt"><div class="ef-dth" onclick="EF.tg(\'D'+s.id+'\')">'
+                    + cb(on("s"+s.id),"EF.ts("+s.id+")")
+                    + '<span class="ef-arw">'+(openD?"▾":"▸")+'</span>'+s.as_of
+                    + '<span class="ef-badge '+(s.complete?"ef-full":"ef-part")+'">'+(s.complete?"FULL":"PARTIAL")+'</span>'
+                    + '<span class="ef-cnt">'+((s.holdings||[]).length)+' · '+(s.disclosed||0).toFixed(1)+'%</span>'
+                    + '<button class="ef-x" onclick="event.stopPropagation();EF.delSnap('+s.id+')">✕</button></div>';
+                  if(openD){
+                    const rows=(s.holdings||[]).slice().sort((a,b)=>b.w-a.w);
+                    h+='<div class="ef-sub"><table class="ef-t"><thead><tr><th>Ticker</th><th>%</th></tr></thead><tbody>'
+                      + rows.map(r=>'<tr><td class="ef-tk">'+esc(r.t)+'</td><td>'+r.w.toFixed(2)+'</td></tr>').join('')
+                      + '</tbody></table></div>';
+                  }
+                  h+='</div>';
+                });
+                h+='<div class="ef-sub"><div class="ef-subt">Month view — '+K.ymLabel(mk)+'</div>'+K.etfMonthTable(e.id,mk)+'</div>';
+              }
+              h+='</div>';
+            });
+          }
+          h+='</div>';
+        });
+      }
+      h+='</div>';
+    });
+    box.innerHTML=h;
+    NODES.filter(n=>n.kind==="etf").forEach(e=>{
+      const d=$("efd"+e.id), i=$("efi"+e.id); if(!d)return;
+      d.addEventListener("click",()=>i.click());
+      i.addEventListener("change",ev=>{ if(ev.target.files[0])handleFiles(e.id,ev.target.files); ev.target.value=""; });
+      ["dragover","dragenter"].forEach(x=>d.addEventListener(x,ev=>{ev.preventDefault();d.classList.add("over");}));
+      d.addEventListener("dragleave",ev=>{ev.preventDefault();d.classList.remove("over");});
+      d.addEventListener("drop",ev=>{ev.preventDefault();d.classList.remove("over");handleFiles(e.id,ev.dataTransfer.files);});
+    });
+  }
+
+  /* ── calc panel ── */
+  function refresh(){
+    K.setData(NODES,SNAPS,SEL);
+    MODEL=K.buildModel(); renderCalc(); renderTree();
+  }
+  function fmtD(v){ return v===null||v===undefined?'<span class="ef-dim">TBD</span>'
+    :'<span class="'+(v>0.004?"ef-up":v<-0.004?"ef-dn":"ef-flat")+'">'+(v>0?"+":"")+v.toFixed(2)+'</span>'; }
+  function renderCalc(){
+    const rows=MODEL.rows.slice();
+    const shown=HZ.filter(h=>!hideHz[h]);
+    $("efCur").innerHTML = MODEL.cur
+      ? 'Current month <b>'+K.ymLabel(MODEL.cur)+'</b> · '+K.selectedEtfs().length+' ETFs selected · '+rows.length+' tickers'
+      : 'Nothing selected yet.';
+    let h='<thead><tr>'
+      +['t|Ticker','holders|#ETF','avg|Avg %'].map(c=>{const[k,l]=c.split("|");
+        return '<th data-s="'+k+'">'+l+(sortBy.c===k?'<span class="ef-arr">'+(sortBy.d==="asc"?"▲":"▼")+'</span>':'')+'</th>';}).join('')
+      + shown.map(x=>'<th data-s="d'+x+'">Δ'+(x<12?x+"m":x/12+"y")+(sortBy.c==="d"+x?'<span class="ef-arr">'+(sortBy.d==="asc"?"▲":"▼")+'</span>':'')+'</th>').join('')
+      + '<th data-s="flag">Flag</th>'
+      + '<th data-s="score">Score'+(sortBy.c==="score"?'<span class="ef-arr">'+(sortBy.d==="asc"?"▲":"▼")+'</span>':'')+'</th>'
+      + '<th data-s="rank">Rank</th></tr></thead><tbody>';
+    const dir=sortBy.d==="asc"?1:-1, c=sortBy.c;
+    rows.sort((a,b)=>{
+      let A,B;
+      if(c==="t"){return a.t.localeCompare(b.t)*dir;}
+      if(c==="flag"){return String(a.flag||"").localeCompare(String(b.flag||""))*dir;}
+      if(c.startsWith("d")){A=a.dpp[+c.slice(1)];B=b.dpp[+c.slice(1)];}
+      else {A=a[c];B=b[c];}
+      if(A===null||A===undefined)A=-Infinity; if(B===null||B===undefined)B=-Infinity;
+      return (A-B)*dir;
+    });
+    if(!rows.length)h+='<tr><td class="ef-empty" colspan="'+(shown.length+6)+'">Tick some ETFs on the left to build the flow table.</td></tr>';
+    rows.forEach(r=>{
+      h+='<tr><td class="ef-tk">'+esc(r.t)+'</td><td>'+r.holders+'</td><td>'+r.avg.toFixed(2)+'</td>'
+        + shown.map(x=>'<td>'+fmtD(r.dpp[x])+'</td>').join('')
+        + '<td>'+(r.flag?'<span class="ef-flag '+(r.flag==="NEW"?"ef-new":"ef-ex")+'">'+r.flag+'</span>':'')+'</td>'
+        + '<td class="ef-sc">'+(r.score===null?'<span class="ef-dim">—</span>':r.score.toFixed(1))+'</td>'
+        + '<td class="ef-rk">'+(r.rank||'<span class="ef-dim">—</span>')+'</td></tr>';
+    });
+    $("efTable").innerHTML=h+'</tbody>';
+    $("efTable").querySelectorAll("th[data-s]").forEach(th=>th.addEventListener("click",()=>{
+      const k=th.dataset.s;
+      if(sortBy.c===k)sortBy.d=sortBy.d==="asc"?"desc":"asc";
+      else{sortBy.c=k;sortBy.d=(k==="t"||k==="rank")?"asc":"desc";}
+      renderCalc();
+    }));
+    // sector rollup
+    const sec=NODES.filter(n=>n.kind==="sector");
+    let sh='<table class="ef-t"><thead><tr><th>Sector</th><th>ETFs on</th><th>Tickers</th><th>Avg %</th></tr></thead><tbody>';
+    sec.forEach(s=>{
+      const es=NODES.filter(n=>n.parent_id===s.id&&on("n"+n.id)&&on("n"+s.id));
+      if(!es.length)return;
+      let tk=new Set(),sum=0,n=0;
+      es.forEach(e=>{ const v=MODEL.cur?monthOf(e.id,MODEL.cur):null; if(!v)return;
+        for(const t in v){ tk.add(t); sum+=v[t]; n++; } });
+      sh+='<tr><td>'+esc(s.name)+'</td><td>'+es.length+'</td><td>'+tk.size+'</td><td>'+(n?(sum/n).toFixed(2):'—')+'</td></tr>';
+    });
+    $("efSector").innerHTML=sh+'</tbody></table>';
+    $("efHz").innerHTML=HZ.map(x=>'<label class="ef-hzc"><input type="checkbox" '+(hideHz[x]?"":"checked")+' data-hz="'+x+'"> Δ'+(x<12?x+"m":x/12+"y")+'</label>').join('');
+    $("efHz").querySelectorAll("[data-hz]").forEach(i=>i.addEventListener("change",e=>{hideHz[e.target.dataset.hz]=!e.target.checked;renderCalc();}));
+  }
+  function monthOf(etfId,mk){
+    const ss=SNAPS.filter(s=>s.etf_id===etfId&&K.ym(s.as_of)===mk&&on("s"+s.id));
+    if(!ss.length)return null;
+    const sum={},den={},all=new Set();
+    ss.forEach(s=>(s.holdings||[]).forEach(x=>all.add(x.t)));
+    all.forEach(t=>{sum[t]=0;den[t]=0;});
+    ss.forEach(s=>{const m={};(s.holdings||[]).forEach(x=>m[x.t]=x.w);
+      all.forEach(t=>{ if(m[t]!==undefined){sum[t]+=m[t];den[t]++;} else if(s.complete){den[t]++;} });});
+    const o={}; all.forEach(t=>{ if(den[t]>0)o[t]=sum[t]/den[t]; }); return o;
+  }
+  function exportTxt(){
+    let n=parseInt($("efTopn").value)||20;
+    const ranked=MODEL.rows.filter(r=>r.rank).sort((a,b)=>a.rank-b.rank).slice(0,n);
+    if(!ranked.length){ $("efExpNote").textContent="Nothing ranked yet."; return; }
+    const blob=new Blob([ranked.map(r=>r.t).join(",")],{type:"text/plain"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+    a.download="etf_flow_top"+ranked.length+".txt"; a.click();
+    $("efExpNote").textContent="Exported top "+ranked.length+" by Score. Import via TradingView → watchlist name → Upload list.";
+  }
+  function renderCfg(){
+    const c=K.CFG;
+    $("efCfg").innerHTML=
+      '<div class="ef-cfgrow"><label>Momentum %<input type="number" data-c="wMom" value="'+c.wMom+'"></label>'
+      +'<label>Breadth %<input type="number" data-c="wBreadth" value="'+c.wBreadth+'"></label>'
+      +'<label>Size %<input type="number" data-c="wLevel" value="'+c.wLevel+'"></label></div>'
+      +'<div class="ef-cfgrow"><label>Prior (history shrink)<input type="number" step="0.5" data-c="prior" value="'+c.prior+'"></label>'
+      +'<label>Outlier cap<input type="number" step="0.5" data-c="cap" value="'+c.cap+'"></label>'
+      +'<label>Min alloc %<input type="number" step="0.01" data-c="minAlloc" value="'+c.minAlloc+'"></label></div>'
+      +'<div class="ef-cfglbl">Horizon weights</div><div class="ef-cfgrow">'
+      + HZ.map(x=>'<label>'+(x<12?x+"m":x/12+"y")+'<input type="number" data-hzw="'+x+'" value="'+(c.wHz[x]||0)+'"></label>').join('')+'</div>'
+      +'<div class="ef-cfglbl">Ignore rows containing (comma separated)</div>'
+      +'<textarea data-c="exclude" class="ef-ta">'+esc(c.exclude)+'</textarea>';
+    $("efCfg").querySelectorAll("[data-c]").forEach(i=>i.addEventListener("input",e=>{
+      const k=e.target.dataset.c; K.CFG[k]=e.target.type==="number"?parseFloat(e.target.value):e.target.value; refresh(); }));
+    $("efCfg").querySelectorAll("[data-hzw]").forEach(i=>i.addEventListener("input",e=>{
+      K.CFG.wHz[e.target.dataset.hzw]=parseFloat(e.target.value)||0; refresh(); }));
+  }
+
+  function init(){ if(inited)return; inited=true;
+    $("efAddSec").addEventListener("click",addSector);
+    $("efCSave").addEventListener("click",commitImport);
+    $("efCCancel").addEventListener("click",()=>{$("efConfirm").classList.remove("show");pending=null;});
+    $("efExport").addEventListener("click",exportTxt);
+    $("efSaveCfg").addEventListener("click",saveCfg);
+    $("efResetCfg").addEventListener("click",()=>{K.CFG=JSON.parse(JSON.stringify(K.DEF_CFG));renderCfg();refresh();});
+    load();
+  }
+  window.EF={ensureInit:init,tg:k=>{OPEN[k]=!OPEN[k];renderTree();},tn:toggleNode,ts:toggleSnap,tm:toggleMonth,
+             addEtf,delNode,delSnap,paste:pasteText};
 })();
 
 </script>
