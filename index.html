@@ -1071,6 +1071,7 @@ tr.flt-row .flt2{display:flex;gap:3px}
       <button class="nav-btn" onclick="showPage(&#39;plan&#39;,this)">📐 Trading Plan</button>
       <button class="nav-btn" onclick="showPage(&#39;rs&#39;,this); if(window.RS) RS.ensureInit(); if(window.RS2) RS2.ensureInit();">📈 RS Score</button>
       <button class="nav-btn" onclick="showPage(&#39;etf&#39;,this); if(window.EF) EF.ensureInit();">🧭 ETF Flow</button>
+      <button class="nav-btn" onclick="showPage(&#39;mom&#39;,this); if(window.MO) MO.ensureInit();">🚀 Momentum</button>
     </div>
     <div class="topbar-right">
       <div class="balance-chip">Balance: <strong id="topbarBalance">$10,764.09</strong></div>
@@ -2042,6 +2043,71 @@ tr.flt-row .flt2{display:flex;gap:3px}
               <button class="btn btn-ghost btn-sm" id="efResetCfg">Defaults</button>
             </div>
           </details>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══ MOMENTUM PAGE ══ -->
+  <div class="page" id="page-mom">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">MOMENTUM <span>RANK</span></div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-gold btn-sm" id="moAddUni">+ Universe</button>
+        </div>
+      </div>
+      <div class="mo-err" id="moErr"></div>
+
+      <div class="mo-wrap">
+        <!-- LEFT : universes + snapshots -->
+        <div class="mo-pane">
+          <div class="mo-ph"><div class="mo-pt">UNIVERSES</div></div>
+          <div id="moUnis"></div>
+          <div class="mo-drop" id="moDrop" style="margin-top:12px">
+            Drop TradingView CSV here<br><span class="mo-dim" style="font-size:10.5px">or click to browse</span>
+          </div>
+          <div class="mo-note">
+            Export one index at a time from the TradingView screener. Score each universe separately —
+            z-scores are relative to the pool they are computed in.
+          </div>
+        </div>
+
+        <!-- RIGHT : ranking -->
+        <div class="mo-pane">
+          <div class="mo-ph">
+            <div class="mo-pt">RANKING</div>
+            <div class="mo-dim" style="font-size:10.5px">Z(6M÷vol) + Z(12M÷vol), averaged</div>
+          </div>
+
+          <div class="mo-kpi" id="moKpi"></div>
+
+          <div class="mo-bar">
+            <div class="mo-sw"><div class="mo-tg" id="moTg3"></div>
+              <span title="Adds Z(3M÷vol) at half weight. Off by default — the momentum premium is strongest at 6-12 months.">Include 3M</span></div>
+            <div class="mo-sw"><div class="mo-tg" id="moTgV"></div>
+              <span title="Averages volatility across the last 3 uploads so one earnings gap cannot distort the denominator. Needs 3+ snapshots.">Smooth vol</span></div>
+            <label>Top N <input type="number" id="moTopN" min="5" max="200" value="30"></label>
+            <label title="Flags rows whose price × 30-day average volume falls below this. 0 = off.">Min turnover $M <input type="number" id="moTurn" min="0" step="1" value="0"></label>
+            <div style="margin-left:auto;display:flex;gap:7px">
+              <button class="btn btn-ghost btn-sm" id="moMoves">Export entries / exits</button>
+              <button class="btn btn-gold btn-sm" id="moExport">Export top N →TV</button>
+            </div>
+          </div>
+
+          <div style="overflow:auto;max-height:56vh;border:1px solid var(--border);border-radius:8px" id="moTable"></div>
+
+          <div class="mo-drop" id="moDrop2" style="margin-top:10px;display:none;padding:10px">
+            Drop next month's CSV here to add a snapshot
+          </div>
+
+          <div class="mo-note">
+            <b>Δ 1 / 3 / 6</b> = rank change vs 1, 3 and 6 uploads ago — ▲ means the rank improved.
+            <b>NEW</b> = not in the previous snapshot. <b>F</b> = quick fundamental flags from the CSV
+            (ROE&gt;15 · rev growth&gt;10 · net debt/EBITDA&lt;2 · FCF&gt;0 · net margin&gt;0); leverage flags are
+            suppressed for financials. This is a coarse pre-filter — the real seven-light check is IVA Pro on the chart.
+          </div>
         </div>
       </div>
     </div>
@@ -4640,4 +4706,497 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 })();
 
 </script>
+<style>
+/* ===== Momentum Rank (scoped to #page-mom) ===== */
+#page-mom .mo-wrap{display:grid;grid-template-columns:288px 1fr;gap:14px;align-items:start}
+@media(max-width:1100px){#page-mom .mo-wrap{grid-template-columns:1fr}}
+#page-mom .mo-pane{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px}
+#page-mom .mo-ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+#page-mom .mo-pt{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.06em;color:var(--accent)}
+#page-mom .mo-dim{color:var(--text3)}
+#page-mom .mo-err{color:var(--red);font-size:12px;margin-bottom:8px;min-height:0}
+#page-mom .mo-uni{display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:7px;cursor:pointer;border:1px solid transparent;font-size:13px;color:var(--text)}
+#page-mom .mo-uni:hover{background:var(--bg3)}
+#page-mom .mo-uni.on{background:var(--surface);border-color:var(--border2);color:var(--accent);font-weight:600}
+#page-mom .mo-uni .mo-cnt{margin-left:auto;font-size:10.5px;color:var(--text3);font-weight:400}
+#page-mom .mo-x{color:var(--text3);font-size:14px;padding:0 3px;border:0;background:none;cursor:pointer;line-height:1}
+#page-mom .mo-x:hover{color:var(--red)}
+#page-mom .mo-snap{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text2);padding:4px 8px 4px 16px}
+#page-mom .mo-snap b{color:var(--text);font-weight:600}
+#page-mom .mo-drop{border:2px dashed var(--border2);border-radius:9px;padding:16px;text-align:center;cursor:pointer;color:var(--text3);background:var(--bg3);font-size:12px;transition:.15s}
+#page-mom .mo-drop:hover,#page-mom .mo-drop.over{border-color:var(--accent);color:var(--accent);background:var(--surface)}
+#page-mom .mo-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
+#page-mom .mo-bar label{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px}
+#page-mom .mo-bar input[type=number]{width:72px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 6px;color:var(--text);font-size:12px}
+#page-mom .mo-sw{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text)}
+#page-mom .mo-tg{position:relative;width:38px;height:20px;background:var(--border2);border-radius:20px;cursor:pointer;transition:.15s;flex:none}
+#page-mom .mo-tg.on{background:var(--accent)}
+#page-mom .mo-tg:after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;background:var(--text);border-radius:50%;transition:.15s}
+#page-mom .mo-tg.on:after{left:20px;background:var(--bg)}
+#page-mom table.mo-t{border-collapse:collapse;width:100%;font-size:12px}
+#page-mom table.mo-t th,#page-mom table.mo-t td{padding:5px 7px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text)}
+#page-mom table.mo-t th:nth-child(2),#page-mom table.mo-t td:nth-child(2),
+#page-mom table.mo-t th:nth-child(3),#page-mom table.mo-t td:nth-child(3){text-align:left}
+#page-mom table.mo-t th{position:sticky;top:0;background:var(--surface);color:var(--accent);cursor:pointer;user-select:none;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;z-index:2}
+#page-mom table.mo-t th:hover{background:var(--surface2)}
+#page-mom table.mo-t tbody tr:hover{background:var(--bg3)}
+#page-mom td.mo-rk{font-weight:700;color:var(--accent);text-align:center}
+#page-mom td.mo-tk{font-weight:600}
+#page-mom .mo-tag{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700;letter-spacing:.03em}
+#page-mom .mo-new{background:rgba(91,141,238,.18);color:var(--blue2)}
+#page-mom .mo-out{background:rgba(240,82,82,.16);color:var(--red)}
+#page-mom .mo-in{background:rgba(61,214,140,.16);color:var(--green)}
+#page-mom .mo-warn{background:rgba(240,120,80,.18);color:var(--orange)}
+#page-mom .mo-note{font-size:11px;color:var(--text3);margin-top:7px;line-height:1.55}
+#page-mom .mo-kpi{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+#page-mom .mo-k{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:11px;color:var(--text2)}
+#page-mom .mo-k b{color:var(--text);font-size:13px;display:block;font-weight:700}
+#page-mom .mo-k.alert{border-color:var(--orange);color:var(--orange)}
+#page-mom .mo-f{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:2px}
+#page-mom .mo-f.y{background:var(--green)}
+#page-mom .mo-f.n{background:var(--border2)}
+#page-mom .mo-empty{padding:34px;text-align:center;color:var(--text3);font-size:13px}
+#page-mom .mo-seg{display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+#page-mom .mo-seg button{background:var(--bg3);border:0;color:var(--text2);padding:5px 11px;font-size:11.5px;cursor:pointer;font-weight:600}
+#page-mom .mo-seg button.on{background:var(--accent);color:var(--bg)}
+</style>
+
+<script>
+/* ============ MOMENTUM RANK TAB — isolated module ============ */
+(function(){
+  const T_UNI="mom_universes", T_SNAP="mom_snapshots";
+
+  let UNIS=[], SNAPS=[], curUni=null, inited=false;
+  let use3M=false, volSmooth=true, sortBy={c:"rank",d:"asc"}, topN=30, minTurn=0;
+  let MODEL={rows:[],churn:null,secTop:[],prev:null};
+
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+  /* ---------- numeric parse (handles %, commas, parentheses, dashes) ---------- */
+  function num(v){
+    if(v===null||v===undefined)return null;
+    let s=String(v).trim();
+    if(s===""||/^(n\/?a|--|—|-|null)$/i.test(s))return null;
+    let neg=false;
+    if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1);}
+    s=s.replace(/[%,\s$₹]/g,"").replace(/[\u2212\u2013\u2014]/g,"-");
+    const f=parseFloat(s);
+    if(isNaN(f))return null;
+    return neg?-f:f;
+  }
+
+  /* ---------- CSV parser (RFC4180: quotes, embedded commas/newlines) ---------- */
+  function parseCSV(text){
+    const rows=[];let i=0,field="",row=[],q=false;
+    if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);
+    while(i<text.length){const c=text[i];
+      if(q){ if(c==='"'){ if(text[i+1]==='"'){field+='"';i++;} else q=false; } else field+=c; }
+      else{ if(c==='"')q=true;
+            else if(c===','){row.push(field);field="";}
+            else if(c==='\n'){row.push(field);rows.push(row);row=[];field="";}
+            else if(c==='\r'){}
+            else field+=c; }
+      i++;}
+    if(field!==""||row.length){row.push(field);rows.push(row);}
+    return rows.filter(r=>r.length&&!(r.length===1&&r[0].trim()===""));
+  }
+
+  /* ---------- header matching: tolerant to TradingView renaming columns ---------- */
+  const FIELDS=[
+    ["t",    [/^symbol$/i,/^ticker$/i]],
+    ["n",    [/^description$/i,/^name$/i,/company/i]],
+    ["ex",   [/^exchange$/i]],
+    ["sec",  [/^sector$/i]],
+    ["ind",  [/^industry$/i]],
+    ["p1w",  [/perf.*1\s*week/i,/perf.*\bw\b/i]],
+    ["p1m",  [/perf.*1\s*month\b/i]],
+    ["p3m",  [/perf.*3\s*month/i]],
+    ["p6m",  [/perf.*6\s*month/i]],
+    ["p1y",  [/perf.*1\s*year/i,/perf.*12\s*month/i,/perf.*yearly/i]],
+    ["vol",  [/volatil.*1\s*month/i,/volatil/i]],
+    ["mcap", [/market\s*cap(?!.*currency)/i]],
+    ["avol", [/average\s*volume/i,/avg.*volume/i]],
+    ["px",   [/^price$/i]],
+    ["roe",  [/return on equity/i]],
+    ["de",   [/debt to equity/i]],
+    ["gm",   [/gross margin/i]],
+    ["nm",   [/net margin/i]],
+    ["rg",   [/revenue growth/i]],
+    ["pe",   [/price to earnings/i,/^p\/e$/i]],
+    ["eve",  [/enterprise value to ebitda/i,/ev\s*\/\s*ebitda/i]],
+    ["fcf",  [/free cash flow(?!.*currency)/i]],
+    ["nd",   [/net debt(?!.*currency)/i]],
+    ["ebit", [/^ebitda(?!.*currency)/i,/\bebitda\b(?!.*currency)/i]]
+  ];
+  function mapHeaders(heads){
+    const m={},used=new Set();
+    FIELDS.forEach(([key,rxs])=>{
+      for(const rx of rxs){
+        const hit=heads.findIndex((h,j)=>!used.has(j)&&rx.test(String(h).trim()));
+        if(hit>=0){m[key]=hit;used.add(hit);return;}
+      }
+    });
+    return m;
+  }
+  const TEXTF=new Set(["t","n","ex","sec","ind"]);
+  function ingest(matrix){
+    const heads=matrix[0].map(h=>String(h).trim());
+    const m=mapHeaders(heads);
+    const miss=["t","p6m","p1y","vol"].filter(k=>m[k]===undefined);
+    if(miss.length){
+      const names={t:"Symbol",p6m:"Performance % 6 months",p1y:"Performance % 1 year",vol:"Volatility 1 month"};
+      throw new Error("Missing required column(s): "+miss.map(k=>names[k]).join(", "));
+    }
+    const out=[];
+    for(let r=1;r<matrix.length;r++){
+      const raw=matrix[r]; if(!raw||!raw.length)continue;
+      const o={};
+      for(const k in m){
+        const v=raw[m[k]];
+        o[k]=TEXTF.has(k)?String(v==null?"":v).trim():num(v);
+      }
+      if(!o.t)continue;
+      o.t=o.t.toUpperCase();
+      out.push(o);
+    }
+    return out;
+  }
+
+  /* ---------- statistics ---------- */
+  function zmaker(vals){
+    const v=vals.filter(x=>x!==null&&x!==undefined&&isFinite(x));
+    if(v.length<2)return ()=>null;
+    const mean=v.reduce((a,b)=>a+b,0)/v.length;
+    const sd=Math.sqrt(v.reduce((a,b)=>a+(b-mean)*(b-mean),0)/v.length);
+    if(!(sd>0))return ()=>0;
+    return x=>(x===null||x===undefined||!isFinite(x))?null:(x-mean)/sd;
+  }
+
+  /* ---------- the model ---------- */
+  function snapsFor(uid){
+    return SNAPS.filter(s=>s.universe_id===uid).sort((a,b)=>a.as_of<b.as_of?-1:1);
+  }
+  // volatility smoothing: mean of this + up to 2 prior uploads, per ticker
+  function volMap(list,idx){
+    const use=list.slice(Math.max(0,idx-2),idx+1);
+    const acc={},cnt={};
+    use.forEach(s=>(s.rows||[]).forEach(r=>{
+      if(r.vol!==null&&r.vol!==undefined&&r.vol>0){acc[r.t]=(acc[r.t]||0)+r.vol;cnt[r.t]=(cnt[r.t]||0)+1;}
+    }));
+    const o={};for(const t in acc)o[t]=acc[t]/cnt[t];
+    return {map:o,n:use.length};
+  }
+  function rankSnapshot(list,idx,opts){
+    const snap=list[idx]; if(!snap)return null;
+    const rows=(snap.rows||[]).map(r=>Object.assign({},r));
+    const vm=(opts.smooth&&idx>=2)?volMap(list,idx):null;
+    rows.forEach(r=>{ r._vol=vm?(vm.map[r.t]!==undefined?vm.map[r.t]:r.vol):r.vol; });
+    const ra=(ret,v)=>(ret===null||ret===undefined||v===null||v===undefined||!(v>0))?null:ret/v;
+    rows.forEach(r=>{ r._ra6=ra(r.p6m,r._vol); r._ra12=ra(r.p1y,r._vol); r._ra3=ra(r.p3m,r._vol); });
+    // volatility sanity floor: a denominator far below the universe floor is a
+    // data artifact (thin/halted trading), not a smooth trend. Flag it.
+    const vsorted=rows.map(r=>r._vol).filter(v=>v!==null&&v!==undefined&&v>0).sort((a,b)=>a-b);
+    const p2 = vsorted.length ? vsorted[Math.floor(0.02*(vsorted.length-1))] : null;
+    rows.forEach(r=>{ r.volSus = (p2!==null&&r._vol!==null&&r._vol!==undefined&&r._vol<p2*0.75); });
+    const z6=zmaker(rows.map(r=>r._ra6)), z12=zmaker(rows.map(r=>r._ra12)), z3=zmaker(rows.map(r=>r._ra3));
+    // winsorize at +/-3 sd, the standard index-provider treatment: one freak
+    // denominator cannot then hijack rank 1.
+    const CLIP=3, clip=z=>z===null||z===undefined?null:Math.max(-CLIP,Math.min(CLIP,z));
+    rows.forEach(r=>{
+      const a=clip(z6(r._ra6)), b=clip(z12(r._ra12)), c=opts.use3M?clip(z3(r._ra3)):null;
+      r._z6=a; r._z12=b; r._z3=c;
+      if(a===null||b===null){ r.score=null; return; }
+      r.score = opts.use3M&&c!==null ? (a+b+0.5*c)/2.5 : (a+b)/2;
+    });
+    rows.filter(r=>r.score!==null).sort((x,y)=>y.score-x.score).forEach((r,i)=>r.rank=i+1);
+    return rows;
+  }
+  function build(){
+    const uid=curUni; MODEL={rows:[],churn:null,secTop:[],prev:null};
+    if(!uid){render();return;}
+    const list=snapsFor(uid);
+    if(!list.length){render();return;}
+    const idx=list.length-1;
+    const opts={use3M,smooth:volSmooth};
+    const cur=rankSnapshot(list,idx,opts);
+    const back=k=>(idx-k>=0)?rankSnapshot(list,idx-k,opts):null;
+    const p1=back(1), p3=back(3), p6=back(6);
+    const rk=arr=>{const o={};(arr||[]).forEach(r=>{if(r.rank)o[r.t]=r.rank;});return o;};
+    const R1=rk(p1),R3=rk(p3),R6=rk(p6);
+    cur.forEach(r=>{
+      r.d1 = (r.rank&&R1[r.t])?R1[r.t]-r.rank:null;
+      r.d3 = (r.rank&&R3[r.t])?R3[r.t]-r.rank:null;
+      r.d6 = (r.rank&&R6[r.t])?R6[r.t]-r.rank:null;
+      r.isNew = p1 ? !(r.t in R1) : false;
+      r.turn = (r.px!=null&&r.avol!=null)?r.px*r.avol:null;
+      r.thin = (minTurn>0&&r.turn!=null)?r.turn<minTurn*1e6:false;
+      r.ndeb = (r.nd!=null&&r.ebit!=null&&r.ebit>0)?r.nd/r.ebit:null;
+      const bank=/financ|bank/i.test(r.sec||"");
+      r.bank=bank;
+      const f=[];
+      f.push(r.roe!=null?r.roe>15:null);
+      f.push(r.rg!=null?r.rg>10:null);
+      f.push(bank?null:(r.ndeb!=null?r.ndeb<2:null));
+      f.push(r.fcf!=null?r.fcf>0:null);
+      f.push(r.nm!=null?r.nm>0:null);
+      r.flags=f; r.fscore=f.filter(x=>x===true).length; r.fmax=f.filter(x=>x!==null).length;
+    });
+    // dropped names (were ranked last time, absent now)
+    const nowSet=new Set(cur.map(r=>r.t));
+    const dropped=(p1||[]).filter(r=>r.rank&&!nowSet.has(r.t)).sort((a,b)=>a.rank-b.rank);
+    // churn warning
+    if(p1&&p1.length){
+      const ch=Math.abs(cur.length-p1.length)/p1.length;
+      MODEL.churn={pct:ch*100,now:cur.length,prev:p1.length,warn:ch>0.10};
+    }
+    // sector concentration in top N
+    const topRows=cur.filter(r=>r.rank&&r.rank<=topN);
+    const bys={}; topRows.forEach(r=>{const s=r.sec||"—";bys[s]=(bys[s]||0)+1;});
+    MODEL.secTop=Object.entries(bys).sort((a,b)=>b[1]-a[1]).slice(0,4)
+      .map(([s,n])=>({s,n,pct:topRows.length?n/topRows.length*100:0}));
+    MODEL.rows=cur; MODEL.dropped=dropped; MODEL.prev=p1; MODEL.snap=list[idx]; MODEL.count=list.length;
+    render();
+  }
+
+  /* ---------- data layer ---------- */
+  async function load(){
+    try{
+      UNIS=await sb(T_UNI+"?select=*&order=sort.asc,id.asc")||[];
+      SNAPS=await sb(T_SNAP+"?select=id,universe_id,as_of,filename,n_rows,rows&order=as_of.asc")||[];
+      $("moErr").textContent="";
+    }catch(e){
+      $("moErr").textContent="Load failed: "+e.message+" — has momentum_setup.sql been run in Supabase?";
+      UNIS=[];SNAPS=[];
+    }
+    if(!curUni&&UNIS.length)curUni=UNIS[0].id;
+    if(curUni&&!UNIS.some(u=>u.id===curUni))curUni=UNIS.length?UNIS[0].id:null;
+    renderUnis(); build();
+  }
+  async function addUni(){
+    const n=prompt("Universe name (e.g. Nifty 200):"); if(!n||!n.trim())return;
+    const code=(prompt("Short code for export headers (e.g. NIFTY200):","")||n).trim().toUpperCase().replace(/[^A-Z0-9]/g,"");
+    try{ await sb(T_UNI,"POST",{name:n.trim(),code:code,sort:UNIS.length+1}); await load(); toast("Universe added","success"); }
+    catch(e){ toast("Add failed: "+e.message,"error"); }
+  }
+  async function delUni(id,ev){
+    ev.stopPropagation();
+    const u=UNIS.find(x=>x.id===id); const k=snapsFor(id).length;
+    if(!confirm("Delete \""+(u?u.name:"")+"\" and its "+k+" snapshot(s)? This cannot be undone."))return;
+    try{ await sb(T_UNI+"?id=eq."+id,"DELETE"); if(curUni===id)curUni=null; await load(); toast("Deleted","success"); }
+    catch(e){ toast("Delete failed: "+e.message,"error"); }
+  }
+  async function delSnap(id,ev){
+    ev.stopPropagation();
+    if(!confirm("Delete this snapshot?"))return;
+    try{ await sb(T_SNAP+"?id=eq."+id,"DELETE"); await load(); toast("Snapshot deleted","success"); }
+    catch(e){ toast("Delete failed: "+e.message,"error"); }
+  }
+  async function saveSnap(rows,fname,asOf){
+    try{
+      await sb(T_SNAP+"?universe_id=eq."+curUni+"&as_of=eq."+asOf,"DELETE");
+      await sb(T_SNAP,"POST",{universe_id:curUni,as_of:asOf,filename:fname,n_rows:rows.length,rows:rows});
+      await load();
+      toast("Imported "+rows.length+" rows","success");
+    }catch(e){ $("moErr").textContent="Save failed: "+e.message; toast("Save failed","error"); }
+  }
+
+  /* ---------- import ---------- */
+  function dateFromName(name){
+    const m=String(name).match(/(20\d{2})[-_]?(\d{2})[-_]?(\d{2})/);
+    if(m)return m[1]+"-"+m[2]+"-"+m[3];
+    return new Date().toISOString().slice(0,10);
+  }
+  function handleFile(file){
+    if(!curUni){toast("Select or add a universe first","error");return;}
+    const rd=new FileReader();
+    rd.onload=e=>{
+      let rows;
+      try{ rows=ingest(parseCSV(e.target.result)); }
+      catch(err){ $("moErr").textContent=err.message; toast("Import failed","error"); return; }
+      if(!rows.length){ $("moErr").textContent="No data rows found in that file."; return; }
+      $("moErr").textContent="";
+      const suggested=dateFromName(file.name);
+      const d=prompt("Date this export represents (YYYY-MM-DD):",suggested);
+      if(!d)return;
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(d.trim())){toast("Date must be YYYY-MM-DD","error");return;}
+      saveSnap(rows,file.name,d.trim());
+    };
+    rd.readAsText(file);
+  }
+
+  /* ---------- export ---------- */
+  function uniCode(){ const u=UNIS.find(x=>x.id===curUni); return (u&&(u.code||u.name)||"UNIVERSE").toUpperCase().replace(/[^A-Z0-9]/g,""); }
+  function sym(r){ return (r.ex?String(r.ex).toUpperCase()+":":"")+r.t; }
+  function dl(txt,fname){
+    const b=new Blob([txt],{type:"text/plain"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download=fname; a.click();
+  }
+  function exportTop(){
+    const rows=MODEL.rows.filter(r=>r.rank&&r.rank<=topN&&!r.thin).sort((a,b)=>a.rank-b.rank);
+    if(!rows.length){toast("Nothing ranked yet","error");return;}
+    const code=uniCode();
+    dl("###MOMO_"+code+"_TOP"+topN+"\n"+rows.map(sym).join(",")+"\n",
+       "momentum_"+code.toLowerCase()+"_top"+topN+".txt");
+    toast("Exported top "+rows.length,"success");
+  }
+  function exportMoves(){
+    const inN=MODEL.rows.filter(r=>r.rank&&r.rank<=topN&&(r.isNew||(r.d1!==null&&(r.rank+ (r.d1||0))>topN))).sort((a,b)=>a.rank-b.rank);
+    const outN=[].concat(
+      (MODEL.dropped||[]).map(r=>({t:r.t,ex:r.ex})),
+      MODEL.rows.filter(r=>r.rank&&r.rank>60&&r.d1!==null&&(r.rank-(r.d1||0))<=60)
+    );
+    if(!inN.length&&!outN.length){toast("No entries or exits since last upload","error");return;}
+    const code=uniCode();
+    let t="";
+    if(inN.length) t+="###MOMO_"+code+"_ENTRIES\n"+inN.map(sym).join(",")+"\n\n";
+    if(outN.length)t+="###MOMO_"+code+"_EXITS\n"+outN.map(sym).join(",")+"\n";
+    dl(t,"momentum_"+code.toLowerCase()+"_moves.txt");
+    toast("Exported "+inN.length+" entries, "+outN.length+" exits","success");
+  }
+
+  /* ---------- render ---------- */
+  function renderUnis(){
+    const el=$("moUnis");
+    if(!UNIS.length){ el.innerHTML='<div class="mo-note">No universes yet. Add one to begin.</div>'; return; }
+    el.innerHTML=UNIS.map(u=>{
+      const ss=snapsFor(u.id);
+      let h='<div class="mo-uni'+(u.id===curUni?" on":"")+'" onclick="MO.pick('+u.id+')">'
+        +'<span>'+esc(u.name)+'</span>'
+        +'<span class="mo-cnt">'+ss.length+' snap'+(ss.length===1?"":"s")+'</span>'
+        +'<button class="mo-x" title="Delete universe" onclick="MO.delUni('+u.id+',event)">×</button></div>';
+      if(u.id===curUni&&ss.length){
+        h+=ss.slice().reverse().slice(0,8).map(s=>
+          '<div class="mo-snap"><b>'+esc(s.as_of)+'</b><span class="mo-dim">'+(s.n_rows||0)+' rows</span>'
+          +'<button class="mo-x" style="margin-left:auto" title="Delete snapshot" onclick="MO.delSnap('+s.id+',event)">×</button></div>').join("");
+        if(ss.length>8)h+='<div class="mo-snap mo-dim">+ '+(ss.length-8)+' older</div>';
+      }
+      return h;
+    }).join("");
+  }
+
+  const COLS=[
+    {k:"rank", t:"#",      w:"rank"},
+    {k:"t",    t:"Ticker"},
+    {k:"n",    t:"Name"},
+    {k:"score",t:"Score",  f:v=>v==null?"—":v.toFixed(2)},
+    {k:"d1",   t:"Δ 1",    d:1},
+    {k:"d3",   t:"Δ 3",    d:1},
+    {k:"d6",   t:"Δ 6",    d:1},
+    {k:"p1w",  t:"1W",     f:pct},
+    {k:"p1m",  t:"1M",     f:pct},
+    {k:"p3m",  t:"3M",     f:pct},
+    {k:"p6m",  t:"6M",     f:pct},
+    {k:"p1y",  t:"1Y",     f:pct},
+    {k:"_vol", t:"Vol",    f:v=>v==null?"—":v.toFixed(2)},
+    {k:"fscore",t:"F",     f:null},
+    {k:"sec",  t:"Sector"}
+  ];
+  function pct(v){ return v==null?"—":(v>0?"+":"")+v.toFixed(1)+"%"; }
+  function col(v){ if(v==null)return "var(--text3)"; return v>0?"var(--green)":v<0?"var(--red)":"var(--text2)"; }
+  function deltaCell(v,isNew){
+    if(isNew)return '<span class="mo-tag mo-new">NEW</span>';
+    if(v===null||v===undefined)return '<span class="mo-dim">—</span>';
+    if(v===0)return '<span class="mo-dim">0</span>';
+    const up=v>0;
+    return '<span style="color:'+(up?"var(--green)":"var(--red)")+';font-weight:600">'+(up?"▲":"▼")+Math.abs(v)+'</span>';
+  }
+  function render(){
+    const hasData=MODEL.rows&&MODEL.rows.length;
+    $("moKpi").innerHTML = hasData ? kpis() : "";
+    const el=$("moTable");
+    if(!hasData){
+      el.innerHTML='<div class="mo-empty">'+(UNIS.length?"No snapshot yet for this universe. Drop a TradingView CSV export below.":"Add a universe to begin.")+'</div>';
+      $("moDrop2").style.display=UNIS.length?"block":"none";
+      return;
+    }
+    $("moDrop2").style.display="block";
+    let rows=MODEL.rows.slice();
+    const s=sortBy;
+    rows.sort((a,b)=>{
+      let x=a[s.c],y=b[s.c];
+      if(s.c==="rank"){x=x||1e9;y=y||1e9;}
+      if(x===null||x===undefined)x=s.d==="asc"?Infinity:-Infinity;
+      if(y===null||y===undefined)y=s.d==="asc"?Infinity:-Infinity;
+      if(typeof x==="string")return s.d==="asc"?String(x).localeCompare(String(y)):String(y).localeCompare(String(x));
+      return s.d==="asc"?x-y:y-x;
+    });
+    const head='<thead><tr>'+COLS.map(c=>
+      '<th onclick="MO.sort(\''+c.k+'\')">'+c.t+(s.c===c.k?'<span style="font-size:9px"> '+(s.d==="asc"?"▲":"▼")+'</span>':'')+'</th>').join("")+'</tr></thead>';
+    const body='<tbody>'+rows.map(r=>{
+      const tds=COLS.map(c=>{
+        if(c.k==="rank")  return '<td class="mo-rk">'+(r.rank||"—")+'</td>';
+        if(c.k==="t")     return '<td class="mo-tk">'+esc(r.t)
+                                 +(r.thin?' <span class="mo-tag mo-warn" title="Low turnover — low volatility may be a liquidity artifact">THIN</span>':'')
+                                 +(r.volSus?' <span class="mo-tag mo-warn" title="Volatility far below the universe floor — likely a data artifact, not a smooth trend. Score is winsorized, but verify this one on the chart.">VOL?</span>':'')+'</td>';
+        if(c.k==="n")     return '<td style="max-width:190px;overflow:hidden;text-overflow:ellipsis"><span class="mo-dim">'+esc((r.n||"").slice(0,32))+'</span></td>';
+        if(c.k==="d1")    return '<td>'+deltaCell(r.d1,r.isNew)+'</td>';
+        if(c.k==="d3")    return '<td>'+deltaCell(r.d3,false)+'</td>';
+        if(c.k==="d6")    return '<td>'+deltaCell(r.d6,false)+'</td>';
+        if(c.k==="fscore"){
+          const dots=(r.flags||[]).map(f=>'<span class="mo-f '+(f===true?"y":"n")+'"></span>').join("");
+          return '<td title="ROE&gt;15 · RevGrowth&gt;10 · NetDebt/EBITDA&lt;2 · FCF&gt;0 · NetMargin&gt;0'+(r.bank?" (bank: leverage flags suppressed)":"")+'">'+dots+' <span class="mo-dim">'+r.fscore+'/'+r.fmax+'</span></td>';
+        }
+        if(c.k==="sec")   return '<td style="text-align:left"><span class="mo-dim">'+esc((r.sec||"—").slice(0,22))+'</span></td>';
+        const v=r[c.k], txt=c.f?c.f(v):(v==null?"—":v);
+        const cc=/^p1|^p3|^p6/.test(c.k)?col(v):"var(--text)";
+        return '<td style="color:'+cc+'">'+txt+'</td>';
+      }).join("");
+      return '<tr>'+tds+'</tr>';
+    }).join("")+'</tbody>';
+    el.innerHTML='<table class="mo-t">'+head+body+'</table>';
+  }
+  function kpis(){
+    const m=MODEL; let h="";
+    h+='<div class="mo-k">Snapshot<b>'+esc(m.snap.as_of)+'</b></div>';
+    h+='<div class="mo-k">Ranked<b>'+m.rows.filter(r=>r.rank).length+' / '+m.rows.length+'</b></div>';
+    h+='<div class="mo-k">History<b>'+m.count+' upload'+(m.count===1?"":"s")+'</b></div>';
+    h+='<div class="mo-k">Vol basis<b>'+((volSmooth&&m.count>=3)?"3-upload avg":"raw 1M")+'</b></div>';
+    if(m.churn){
+      h+='<div class="mo-k'+(m.churn.warn?" alert":"")+'">Membership<b>'+m.churn.now+' vs '+m.churn.prev+
+         ' ('+m.churn.pct.toFixed(1)+'%)</b></div>';
+    }
+    if(m.dropped&&m.dropped.length)
+      h+='<div class="mo-k">Dropped out<b>'+m.dropped.length+' name'+(m.dropped.length===1?"":"s")+'</b></div>';
+    if(m.secTop.length){
+      const top=m.secTop[0];
+      h+='<div class="mo-k'+(top.pct>40?" alert":"")+'">Top sector in top '+topN+'<b>'+esc(top.s.slice(0,20))+' '+top.pct.toFixed(0)+'%</b></div>';
+    }
+    return h;
+  }
+
+  /* ---------- wiring ---------- */
+  function bindDrop(el){
+    el.addEventListener("click",()=>{
+      const i=document.createElement("input"); i.type="file"; i.accept=".csv,text/csv";
+      i.onchange=e=>{ if(e.target.files[0])handleFile(e.target.files[0]); };
+      i.click();
+    });
+    ["dragenter","dragover"].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();el.classList.add("over");}));
+    ["dragleave","drop"].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();el.classList.remove("over");}));
+    el.addEventListener("drop",e=>{ const f=e.dataTransfer.files[0]; if(f)handleFile(f); });
+  }
+  function init(){
+    if(inited)return; inited=true;
+    bindDrop($("moDrop")); bindDrop($("moDrop2"));
+    $("moAddUni").onclick=addUni;
+    $("moExport").onclick=exportTop;
+    $("moMoves").onclick=exportMoves;
+    $("moTg3").onclick=function(){ use3M=!use3M; this.classList.toggle("on",use3M); build(); };
+    $("moTgV").onclick=function(){ volSmooth=!volSmooth; this.classList.toggle("on",volSmooth); build(); };
+    $("moTopN").onchange=function(){ topN=parseInt(this.value)||30; build(); };
+    $("moTurn").onchange=function(){ minTurn=parseFloat(this.value)||0; build(); };
+    $("moTgV").classList.toggle("on",volSmooth);
+    load();
+  }
+
+  window.MO={
+    ensureInit:init,
+    pick:id=>{curUni=id;renderUnis();build();},
+    delUni, delSnap,
+    sort:c=>{ if(sortBy.c===c)sortBy.d=sortBy.d==="asc"?"desc":"asc"; else sortBy={c:c,d:(c==="rank"||c==="t"||c==="n"||c==="sec")?"asc":"desc"}; render(); }
+  };
+})();
+</script>
+
 </body></html>
