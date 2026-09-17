@@ -4893,15 +4893,26 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     const vm=(opts.smooth&&idx>=2)?volMap(list,idx):null;
     rows.forEach(r=>{ r._vol=vm?(vm.map[r.t]!==undefined?vm.map[r.t]:r.vol):r.vol; });
     const ra=(ret,v)=>(ret===null||ret===undefined||v===null||v===undefined||!(v>0))?null:ret/v;
-    rows.forEach(r=>{ r._ra6=ra(r.p6m,r._vol); r._ra12=ra(r.p1y,r._vol); r._ra3=ra(r.p3m,r._vol); });
-    // volatility sanity floor: a denominator far below the universe floor is a
-    // data artifact (thin/halted trading), not a smooth trend. Flag it.
+    // ── VOLATILITY FLOOR ──────────────────────────────────────────
+    // TradingView's 1-month volatility is occasionally corrupt: a heavily
+    // traded name reports ~0.2 when the universe median is ~3.7. Dividing by
+    // that inflates the ratio ~15x and sweeps the top of the ranking. Nothing
+    // about liquidity predicts it, so no turnover filter can catch it.
+    // Fix: no stock may use a denominator below the universe's own 10th
+    // percentile. Self-calibrating per universe; harmless to names only
+    // slightly below the floor, decisive against corrupt readings.
     const vsorted=rows.map(r=>r._vol).filter(v=>v!==null&&v!==undefined&&v>0).sort((a,b)=>a-b);
-    const p2 = vsorted.length ? vsorted[Math.floor(0.02*(vsorted.length-1))] : null;
-    rows.forEach(r=>{ r.volSus = (p2!==null&&r._vol!==null&&r._vol!==undefined&&r._vol<p2*0.75); });
+    const vFloor = vsorted.length ? vsorted[Math.floor(0.10*(vsorted.length-1))] : null;
+    rows.forEach(r=>{
+      r.volRaw=r._vol;
+      if(vFloor!==null&&r._vol!==null&&r._vol!==undefined&&r._vol<vFloor)r._vol=vFloor;
+      // flag only a material correction (>2x), i.e. the genuinely corrupt ones
+      r.volSus=(vFloor!==null&&r.volRaw!==null&&r.volRaw!==undefined&&r.volRaw<vFloor*0.5);
+    });
+    // ratios computed AFTER the floor, so the floor actually binds
+    rows.forEach(r=>{ r._ra6=ra(r.p6m,r._vol); r._ra12=ra(r.p1y,r._vol); r._ra3=ra(r.p3m,r._vol); });
     const z6=zmaker(rows.map(r=>r._ra6)), z12=zmaker(rows.map(r=>r._ra12)), z3=zmaker(rows.map(r=>r._ra3));
-    // winsorize at +/-3 sd, the standard index-provider treatment: one freak
-    // denominator cannot then hijack rank 1.
+    // winsorize at +/-3 sd, the standard index-provider treatment
     const CLIP=3, clip=z=>z===null||z===undefined?null:Math.max(-CLIP,Math.min(CLIP,z));
     rows.forEach(r=>{
       const a=clip(z6(r._ra6)), b=clip(z12(r._ra12)), c=opts.use3M?clip(z3(r._ra3)):null;
@@ -5128,7 +5139,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
         if(c.k==="rank")  return '<td class="mo-rk">'+(r.rank||"—")+'</td>';
         if(c.k==="t")     return '<td class="mo-tk">'+esc(r.t)
                                  +(r.thin?' <span class="mo-tag mo-warn" title="Low turnover — low volatility may be a liquidity artifact">THIN</span>':'')
-                                 +(r.volSus?' <span class="mo-tag mo-warn" title="Volatility far below the universe floor — likely a data artifact, not a smooth trend. Score is winsorized, but verify this one on the chart.">VOL?</span>':'')+'</td>';
+                                 +(r.volSus?' <span class="mo-tag mo-warn" title="Reported volatility far below the universe floor — a TradingView data artifact, not a smooth trend. The score already uses the floored value; this tag just tells you the raw reading is unreliable.">VOL?</span>':'')+'</td>';
         if(c.k==="n")     return '<td style="max-width:190px;overflow:hidden;text-overflow:ellipsis"><span class="mo-dim">'+esc((r.n||"").slice(0,32))+'</span></td>';
         if(c.k==="d1")    return '<td>'+deltaCell(r.d1,r.isNew)+'</td>';
         if(c.k==="d3")    return '<td>'+deltaCell(r.d3,false)+'</td>';
