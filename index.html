@@ -4911,7 +4911,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     let h="";
     sectors.forEach(sec=>{
       const etfs=NODES.filter(n=>n.parent_id===sec.id);
-      const openS=OPEN["S"+sec.id]!==false;
+      const openS=OPEN["S"+sec.id]===true;   // collapsed on load; click a sector to open it
       h+='<div class="ef-sec"><div class="ef-sech" onclick="EF.tg(\'S'+sec.id+'\')">'
         + cb(on("n"+sec.id),"EF.tn("+sec.id+")")
         + '<span class="ef-arw">'+(openS?"▾":"▸")+'</span><span class="ef-secn">'+esc(sec.name)+'</span>'
