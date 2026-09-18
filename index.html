@@ -932,6 +932,9 @@ tr.flt-row .flt2{display:flex;gap:3px}
 #page-etf .ef-etf{margin:4px 6px 4px 20px;border-left:2px solid var(--border);padding-left:8px}
 #page-etf .ef-etfh{display:flex;align-items:center;gap:8px;padding:5px 4px;cursor:pointer}
 #page-etf .ef-etfn{font-weight:600;font-size:13px;color:var(--text);flex:1}
+#page-etf .ef-notes{width:100%;min-height:340px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:'Consolas','SF Mono',monospace;font-size:11.5px;line-height:1.6;padding:12px;resize:vertical;white-space:pre}
+#page-etf .ef-notes:focus{outline:none;border-color:var(--accent,#e8b84b);color:var(--text)}
+#page-etf .ef-note-help{font-size:11px;color:var(--text3);margin-bottom:8px;line-height:1.5}
 #page-etf .ef-star{font-size:13px;line-height:1;color:var(--text3);cursor:pointer;padding:0 2px;flex:0 0 auto;transition:.12s}
 #page-etf .ef-star:hover{color:var(--accent,#e8b84b);transform:scale(1.18)}
 #page-etf .ef-star.on{color:var(--accent,#e8b84b)}
@@ -2006,7 +2009,7 @@ tr.flt-row .flt2{display:flex;gap:3px}
       <div class="section-header">
         <div class="section-title">ETF <span>FLOW</span></div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <button class="btn btn-ghost btn-sm" id="efSeed" title="Create the recommended sector/ETF structure. Never deletes anything holding data.">Recommended set</button>
+          <button class="btn btn-ghost btn-sm" id="efSaveSel" title="Remember exactly which ETFs are ticked right now, and restore this set on every reload.">Save current set</button>
           <button class="btn btn-gold btn-sm" id="efAddSec">+ Sector</button>
         </div>
       </div>
@@ -2053,6 +2056,21 @@ tr.flt-row .flt2{display:flex;gap:3px}
           </details>
         </div>
       </div>
+    </div>
+
+    <div class="section" style="margin-top:14px">
+      <div class="section-header">
+        <div class="section-title">ETF <span>REFERENCE LIBRARY</span></div>
+        <div style="display:flex;gap:7px;align-items:center">
+          <button class="btn btn-ghost btn-sm" id="efNotesFill" title="Rewrite these notes from the built-in catalogue. Anything you typed is replaced.">Reset to catalogue</button>
+          <button class="btn btn-gold btn-sm" id="efNotesSave">Save notes</button>
+        </div>
+      </div>
+      <div class="ef-note-help">
+        Keep the tree above small &mdash; only the funds you actually track. Everything else lives here as
+        plain text. When you want one back, copy its ticker and use <b>+ ETF</b> in the right sector.
+      </div>
+      <textarea id="efNotes" class="ef-notes" spellcheck="false" placeholder="Loading catalogue..."></textarea>
     </div>
   </div>
 
@@ -4464,7 +4482,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       if(st&&st[0]&&st[0].etf_cfg){ try{ K.CFG=Object.assign(JSON.parse(JSON.stringify(K.DEF_CFG)), typeof st[0].etf_cfg==="string"?JSON.parse(st[0].etf_cfg):st[0].etf_cfg); }catch(e){} }
       $("efErr").textContent="";
     }catch(e){ $("efErr").textContent="Load failed: "+e.message+"  — have the ETF tables been created?"; }
-    applyRefDefaults();
+    if(!applySavedSet()) applyRefDefaults();
     K.setData(NODES,SNAPS,SEL); renderTree(); refresh(); renderCfg();
   }
 
@@ -4733,6 +4751,69 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     const n=NODES.find(x=>x.id===id); if(!n)return;
     try{ await sb("etf_nodes?id=eq."+id,"PATCH",{fav:!n.fav}); await load(); }
     catch(err){ toast("Could not save: "+err.message,"error"); }
+  }
+  // ---- reference library -------------------------------------------------
+  // Built from the same REC + DESCR tables the tree used to be seeded from,
+  // so the catalogue text always matches what the app knows.
+  function catalogueText(){
+    let s="ETF REFERENCE LIBRARY\n";
+    s+="Keep the tree small. Copy a ticker from here and use + ETF to add it back.\n";
+    s+="(ref) = passive, weights follow price, not decisions.\n";
+    s+="".padEnd(78,"=")+"\n";
+    REC.forEach(function(sec){
+      s+="\n"+sec[0].toUpperCase()+"\n"+"".padEnd(78,"-")+"\n";
+      sec[1].forEach(function(e){
+        const t=e[0], d=DESCR[t]||"";
+        s+="  "+t.padEnd(7)+(e[2]?"(ref) ":"      ")+d+"\n";
+      });
+    });
+    s+="\n"+"".padEnd(78,"=")+"\n";
+    s+="NOTES\n\n";
+    return s;
+  }
+  async function loadNotes(){
+    try{
+      const r=await sb("settings?select=id,etf_notes&limit=1");
+      const el=document.getElementById("efNotes"); if(!el)return;
+      const v=(r&&r.length&&r[0].etf_notes)?r[0].etf_notes:catalogueText();
+      el.value=v;
+    }catch(e){
+      const el=document.getElementById("efNotes");
+      if(el)el.value=catalogueText();
+    }
+  }
+  async function saveNotes(){
+    const el=document.getElementById("efNotes"); if(!el)return;
+    try{
+      const r=await sb("settings?select=id&limit=1");
+      if(r&&r.length) await sb("settings?id=eq."+r[0].id,"PATCH",{etf_notes:el.value});
+      else await sb("settings","POST",{etf_notes:el.value});
+      toast("Notes saved","success");
+    }catch(e){ toast("Save failed: "+e.message+" \u2014 was the etf_notes column added?","error"); }
+  }
+  // ---- remember which ETFs are ticked ------------------------------------
+  async function saveCurrentSet(){
+    const etfs=NODES.filter(n=>n.kind==="etf");
+    if(!etfs.length){ toast("Nothing to save","error"); return; }
+    try{
+      for(const e of etfs){
+        const want = SEL["n"+e.id]!==false;
+        if(e.sel_default!==want) await sb("etf_nodes?id=eq."+e.id,"PATCH",{sel_default:want});
+      }
+      await load();
+      toast(etfs.filter(e=>SEL["n"+e.id]!==false).length+" ETFs saved as the startup set","success");
+    }catch(err){ toast("Save failed: "+err.message+" \u2014 was the sel_default column added?","error"); }
+  }
+  // applied on every load: a saved set wins over the (ref) rule
+  function applySavedSet(){
+    const saved=NODES.filter(n=>n.kind==="etf"&&n.sel_default!==null&&n.sel_default!==undefined);
+    if(!saved.length)return false;
+    NODES.filter(n=>n.kind==="etf").forEach(e=>{
+      const v=(e.sel_default===null||e.sel_default===undefined)?false:!!e.sel_default;
+      SEL["n"+e.id]=v;
+      if(!v)SNAPS.filter(s=>s.etf_id===e.id).forEach(s=>SEL["s"+s.id]=false);
+    });
+    return true;
   }
   async function addEtf(pid){
     const n=prompt("ETF ticker / name (e.g. QQQ):"); if(!n||!n.trim())return;
@@ -5004,7 +5085,13 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 
   function init(){ if(inited)return; inited=true;
     $("efAddSec").addEventListener("click",addSector);
-    $("efSeed").addEventListener("click",seedRecommended);
+    $("efSaveSel").addEventListener("click",saveCurrentSet);
+    $("efNotesSave").addEventListener("click",saveNotes);
+    $("efNotesFill").addEventListener("click",function(){
+      if(confirm("Rewrite the notes from the built-in catalogue? Anything you typed here is replaced."))
+        document.getElementById("efNotes").value=catalogueText();
+    });
+    loadNotes();
     $("efCSave").addEventListener("click",commitImport);
     $("efCCancel").addEventListener("click",()=>{$("efConfirm").classList.remove("show");pending=null;});
     $("efExport").addEventListener("click",exportTxt);
