@@ -932,6 +932,13 @@ tr.flt-row .flt2{display:flex;gap:3px}
 #page-etf .ef-etf{margin:4px 6px 4px 20px;border-left:2px solid var(--border);padding-left:8px}
 #page-etf .ef-etfh{display:flex;align-items:center;gap:8px;padding:5px 4px;cursor:pointer}
 #page-etf .ef-etfn{font-weight:600;font-size:13px;color:var(--text);flex:1}
+#page-etf .ef-star{font-size:13px;line-height:1;color:var(--text3);cursor:pointer;padding:0 2px;flex:0 0 auto;transition:.12s}
+#page-etf .ef-star:hover{color:var(--accent,#e8b84b);transform:scale(1.18)}
+#page-etf .ef-star.on{color:var(--accent,#e8b84b)}
+#page-etf .ef-desc{margin:0 0 5px 46px;font-size:11px;line-height:1.45;color:var(--text3);cursor:pointer;padding:1px 3px;border-radius:4px}
+#page-etf .ef-desc:hover{color:var(--text2);background:var(--bg3)}
+#page-etf .ef-pen{opacity:0;margin-left:6px;font-size:10px}
+#page-etf .ef-desc:hover .ef-pen{opacity:.65}
 #page-etf .ef-mo{margin:3px 0 3px 18px}
 #page-etf .ef-moh{display:flex;align-items:center;gap:8px;padding:4px;cursor:pointer;font-size:12px;color:var(--text2);font-family:'Barlow Condensed',sans-serif}
 #page-etf .ef-dt{margin-left:18px}
@@ -1071,7 +1078,7 @@ tr.flt-row .flt2{display:flex;gap:3px}
       <button class="nav-btn" onclick="showPage(&#39;plan&#39;,this)">📐 Trading Plan</button>
       <button class="nav-btn" onclick="showPage(&#39;rs&#39;,this); if(window.RS) RS.ensureInit(); if(window.RS2) RS2.ensureInit();">📈 RS Score</button>
       <button class="nav-btn" onclick="showPage(&#39;etf&#39;,this); if(window.EF) EF.ensureInit();">🧭 ETF Flow</button>
-      <button class="nav-btn" onclick="showPage(&#39;mom&#39;,this); if(window.MO) MO.ensureInit();">🚀 Momentum</button>
+      <button class="nav-btn" onclick="showPage(&#39;mom&#39;,this); if(window.MO) MO.ensureInit(); if(window.MX) MX.init();">🚀 Momentum</button>
     </div>
     <div class="topbar-right">
       <div class="balance-chip">Balance: <strong id="topbarBalance">$10,764.09</strong></div>
@@ -1999,6 +2006,7 @@ tr.flt-row .flt2{display:flex;gap:3px}
       <div class="section-header">
         <div class="section-title">ETF <span>FLOW</span></div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" id="efSeed" title="Create the recommended sector/ETF structure. Never deletes anything holding data.">Recommended set</button>
           <button class="btn btn-gold btn-sm" id="efAddSec">+ Sector</button>
         </div>
       </div>
@@ -2109,6 +2117,41 @@ tr.flt-row .flt2{display:flex;gap:3px}
             suppressed for financials. This is a coarse pre-filter — the real seven-light check is IVA Pro on the chart.
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="section" style="margin-top:14px">
+      <div class="section-header">
+        <div class="section-title">INTERSECT <span>ETF x MOMENTUM</span></div>
+        <div class="mo-dim" style="font-size:10.5px">rank order inside each file is the join key</div>
+      </div>
+
+      <div class="mx-grid">
+        <div class="mx-drop" id="mxDropA"><b>Momentum list</b>drop the .txt exported from the table above<div class="mx-meta">top N, in rank order</div></div>
+        <div class="mx-drop" id="mxDropB"><b>ETF list</b>drop the .txt exported from the ETF Flow tab<div class="mx-meta">matching universe</div></div>
+      </div>
+
+      <div class="mx-bar" id="mxBar" style="display:none">
+        <div class="mx-seg" id="mxMode">
+          <button data-m="both" class="on">Both lists</button>
+          <button data-m="all">All names</button>
+        </div>
+        <label title="Slide toward momentum to trust price more, toward ETF to trust manager behaviour more.">Weight mom / etf
+          <input type="range" id="mxW" min="0" max="100" step="5" value="50">
+          <span id="mxWL" style="min-width:48px">50 / 50</span></label>
+        <label>Export top <input type="number" id="mxTopN" min="5" max="500" value="100"></label>
+        <span class="mo-dim" id="mxStat" style="font-size:11px"></span>
+        <button class="btn btn-gold btn-sm" id="mxExport" style="margin-left:auto">Export combined &rarr;TV</button>
+      </div>
+
+      <div style="overflow:auto;max-height:52vh;border:1px solid var(--border);border-radius:8px" id="mxOut"></div>
+
+      <div class="mo-note">
+        <b>Combined</b> runs 0-100, higher is better: each list becomes a percentile first, so lists of
+        different lengths merge fairly, then the slider blends them. <b>Disagree</b> is how far apart the two
+        lists place a name &mdash; a high value with <b>SPLIT</b> means price and manager behaviour are telling
+        different stories, which is worth a look either way. Under <b>All names</b>, a stock missing from one
+        list counts as neutral there, never as worst &mdash; no ETF coverage is not evidence against a stock.
       </div>
     </div>
   </div>
@@ -4421,12 +4464,275 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       if(st&&st[0]&&st[0].etf_cfg){ try{ K.CFG=Object.assign(JSON.parse(JSON.stringify(K.DEF_CFG)), typeof st[0].etf_cfg==="string"?JSON.parse(st[0].etf_cfg):st[0].etf_cfg); }catch(e){} }
       $("efErr").textContent="";
     }catch(e){ $("efErr").textContent="Load failed: "+e.message+"  — have the ETF tables been created?"; }
+    applyRefDefaults();
     K.setData(NODES,SNAPS,SEL); renderTree(); refresh(); renderCfg();
   }
+
+  /* ───────── recommended structure ─────────
+     "(ref)" marks a passive, cap-weighted fund. Its weights move with price,
+     not with any manager decision, so it is seeded UNSELECTED and kept only as
+     an index reference. Everything else is active, equal-weight, or rules-based
+     — a weight change there is a decision, which is what this tab measures. */
+
+  // One-line plain descriptions, keyed by bare ticker. Used when a node has no
+  // saved description of its own. Editing a fund writes to etf_nodes.descr and
+  // overrides whatever is here.
+  const DESCR={
+    QQQ:"Nasdaq-100. Cap-weighted, passive — weights move with price, not decisions.",
+    DIA:"Dow 30. Price-weighted, passive. A yardstick, not a signal.",
+    RSP:"S&P 500 held in equal weight. Quarterly reset, so rebalancing IS a decision.",
+    MTUM:"MSCI momentum: 6M and 12M risk-adjusted price momentum. Same signal as your Momentum tab — not independent confirmation.",
+    QUAL:"MSCI quality: high ROE, low debt/equity, low earnings variability, scored within each sector. Closest fund to your seven lights.",
+    USMV:"MSCI min-vol. An optimiser minimises whole-portfolio risk using a covariance matrix — it is not a per-stock ranking.",
+    IWM:"Russell 2000. The small-cap yardstick your Momentum universe is built from.",
+    AVUV:"Avantis small-cap value. Systematically active — tilts to cheap, profitable small caps.",
+    SMOT:"Morningstar small/mid moat. Analysts assign the moat rating; the fund rotates on valuation.",
+    MOAT:"Morningstar wide-moat large cap. Analyst-assigned moats, bought when they look cheap.",
+    AVUS:"Avantis US core. Broad market with systematic value and profitability tilts.",
+    FBCG:"Fidelity Blue Chip Growth, active. Transparent daily holdings.",
+    FMAG:"Fidelity Magellan, active. The classic fund in ETF form.",
+    TCHP:"T. Rowe Price Blue Chip Growth, active large-cap growth.",
+    ARKK:"ARK Innovation. High-conviction disruptive growth, daily disclosure.",
+    GTEK:"Goldman Sachs Future Tech Leaders. Active, skews outside mega-cap.",
+    FMILX:"Fidelity New Millennium, mutual fund. Quarterly holdings only.",
+    FINN:"Canadian fund. Quarterly disclosure under NI 81-102, not US daily rules.",
+    XLK:"S&P 500 technology, cap-weighted. Passive reference.",
+    ARKW:"ARK Next Generation Internet. Active, daily disclosure.",
+    IVES:"Dan Ives Wedbush AI Revolution. Active thematic AI.",
+    CHAT:"Roundhill Generative AI. Thematic, rules-based reconstitution.",
+    IGV:"Software. Modified cap-weight with caps, so the caps force decisions.",
+    XT:"Morningstar Exponential Technologies. Index-tracked thematic, not active.",
+    XSW:"Software in equal weight. Small and mid software get real weight here.",
+    SOXX:"Semiconductors, cap-weighted. Passive reference.",
+    XSD:"Semiconductors in equal weight. Far more small-cap chip exposure than SOXX.",
+    PSI:"Dynamic semiconductors. Rules-based selection on fundamentals and momentum.",
+    FTXL:"Nasdaq semiconductors, weighted on volatility and value factors.",
+    ARKQ:"ARK Autonomous Tech & Robotics. Active.",
+    ROBO:"Global robotics and automation. Equal-weight thematic.",
+    AIQ:"Global AI and big data. Thematic reconstitution.",
+    IGPT:"Invesco AI and next-gen software.",
+    WTAI:"WisdomTree AI and innovation.",
+    XLV:"S&P 500 healthcare, cap-weighted. Passive reference.",
+    ARKG:"ARK Genomic Revolution. Active, deep biotech.",
+    XBI:"Biotech in equal weight — the standard small-cap biotech read.",
+    XPH:"Pharmaceuticals in equal weight.",
+    XLF:"S&P 500 financials, cap-weighted. Passive reference.",
+    ARKF:"ARK Fintech Innovation. Active.",
+    KBE:"Banks in equal weight — regionals carry the same weight as money-centres.",
+    KIE:"Insurance in equal weight.",
+    VNQ:"US REITs, cap-weighted. Passive reference.",
+    PSR:"Active real estate. Manager picks REITs on valuation and cash flow.",
+    REIT:"ALPS active REIT.",
+    SRVR:"Data centre and cell tower REITs — the AI infrastructure landlords.",
+    INDS:"Industrial and logistics REITs — warehouses, last-mile.",
+    XLE:"S&P 500 energy, cap-weighted. Passive reference.",
+    XOP:"Oil and gas exploration and production, equal weight. Very different from XLE.",
+    XES:"Oil services and equipment, equal weight.",
+    FCG:"Natural gas producers.",
+    ICLN:"Global clean energy. Thematic reconstitution.",
+    URA:"Uranium miners and nuclear fuel.",
+    NLR:"Nuclear energy and uranium, broader than URA.",
+    XLI:"S&P 500 industrials, cap-weighted. Passive reference.",
+    ARKX:"ARK Space Exploration. Active.",
+    XAR:"Aerospace and defence in equal weight — small suppliers matter here.",
+    PPA:"Aerospace and defence, broader and cap-tilted.",
+    ITB:"Home construction, cap-weighted. Passive reference.",
+    XHB:"Homebuilders in equal weight — includes suppliers and fit-out.",
+    IFRA:"US infrastructure. Rules-based across utilities, transport, construction.",
+    PAVE:"US infrastructure development — the build-out basket.",
+    PKB:"Dynamic building and construction, rules-based.",
+    XLB:"S&P 500 materials, cap-weighted. Passive reference.",
+    XME:"Metals and mining in equal weight — a cleaner miners read than XLB.",
+    REMX:"Rare earth and strategic metals.",
+    MOO:"Global agribusiness.",
+    WOOD:"Timber and forestry.",
+    XLY:"S&P 500 consumer discretionary, cap-weighted. Passive reference.",
+    XLP:"S&P 500 consumer staples, cap-weighted. Passive reference.",
+    XRT:"Retail in equal weight — the widest small-cap retail read available.",
+    RSPD:"Consumer discretionary in equal weight, quarterly reset.",
+    RSPS:"Consumer staples in equal weight, quarterly reset.",
+    XLU:"S&P 500 utilities, cap-weighted. Passive reference.",
+    RSPU:"Utilities in equal weight, quarterly reset.",
+    XLC:"S&P 500 communication services, cap-weighted. Passive reference.",
+    SOCL:"Global social media.",
+    ESPO:"Video gaming and esports."
+  };
+
+  const REC=[
+    ["Benchmarks",[
+      ["QQQ","QQQ (ref) NASDAQ-100",1],["DIA","DIA (ref) DOW 30",1],
+      ["RSP","RSP* EQUAL WEIGHT S&P",0],["MTUM","MTUM* FACTOR",0],
+      ["QUAL","QUAL* FACTOR",0],["USMV","USMV* FACTOR",0]]],
+    ["Small & Mid Cap · vs Russell 2000",[
+      ["IWM","IWM (ref) RUSSELL 2000",1],
+      ["AVUV","AVUV* SMALL VALUE",0],["SMOT","SMOT* SMID MOAT",0]]],
+    ["Large Cap Quality · vs Russell 1000",[
+      ["MOAT","MOAT* WIDE MOAT",0],["AVUS","AVUS* US CORE",0]]],
+    ["Active Growth & Innovation",[
+      ["FBCG","FBCG*",0],["FMAG","FMAG*",0],["TCHP","TCHP*",0],
+      ["ARKK","ARKK*",0],["GTEK","GTEK*",0]]],
+    ["Mutual Funds (Quarterly)",[
+      ["FMILX","FMILX*",0],["FINN","FINN* (CAN)",0]]],
+    ["Technology",[
+      ["XLK","XLK (ref)",1],
+      ["ARKW","ARKW*",0],["IVES","IVES*",0],["CHAT","CHAT*",0],
+      ["IGV","IGV* SOFTWARE",0],["XT","XT* EXPONENTIAL TECH",0],
+      ["XSW","XSW* EQ-WT SOFTWARE",0]]],
+    ["Semiconductors",[
+      ["SOXX","SOXX (ref)",1],
+      ["XSD","XSD* EQ-WT",0],["PSI","PSI*",0],["FTXL","FTXL*",0]]],
+    ["AI & Robotics",[
+      ["ARKQ","ARKQ*",0],["ROBO","ROBO*",0],["AIQ","AIQ*",0],
+      ["IGPT","IGPT*",0],["WTAI","WTAI*",0]]],
+    ["Healthcare & Biotech",[
+      ["XLV","XLV (ref)",1],
+      ["ARKG","ARKG*",0],["XBI","XBI* EQ-WT BIOTECH",0],["XPH","XPH* EQ-WT PHARMA",0]]],
+    ["Financials & Fintech",[
+      ["XLF","XLF (ref)",1],
+      ["ARKF","ARKF*",0],["KBE","KBE* EQ-WT BANKS",0],["KIE","KIE* EQ-WT INSURANCE",0]]],
+    ["Real Estate",[
+      ["VNQ","VNQ (ref)",1],
+      ["PSR","PSR*",0],["REIT","REIT*",0],["SRVR","SRVR* DATA CENTRES",0],
+      ["INDS","INDS* INDUSTRIAL",0]]],
+    ["Energy",[
+      ["XLE","XLE (ref)",1],
+      ["XOP","XOP* EQ-WT E&P",0],["XES","XES* EQ-WT SERVICES",0],["FCG","FCG* GAS",0]]],
+    ["Nuclear & Clean Energy",[
+      ["ICLN","ICLN*",0],["URA","URA*",0],["NLR","NLR*",0]]],
+    ["Industrials, Defense & Space",[
+      ["XLI","XLI (ref)",1],
+      ["ARKX","ARKX*",0],["XAR","XAR* EQ-WT A&D",0],["PPA","PPA*",0]]],
+    ["Construction & Infrastructure",[
+      ["ITB","ITB (ref)",1],
+      ["XHB","XHB* EQ-WT HOMEBUILD",0],["IFRA","IFRA*",0],
+      ["PAVE","PAVE*",0],["PKB","PKB*",0]]],
+    ["Materials & Mining",[
+      ["XLB","XLB (ref)",1],
+      ["XME","XME* EQ-WT METALS",0],["REMX","REMX* RARE EARTH",0],
+      ["MOO","MOO* AGRI",0],["WOOD","WOOD* TIMBER",0]]],
+    ["Consumer",[
+      ["XLY","XLY (ref) DISCRETIONARY",1],["XLP","XLP (ref) STAPLES",1],
+      ["XRT","XRT* EQ-WT RETAIL",0],["RSPD","RSPD* EQ-WT DISC",0],
+      ["RSPS","RSPS* EQ-WT STAPLES",0]]],
+    ["Utilities",[
+      ["XLU","XLU (ref)",1],["RSPU","RSPU* EQ-WT UTILITIES",0]]],
+    ["Communication Services",[
+      ["XLC","XLC (ref)",1],
+      ["SOCL","SOCL* SOCIAL",0],["ESPO","ESPO* GAMING",0]]]
+  ];
+
+  // pull the bare ticker out of a stored node name ("RSP* (EQUAL WEIGHT S&P)" -> "RSP")
+  function tickerOf(name){
+    return String(name||"").trim().toUpperCase().split(/[\s(*]/)[0].replace(/[^A-Z0-9.\-]/g,"");
+  }
+
+  async function seedRecommended(){
+    const nEtf=NODES.filter(n=>n.kind==="etf").length;
+    if(!confirm("Create the recommended sector and ETF structure?\n\n"
+      +"· Renames sectors and tickers to the recommended labels\n"
+      +"· Moves ETFs into the right sector\n"
+      +"· Adds anything missing\n"
+      +"· Deletes ONLY leftover ETFs that hold no uploaded data\n\n"
+      +"Nothing that contains a snapshot is ever deleted. ("+nEtf+" ETFs currently.)"))return;
+    let added=0,moved=0,renamed=0,removed=0;
+    try{
+      // index what exists
+      const secByName={}; NODES.filter(n=>n.kind==="sector").forEach(s=>secByName[s.name.toLowerCase()]=s);
+      const etfByTic={};  NODES.filter(n=>n.kind==="etf").forEach(e=>{const t=tickerOf(e.name); if(t&&!etfByTic[t])etfByTic[t]=e;});
+      const wanted=new Set();
+      let sort=0;
+
+      for(const [secName,list] of REC){
+        // find the sector: exact name, else any sector already holding one of its tickers
+        let sec=secByName[secName.toLowerCase()];
+        if(!sec){
+          for(const [tic] of list){
+            const e=etfByTic[tic];
+            if(e&&e.parent_id){ const p=NODES.find(n=>n.id===e.parent_id); if(p){sec=p;break;} }
+          }
+          if(sec&&sec.name!==secName){ await sb("etf_nodes?id=eq."+sec.id,"PATCH",{name:secName}); renamed++; }
+        }
+        if(!sec){
+          const r=await sb("etf_nodes","POST",{kind:"sector",name:secName,sort:sort});
+          sec=Array.isArray(r)?r[0]:r; if(sec)secByName[secName.toLowerCase()]=sec;
+        }
+        sort++;
+        if(!sec||!sec.id)continue;
+
+        for(const [tic,label] of list){
+          wanted.add(tic);
+          const ex=etfByTic[tic];
+          if(ex){
+            const patch={};
+            if(ex.name!==label)patch.name=label;
+            if(ex.parent_id!==sec.id)patch.parent_id=sec.id;
+            if(Object.keys(patch).length){
+              await sb("etf_nodes?id=eq."+ex.id,"PATCH",patch);
+              if(patch.name)renamed++; if(patch.parent_id)moved++;
+            }
+          }else{
+            await sb("etf_nodes","POST",{kind:"etf",name:label,parent_id:sec.id,sort:sort});
+            added++;
+          }
+        }
+      }
+
+      // remove leftovers that are NOT recommended AND hold no snapshots
+      const hasData=new Set(SNAPS.map(s=>s.etf_id));
+      for(const e of NODES.filter(n=>n.kind==="etf")){
+        const t=tickerOf(e.name);
+        if(!wanted.has(t)&&!hasData.has(e.id)){
+          await sb("etf_nodes?id=eq."+e.id,"DELETE"); removed++;
+        }
+      }
+      // remove sectors left completely empty
+      await load();
+      for(const s of NODES.filter(n=>n.kind==="sector")){
+        if(!NODES.some(n=>n.kind==="etf"&&n.parent_id===s.id)){
+          await sb("etf_nodes?id=eq."+s.id,"DELETE");
+        }
+      }
+      await load();
+      toast("Added "+added+" · renamed "+renamed+" · moved "+moved+" · removed "+removed+" empty","success");
+    }catch(e){ $("efErr").textContent="Seed failed: "+e.message; toast("Seed failed","error"); }
+  }
+
+  /* Passive "(ref)" funds start UNSELECTED on every load, so the score is
+     built from decisions rather than from price drift. Tick one manually any
+     time you want it included for that session. */
+  function applyRefDefaults(){
+    NODES.forEach(n=>{
+      if(n.kind==="etf" && /\(ref\)/i.test(n.name) && SEL["n"+n.id]===undefined){
+        SEL["n"+n.id]=false;
+        SNAPS.filter(s=>s.etf_id===n.id).forEach(s=>SEL["s"+s.id]=false);
+      }
+    });
+  }
+
   async function addSector(){
     const n=prompt("Main sector name (e.g. Benchmarks, AI, Energy):"); if(!n||!n.trim())return;
     try{ await sb("etf_nodes","POST",{kind:"sector",name:n.trim(),sort:NODES.length}); await load(); }
     catch(e){ toast("Could not add: "+e.message,"error"); }
+  }
+  // saved description wins; otherwise fall back to the built-in one
+  function descOf(e){
+    if(e.descr && String(e.descr).trim()) return e.descr;
+    const d=DESCR[tickerOf(e.name)];
+    return d || "No description yet — click to add one.";
+  }
+  async function editDesc(id){
+    const n=NODES.find(x=>x.id===id); if(!n)return;
+    const cur=(n.descr&&n.descr.trim())?n.descr:(DESCR[tickerOf(n.name)]||"");
+    const v=prompt("Description for "+n.name+":",cur);
+    if(v===null)return;
+    try{ await sb("etf_nodes?id=eq."+id,"PATCH",{descr:v.trim()}); await load(); }
+    catch(err){ toast("Could not save: "+err.message,"error"); }
+  }
+  // purely cosmetic marker — never read by any scoring code
+  async function fav(id){
+    const n=NODES.find(x=>x.id===id); if(!n)return;
+    try{ await sb("etf_nodes?id=eq."+id,"PATCH",{fav:!n.fav}); await load(); }
+    catch(err){ toast("Could not save: "+err.message,"error"); }
   }
   async function addEtf(pid){
     const n=prompt("ETF ticker / name (e.g. QQQ):"); if(!n||!n.trim())return;
@@ -4539,9 +4845,13 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
           const last=snaps.length?snaps[snaps.length-1].as_of:null;
           h+='<div class="ef-etf"><div class="ef-etfh" onclick="EF.tg(\'E'+e.id+'\')">'
             + cb(on("n"+e.id),"EF.tn("+e.id+")")
-            + '<span class="ef-arw">'+(openE?"▾":"▸")+'</span><span class="ef-etfn">'+esc(e.name)+'</span>'
+            + '<span class="ef-arw">'+(openE?"▾":"▸")+'</span>'
+            + '<span class="ef-star'+(e.fav?" on":"")+'" title="Favourite — a visual marker only, it changes nothing in the scoring" onclick="event.stopPropagation();EF.fav('+e.id+')">'+(e.fav?"★":"☆")+'</span>'
+            + '<span class="ef-etfn">'+esc(e.name)+'</span>'
             + '<span class="ef-cnt">'+(last?("last "+last):"no data")+'</span>'
-            + '<button class="ef-x" onclick="event.stopPropagation();EF.delNode('+e.id+')">✕</button></div>';
+            + '<button class="ef-x" onclick="event.stopPropagation();EF.delNode('+e.id+')">✕</button></div>'
+            + '<div class="ef-desc" onclick="EF.editDesc('+e.id+')" title="Click to edit this description">'
+            + esc(descOf(e)) + '<span class="ef-pen">✎</span></div>';
           if(openE){
             h+='<div class="ef-drop" id="efd'+e.id+'" data-etf="'+e.id+'">Drop CSV / Excel / text here, or click to choose'
               + '<input type="file" id="efi'+e.id+'" accept=".csv,.txt,.tsv,.xlsx,.xls" style="display:none"></div>'
@@ -4694,6 +5004,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 
   function init(){ if(inited)return; inited=true;
     $("efAddSec").addEventListener("click",addSector);
+    $("efSeed").addEventListener("click",seedRecommended);
     $("efCSave").addEventListener("click",commitImport);
     $("efCCancel").addEventListener("click",()=>{$("efConfirm").classList.remove("show");pending=null;});
     $("efExport").addEventListener("click",exportTxt);
@@ -4702,7 +5013,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     load();
   }
   window.EF={ensureInit:init,tg:k=>{OPEN[k]=!OPEN[k];renderTree();},tn:toggleNode,ts:toggleSnap,tm:toggleMonth,
-             addEtf,delNode,delSnap,paste:pasteText};
+             addEtf,delNode,delSnap,paste:pasteText,editDesc,fav};
 })();
 
 </script>
@@ -5206,6 +5517,180 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     pick:id=>{curUni=id;renderUnis();build();},
     delUni, delSnap,
     sort:c=>{ if(sortBy.c===c)sortBy.d=sortBy.d==="asc"?"desc":"asc"; else sortBy={c:c,d:(c==="rank"||c==="t"||c==="n"||c==="sec")?"asc":"desc"}; render(); }
+  };
+})();
+</script>
+
+<style>
+#page-mom .mx-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+@media(max-width:900px){#page-mom .mx-grid{grid-template-columns:1fr}}
+#page-mom .mx-drop{border:2px dashed var(--border2);border-radius:9px;padding:18px 14px;text-align:center;cursor:pointer;color:var(--text3);background:var(--bg3);font-size:12px;transition:.15s}
+#page-mom .mx-drop:hover,#page-mom .mx-drop.over{border-color:var(--accent);color:var(--accent);background:var(--surface)}
+#page-mom .mx-drop.has{border-style:solid;border-color:var(--green2);color:var(--text);background:var(--surface)}
+#page-mom .mx-drop b{display:block;font-size:13px;color:var(--text);margin-bottom:3px}
+#page-mom .mx-drop .mx-meta{font-size:10.5px;color:var(--text3);margin-top:4px}
+#page-mom .mx-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:10px}
+#page-mom .mx-bar label{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px}
+#page-mom .mx-bar input[type=number]{width:64px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 6px;color:var(--text);font-size:12px}
+#page-mom .mx-bar input[type=range]{width:110px}
+#page-mom .mx-seg{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+#page-mom .mx-seg button{background:var(--bg3);border:0;color:var(--text2);padding:5px 10px;font-size:11px;cursor:pointer;font-weight:600}
+#page-mom .mx-seg button.on{background:var(--accent);color:var(--bg)}
+#page-mom table.mx-t{border-collapse:collapse;width:100%;font-size:12px}
+#page-mom table.mx-t th,#page-mom table.mx-t td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text)}
+#page-mom table.mx-t th:nth-child(2),#page-mom table.mx-t td:nth-child(2){text-align:left}
+#page-mom table.mx-t th{position:sticky;top:0;background:var(--surface);color:var(--accent);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;z-index:2;cursor:pointer}
+#page-mom table.mx-t tbody tr:hover{background:var(--bg3)}
+#page-mom td.mx-rk{font-weight:700;color:var(--accent);text-align:center}
+#page-mom .mx-tag{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700}
+#page-mom .mx-both{background:rgba(61,214,140,.16);color:var(--green)}
+#page-mom .mx-m{background:rgba(91,141,238,.18);color:var(--blue2)}
+#page-mom .mx-e{background:rgba(155,114,245,.18);color:var(--purple)}
+#page-mom .mx-gap{background:rgba(240,120,80,.18);color:var(--orange)}
+</style>
+
+<script>
+/* ===== INTERSECT: combine an ETF list with a Momentum list ===== */
+(function(){
+  let A=null, B=null;              // A = momentum list, B = etf list
+  let mode="both", wM=50, topN=100, sortBy={c:"rank",d:"asc"};
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+  // A TradingView watchlist .txt has no scores — but it is written in rank
+  // order, so a ticker's POSITION in the file is its rank. That is the join key
+  // for everything below.
+  function parseList(text){
+    const out=[], seen=new Set();
+    String(text||"").split(/[\n,;]+/).forEach(tok=>{
+      let s=tok.trim();
+      if(!s||s.charAt(0)==="#")return;              // ###SECTION headers
+      const parts=s.split(":");
+      const ex=parts.length>1?parts[0].trim().toUpperCase():"";
+      let t=(parts.length>1?parts.slice(1).join(":"):parts[0]).trim().toUpperCase();
+      t=t.replace(/[^A-Z0-9.\-&]/g,"");
+      if(!t||seen.has(t))return;
+      seen.add(t);
+      out.push({t:t,ex:ex,rank:out.length+1});
+    });
+    return out;
+  }
+
+  const pctOf=(r,n)=> n>1 ? (r-1)/(n-1) : 0;        // 0 = best, 1 = worst
+
+  function build(){
+    if(!A||!B){ render(null); return; }
+    const mapA={}, mapB={};
+    A.forEach(r=>mapA[r.t]=r); B.forEach(r=>mapB[r.t]=r);
+    const keys = mode==="both"
+      ? A.filter(r=>mapB[r.t]).map(r=>r.t)
+      : [...new Set(A.map(r=>r.t).concat(B.map(r=>r.t)))];
+    const wm=wM/100, we=1-wm;
+    const rows=keys.map(t=>{
+      const a=mapA[t], b=mapB[t];
+      // a name present in only one list is treated as NEUTRAL in the other,
+      // never as worst: absence of ETF coverage is not evidence against a stock
+      const pa = a ? pctOf(a.rank,A.length) : 0.5;
+      const pb = b ? pctOf(b.rank,B.length) : 0.5;
+      return {
+        t:t, ex:(a&&a.ex)||(b&&b.ex)||"",
+        mr:a?a.rank:null, er:b?b.rank:null,
+        pa:pa, pb:pb,
+        comb: wm*pa + we*pb,
+        gap: (a&&b) ? Math.abs(pa-pb) : null,
+        src: (a&&b)?"both":(a?"mom":"etf")
+      };
+    });
+    rows.sort((x,y)=>x.comb-y.comb).forEach((r,i)=>r.rank=i+1);
+    render(rows);
+  }
+
+  function render(rows){
+    const el=$("mxOut"), bar=$("mxBar");
+    if(!rows){ el.innerHTML='<div class="mo-empty">Drop both files above to combine them.</div>'; bar.style.display="none"; return; }
+    bar.style.display="flex";
+    if(!rows.length){ el.innerHTML='<div class="mo-empty">No overlap between the two lists. Switch to <b>All names</b> to see them side by side.</div>'; return; }
+    const both=rows.filter(r=>r.src==="both").length;
+    $("mxStat").innerHTML='<b>'+both+'</b> in both · <b>'+rows.filter(r=>r.src==="mom").length+'</b> momentum only · <b>'+rows.filter(r=>r.src==="etf").length+'</b> ETF only';
+    let out=rows.slice();
+    const s=sortBy;
+    out.sort((x,y)=>{
+      let a=x[s.c],b=y[s.c];
+      if(a===null)a=s.d==="asc"?Infinity:-Infinity;
+      if(b===null)b=s.d==="asc"?Infinity:-Infinity;
+      if(typeof a==="string")return s.d==="asc"?a.localeCompare(b):b.localeCompare(a);
+      return s.d==="asc"?a-b:b-a;
+    });
+    const H=[["rank","#"],["t","Ticker"],["mr","Mom rank"],["er","ETF rank"],["comb","Combined"],["gap","Disagree"],["src","In"]];
+    let h='<table class="mx-t"><thead><tr>'+H.map(([k,t])=>'<th onclick="MX.sort(\''+k+'\')">'+t+(s.c===k?'<span style="font-size:9px"> '+(s.d==="asc"?"▲":"▼")+'</span>':'')+'</th>').join("")+'</tr></thead><tbody>';
+    out.forEach(r=>{
+      const tag = r.src==="both"?'<span class="mx-tag mx-both">BOTH</span>'
+                : r.src==="mom" ?'<span class="mx-tag mx-m">MOM</span>'
+                                :'<span class="mx-tag mx-e">ETF</span>';
+      h+='<tr><td class="mx-rk">'+r.rank+'</td>'
+        +'<td style="font-weight:600">'+esc(r.t)+(r.gap!==null&&r.gap>0.5?' <span class="mx-tag mx-gap" title="The two lists rank this very differently — worth a look either way">SPLIT</span>':'')+'</td>'
+        +'<td>'+(r.mr||'<span class="mo-dim">—</span>')+'</td>'
+        +'<td>'+(r.er||'<span class="mo-dim">—</span>')+'</td>'
+        +'<td>'+(100-r.comb*100).toFixed(1)+'</td>'
+        +'<td>'+(r.gap===null?'<span class="mo-dim">—</span>':(r.gap*100).toFixed(0))+'</td>'
+        +'<td>'+tag+'</td></tr>';
+    });
+    el.innerHTML=h+'</tbody></table>';
+    window.__MXROWS=rows;
+  }
+
+  function bindDrop(el,which){
+    const take=f=>{
+      const rd=new FileReader();
+      rd.onload=e=>{
+        const list=parseList(e.target.result);
+        if(!list.length){ toast("No tickers found in that file","error"); return; }
+        if(which==="A")A=list; else B=list;
+        el.classList.add("has");
+        el.innerHTML='<b>'+(which==="A"?"Momentum list":"ETF list")+'</b>'+esc(f.name)
+          +'<div class="mx-meta">'+list.length+' tickers · click to replace</div>';
+        build();
+      };
+      rd.readAsText(f);
+    };
+    el.addEventListener("click",()=>{
+      const i=document.createElement("input"); i.type="file"; i.accept=".txt,.csv,text/plain";
+      i.onchange=e=>{ if(e.target.files[0])take(e.target.files[0]); };
+      i.click();
+    });
+    ["dragenter","dragover"].forEach(v=>el.addEventListener(v,e=>{e.preventDefault();e.stopPropagation();el.classList.add("over");}));
+    ["dragleave","drop"].forEach(v=>el.addEventListener(v,e=>{e.preventDefault();e.stopPropagation();el.classList.remove("over");}));
+    el.addEventListener("drop",e=>{ const f=e.dataTransfer.files[0]; if(f)take(f); });
+  }
+
+  function exportTop(){
+    const rows=(window.__MXROWS||[]).slice().sort((a,b)=>a.rank-b.rank).slice(0,topN);
+    if(!rows.length){ toast("Nothing to export","error"); return; }
+    const txt="###COMBINED_TOP"+rows.length+"\n"+rows.map(r=>(r.ex?r.ex+":":"")+r.t).join(",")+"\n";
+    const b=new Blob([txt],{type:"text/plain"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(b);
+    a.download="combined_top"+rows.length+".txt"; a.click();
+    toast("Exported "+rows.length+" tickers","success");
+  }
+
+  window.MX={
+    init:function(){
+      if(this._i)return; this._i=true;
+      bindDrop($("mxDropA"),"A"); bindDrop($("mxDropB"),"B");
+      $("mxExport").onclick=exportTop;
+      $("mxTopN").onchange=function(){ topN=parseInt(this.value)||100; };
+      $("mxW").oninput=function(){ wM=parseInt(this.value); $("mxWL").textContent=wM+" / "+(100-wM); build(); };
+      document.querySelectorAll("#mxMode button").forEach(b=>b.onclick=function(){
+        document.querySelectorAll("#mxMode button").forEach(x=>x.classList.remove("on"));
+        this.classList.add("on"); mode=this.dataset.m; build();
+      });
+      render(null);
+    },
+    sort:function(c){
+      if(sortBy.c===c)sortBy.d=sortBy.d==="asc"?"desc":"asc";
+      else sortBy={c:c,d:(c==="t"||c==="rank"||c==="mr"||c==="er")?"asc":"desc"};
+      build();
+    }
   };
 })();
 </script>
