@@ -5232,6 +5232,18 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 #page-mom .mo-f.y{background:var(--green)}
 #page-mom .mo-f.n{background:var(--border2)}
 #page-mom .mo-f.u{background:transparent;box-shadow:inset 0 0 0 1px var(--border2)}
+#page-mom .mo-read{cursor:pointer;font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--text3);border:1px solid var(--border2);border-radius:4px;padding:1px 6px;text-transform:uppercase}
+#page-mom .mo-read:hover{color:var(--accent);border-color:var(--accent)}
+#page-mom .mo-read.on{color:var(--bg);background:var(--accent);border-color:var(--accent)}
+#page-mom tr.mo-srow td{background:var(--bg3);padding:13px 16px;white-space:normal;border-bottom:2px solid var(--border2)}
+#page-mom .mo-sh{font-size:12.5px;font-weight:700;color:var(--accent);margin-bottom:9px}
+#page-mom .mo-sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:8px}
+#page-mom .mo-si{font-size:11.5px;line-height:1.55;color:var(--text2);background:var(--bg2);border-radius:6px;padding:8px 10px;border-left:3px solid var(--border2)}
+#page-mom .mo-si b{display:block;color:var(--text);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+#page-mom .mo-si.ok{border-left-color:var(--green)}
+#page-mom .mo-si.bad{border-left-color:var(--red)}
+#page-mom .mo-si.na{opacity:.6}
+#page-mom .mo-sf{margin-top:9px;font-size:11px;color:var(--text3);font-style:italic}
 #page-mom .mo-empty{padding:34px;text-align:center;color:var(--text3);font-size:13px}
 #page-mom .mo-seg{display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden}
 #page-mom .mo-seg button{background:var(--bg3);border:0;color:var(--text2);padding:5px 11px;font-size:11.5px;cursor:pointer;font-weight:600}
@@ -5590,6 +5602,81 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     }).join("");
   }
 
+
+  // ---- per-stock narrative -------------------------------------------------
+  // Same seven questions for every stock; only the numbers and the verdicts
+  // change. Deliberately plain: no jargon, no Bible vocabulary required.
+  let openStory=null;
+  function narrate(r){
+    const f=r.flags||[], n=v=>v==null?"\u2014":v.toFixed(1), c=v=>v==null?"\u2014":Math.round(v);
+    const L=[];
+    const rc = r.roic!=null ? r.roic : r.roe;
+    const onOwners = (r.l1src==="ROE");
+
+    L.push(f[0]===null
+      ? ["Return on capital", 0, "Your export has no return-on-capital column, so this one could not be judged."]
+      : f[0]
+        ? ["Return on capital", 1, "Every $1 put into this business brings back about "+c(rc)+" cents a year"+(onOwners?" for the owners":"")+" \u2014 comfortably past the 15-cent mark that separates a good business from an ordinary one. What to watch: the direction. A number sliding year after year is the earliest warning that rivals are catching up."]
+        : ["Return on capital", -1, "It brings back only about "+c(rc)+" cents a year on every $1 invested. Above 15 is what you want; under 8 means the business is quietly losing value as it grows. It can recover if profits improve or they stop funding weak projects \u2014 but until then, growing bigger makes it worse, not better."]);
+
+    L.push(f[1]===null
+      ? ["Growth", 0, "No revenue growth figure in this export."]
+      : f[1]
+        ? ["Growth", 1, "Sales are up "+n(r.rg)+"% over the past year, past the 10% bar. That means it is winning new customers, not just holding on. The risk to watch is growth bought cheaply \u2014 if sales climb while the profit margin falls, it is discounting its way forward."]
+        : ["Growth", -1, "Sales grew only "+n(r.rg)+"% \u2014 below the 10% mark. Slow growth is not fatal for a very profitable company, but it does mean the share price has to come from somewhere else. If this turns negative, the story changes completely."]);
+
+    L.push(f[2]===null
+      ? ["Debt", 0, r.bank?"This is a financial company. Borrowing is what it sells, so this test does not apply \u2014 judge it on the other lights.":"Not enough debt data in this export."]
+      : f[2]
+        ? ["Debt", 1, (r.ndeb<0
+            ? "It holds more cash than debt \u2014 there is nothing to clear at all. That is the strongest position a balance sheet can be in: it owes nobody, so a downturn is an opportunity to go shopping rather than a countdown."
+            : "If every dollar of operating profit went to the bank, the debt would be cleared in about "+n(r.ndeb)+" years. Under 2 is safe \u2014 a bad year is just a bad year, and nobody forces its hand. This is the quality that decides who survives a market crash.")]
+        : ["Debt", -1, "It would take roughly "+n(r.ndeb)+" years of operating profit to clear the debt. Under 2 years is safe; past 4, the lenders effectively decide what happens the moment business wobbles. Check when the debt is actually due \u2014 money owed next year is far more dangerous than money owed in ten."]);
+
+    L.push(f[3]===null
+      ? ["Cash", 0, r.bank?"Cash conversion is not a meaningful test for a bank.":"Cash conversion could not be worked out \u2014 usually because the company has no positive earnings to compare against."]
+      : f[3]
+        ? ["Cash", 1, "About "+c(r.conv*100)+" cents of every dollar of reported profit actually turned up as cash. Above 80 means the profit is real money, not an accounting entry. This is the single hardest number to fake, which is why it is worth more than the profit figure itself."]
+        : ["Cash", -1, "Only about "+c(r.conv*100)+" cents of each dollar of reported profit became real cash. Sometimes that is a warning sign. But sometimes it is a company deliberately spending to build something new \u2014 so before judging, find out what the money went on. Spending on growth is very different from profit that never arrives."]);
+
+    const dg = (r.gm!=null&&r.gmfy!=null) ? r.gm-r.gmfy : null;
+    L.push(f[4]===null
+      ? ["Pricing power", 0, "Add a second gross-margin column set to Annual and this light starts working."]
+      : f[4]
+        ? ["Pricing power", 1, "Out of every dollar customers pay, it keeps about "+c(r.gm)+" cents after making the product \u2014 and that has held steady ("+(dg>=0?"+":"")+n(dg)+" points versus last year). Holding this line while costs rise is the clearest proof that customers will pay up rather than walk away."]
+        : ["Pricing power", -1, "It keeps about "+c(r.gm)+" cents per dollar of sales, down "+n(Math.abs(dg))+" points from last year. The level itself does not matter much \u2014 the slide does. Falling here usually means competitors are forcing prices down, and it shows up long before it reaches the profit line."]);
+
+    const shTxt = r.bby!=null ? ("buyback yield "+n(r.bby)+"%") : (r.shg!=null ? ("share count "+(r.shg>=0?"+":"")+n(r.shg)+"%") : "");
+    L.push(f[5]===null
+      ? ["Your slice", 0, "Add a buyback-yield or share-count column and this light starts working."]
+      : f[5]
+        ? ["Your slice", 1, "The pizza is not being cut into more slices ("+shTxt+"). Your share of everything the company earns is staying put or quietly growing, without you buying anything. Over ten years this alone can be worth as much as the business growth."]
+        : ["Your slice", -1, "New slices are being cut ("+shTxt+"), so your share shrinks a little every year even if the company does well. A few percent a year sounds small; over a decade it can quietly eat a third of your return. Worth checking whether it is paying staff in shares or raising money it needs."]);
+
+    L.push(f[6]===null
+      ? ["Price vs profits", 0, "Add an EPS growth column and this light starts working."]
+      : f[6]
+        ? ["Price vs profits", 1, "The rise came from the business earning more, not from people agreeing to pay more \u2014 the price is actually cheaper per dollar of profit than a year ago. That is the healthiest kind of gain, because it does not rely on the mood lasting."]
+        : ["Price vs profits", -1, "The price has run ahead of the profits: you are paying about "+n((r.mult-1)*100)+"% more per dollar of earnings than a year ago. Not automatically bad \u2014 a great business can deserve a higher price. But this part of the gain is mood, and mood can reverse in a week, so it is the piece most at risk."]);
+
+    const s=r.fscore, mx=r.fmax;
+    const head = mx===0 ? "Nothing could be tested with the columns in this export."
+      : s===mx && mx>=6 ? "Clean on every test that could be run \u2014 rare, and worth a proper look."
+      : s>=mx-1 && mx>=5 ? "Strong overall, with one gap. Read that one before sizing up."
+      : s>=Math.ceil(mx/2) ? "A mixed picture: real strengths and real question marks. Half size until the weak lights are answered."
+      : "Weak on most tests. The chart may still move, but this is a trade, not something to hold through an earnings report.";
+    return {head:head, items:L};
+  }
+  function storyHtml(r){
+    const d=narrate(r);
+    let h='<div class="mo-sh">'+esc(r.t)+' \u2014 '+esc(d.head)+'</div><div class="mo-sg">';
+    d.items.forEach(it=>{
+      const cls = it[1]===1?"ok":it[1]===-1?"bad":"na";
+      h+='<div class="mo-si '+cls+'"><b>'+esc(it[0])+'</b>'+esc(it[2])+'</div>';
+    });
+    return h+'</div><div class="mo-sf">This is a quick read of reported numbers only. It cannot see a lawsuit, a new competitor or a product cycle \u2014 that is what IVA Pro and your own one-page thesis are for.</div>';
+  }
+
   const COLS=[
     {k:"rank", t:"#",      w:"rank"},
     {k:"t",    t:"Ticker"},
@@ -5605,6 +5692,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     {k:"p1y",  t:"1Y",     f:pct},
     {k:"_vol", t:"Vol",    f:v=>v==null?"—":v.toFixed(2)},
     {k:"fscore",t:"F",     f:null},
+    {k:"story", t:"Read",  f:null},
     {k:"sec",  t:"Sector"}
   ];
   function pct(v){ return v==null?"—":(v>0?"+":"")+v.toFixed(1)+"%"; }
@@ -5638,7 +5726,8 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       return s.d==="asc"?x-y:y-x;
     });
     const head='<thead><tr>'+COLS.map(c=>
-      '<th onclick="MO.sort(\''+c.k+'\')">'+c.t+(s.c===c.k?'<span style="font-size:9px"> '+(s.d==="asc"?"▲":"▼")+'</span>':'')+'</th>').join("")+'</tr></thead>';
+      c.k==="story" ? '<th style="cursor:default">'+c.t+'</th>'
+      : '<th onclick="MO.sort(\''+c.k+'\')">'+c.t+(s.c===c.k?'<span style="font-size:9px"> '+(s.d==="asc"?"▲":"▼")+'</span>':'')+'</th>').join("")+'</tr></thead>';
     const body='<tbody>'+rows.map(r=>{
       const tds=COLS.map(c=>{
         if(c.k==="rank")  return '<td class="mo-rk">'+(r.rank||"—")+'</td>';
@@ -5660,12 +5749,15 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
                     +(r.bank?"\n(bank: lights 3 and 4 do not apply)":"");
           return '<td title="'+esc(tip)+'">'+dots+' <span class="mo-dim">'+r.fscore+'/'+r.fmax+(r.fmax<7?'<span style="opacity:.55"> of 7</span>':'')+'</span></td>';
         }
+        if(c.k==="story") return '<td><span class="mo-read'+(openStory===r.t?" on":"")+'" onclick="MO.story(\''+esc(r.t)+'\')">'+(openStory===r.t?"close":"read")+'</span></td>';
         if(c.k==="sec")   return '<td style="text-align:left"><span class="mo-dim">'+esc((r.sec||"—").slice(0,22))+'</span></td>';
         const v=r[c.k], txt=c.f?c.f(v):(v==null?"—":v);
         const cc=/^p1|^p3|^p6/.test(c.k)?col(v):"var(--text)";
         return '<td style="color:'+cc+'">'+txt+'</td>';
       }).join("");
-      return '<tr>'+tds+'</tr>';
+      let tr='<tr>'+tds+'</tr>';
+      if(openStory===r.t) tr+='<tr class="mo-srow"><td colspan="'+COLS.length+'">'+storyHtml(r)+'</td></tr>';
+      return tr;
     }).join("")+'</tbody>';
     el.innerHTML='<table class="mo-t">'+head+body+'</table>';
   }
@@ -5721,7 +5813,8 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     ensureInit:init,
     pick:id=>{curUni=id;renderUnis();build();},
     delUni, delSnap,
-    sort:c=>{ if(sortBy.c===c)sortBy.d=sortBy.d==="asc"?"desc":"asc"; else sortBy={c:c,d:(c==="rank"||c==="t"||c==="n"||c==="sec")?"asc":"desc"}; render(); }
+    sort:c=>{ if(sortBy.c===c)sortBy.d=sortBy.d==="asc"?"desc":"asc"; else sortBy={c:c,d:(c==="rank"||c==="t"||c==="n"||c==="sec")?"asc":"desc"}; render(); },
+    story:t=>{ openStory = (openStory===t) ? null : t; render(); }
   };
 })();
 </script>
