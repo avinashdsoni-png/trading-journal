@@ -2189,9 +2189,11 @@ tr.flt-row .flt2{display:flex;gap:3px}
         </div>
 
         <div class="mo-lnote">
-          <b>Reading the dots.</b> A lit dot is a pass, a dull dot is a fail or no data, and the number beside
-          them is passes out of lights that could be scored. Four lights out of four is not the same as four
-          out of seven &mdash; the second company simply told you more.
+          <b>Reading the dots.</b> Three states, and the difference matters.
+          A <b>solid</b> dot passed. A <b>dull</b> dot failed. A <b>hollow</b> dot could not be judged at all,
+          because your CSV has no column for it. So <i>4/4 of 7</i> does not mean a perfect company &mdash; it
+          means four lights passed and three were never tested. Add the missing columns and those hollow dots
+          start giving real answers. Hover any row to see exactly which light did what.
           <br><br>
           <b>Banks are different.</b> Borrowing is what a bank sells, so lights 3 and 4 are switched off for
           them automatically. Judge a bank on lights 1, 2, 6 and 7 only.
@@ -5229,6 +5231,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 #page-mom .mo-f{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:2px}
 #page-mom .mo-f.y{background:var(--green)}
 #page-mom .mo-f.n{background:var(--border2)}
+#page-mom .mo-f.u{background:transparent;box-shadow:inset 0 0 0 1px var(--border2)}
 #page-mom .mo-empty{padding:34px;text-align:center;color:var(--text3);font-size:13px}
 #page-mom .mo-seg{display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden}
 #page-mom .mo-seg button{background:var(--bg3);border:0;color:var(--text2);padding:5px 11px;font-size:11.5px;cursor:pointer;font-weight:600}
@@ -5647,8 +5650,15 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
         if(c.k==="d3")    return '<td>'+deltaCell(r.d3,false)+'</td>';
         if(c.k==="d6")    return '<td>'+deltaCell(r.d6,false)+'</td>';
         if(c.k==="fscore"){
-          const dots=(r.flags||[]).map(f=>'<span class="mo-f '+(f===true?"y":"n")+'"></span>').join("");
-          return '<td title="1 '+(r.l1src==="ROE"?"ROE (no ROIC column)":"ROIC")+'&gt;15% · 2 revenue growth&gt;10% · 3 net debt/EBITDA&lt;2x · 4 FCF conversion&gt;80% · 5 gross margin not falling · 6 share count not rising · 7 earnings drove the move, not the multiple'+(r.bank?" — bank: 3 and 4 suppressed":"")+'. See the plain-language guide below the table.">'+dots+' <span class="mo-dim">'+r.fscore+'/'+r.fmax+'</span></td>';
+          // three states, because "failed" and "no column for it" are not the
+          // same thing: solid = pass, dull = fail, hollow = nothing to judge
+          const dots=(r.flags||[]).map(f=>'<span class="mo-f '+(f===true?"y":f===false?"n":"u")+'"></span>').join("");
+          const LN=["ROIC above 15%","Revenue growth above 10%","Net debt/EBITDA under 2x",
+                    "FCF conversion above 80%","Gross margin not falling","Share count not rising",
+                    "Earnings drove the move, not the multiple"];
+          const tip=(r.flags||[]).map((f,i)=>(f===true?"PASS":f===false?"FAIL":"no data")+" - "+LN[i]).join("\n")
+                    +(r.bank?"\n(bank: lights 3 and 4 do not apply)":"");
+          return '<td title="'+esc(tip)+'">'+dots+' <span class="mo-dim">'+r.fscore+'/'+r.fmax+(r.fmax<7?'<span style="opacity:.55"> of 7</span>':'')+'</span></td>';
         }
         if(c.k==="sec")   return '<td style="text-align:left"><span class="mo-dim">'+esc((r.sec||"—").slice(0,22))+'</span></td>';
         const v=r[c.k], txt=c.f?c.f(v):(v==null?"—":v);
