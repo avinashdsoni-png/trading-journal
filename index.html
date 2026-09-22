@@ -2116,6 +2116,7 @@ tr.flt-row .flt2{display:flex;gap:3px}
               <span title="Averages volatility across the last 3 uploads so one earnings gap cannot distort the denominator. Needs 3+ snapshots.">Smooth vol</span></div>
             <label>Top N <input type="number" id="moTopN" min="5" max="200" value="30"></label>
             <label title="Flags rows whose price × 30-day average volume falls below this. 0 = off.">Min turnover $M <input type="number" id="moTurn" min="0" step="1" value="0"></label>
+            <label title="Hide stocks with fewer fundamental lights than this. Applies to the table AND to Export top N. Ranks are not renumbered - they still show each stock's place in the full pool.">Min F <select id="moMinF" class="mo-sel"><option value="0">Any</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></label>
             <div style="margin-left:auto;display:flex;gap:7px">
               <button class="btn btn-ghost btn-sm" id="moMoves">Export entries / exits</button>
               <button class="btn btn-gold btn-sm" id="moExport">Export top N →TV</button>
@@ -2131,11 +2132,76 @@ tr.flt-row .flt2{display:flex;gap:3px}
           <div class="mo-note">
             <b>Δ 1 / 3 / 6</b> = rank change vs 1, 3 and 6 uploads ago — ▲ means the rank improved.
             <b>NEW</b> = not in the previous snapshot. <b>F</b> = quick fundamental flags from the CSV
-            (ROE&gt;15 · rev growth&gt;10 · net debt/EBITDA&lt;2 · FCF&gt;0 · net margin&gt;0); leverage flags are
+            (all seven lights &mdash; see the guide below); leverage and conversion lights are
             suppressed for financials. This is a coarse pre-filter — the real seven-light check is IVA Pro on the chart.
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="section" style="margin-top:14px">
+      <details class="mo-guide">
+        <summary>What the seven lights mean &mdash; in plain words</summary>
+        <div class="mo-lg">
+          <div class="mo-lc"><b><i>1</i> Return on capital</b>
+            Plant one dollar in this business. How many cents grow back every year?
+            <span class="g">Green: more than 15 cents.</span> Below 8 cents the business is quietly eating money.
+            This is the single best test of whether a company is any good.</div>
+
+          <div class="mo-lc"><b><i>2</i> Growth</b>
+            Are sales getting bigger?
+            <span class="g">Green: more than 10% a year.</span>
+            Nothing else can grow for long if this does not. A shrinking top line means the company is
+            losing customers, whatever else the numbers say.</div>
+
+          <div class="mo-lc"><b><i>3</i> Debt</b>
+            If every dollar of operating profit went straight to the bank, how many years to be debt-free?
+            <span class="g">Green: under 2 years.</span>
+            Over 4 years and the bank, not you, decides what happens in a bad year. This is the number that
+            separates the companies that survive a crash from the ones that never come back.</div>
+
+          <div class="mo-lc"><b><i>4</i> Cash conversion</b>
+            The company says it made a profit. Did the money actually turn up in the bank?
+            <span class="g">Green: more than 80 cents of every reported dollar.</span>
+            Below 60 cents, for two years running, usually means the profit exists on paper only.
+            One honest exception: a company spending heavily to build something new will look bad here
+            on purpose &mdash; check what the spending is for before judging it.</div>
+
+          <div class="mo-lc"><b><i>5</i> Gross margin</b>
+            Out of every dollar a customer pays, how much is left after making the thing?
+            The level barely matters &mdash; software keeps 80 cents, a grocer keeps 25, and both can be fine.
+            <span class="g">Green: the number is holding steady or rising.</span>
+            Falling means competitors are taking the pricing power away, and that shows up here long before
+            it shows up in the profit.</div>
+
+          <div class="mo-lc"><b><i>6</i> Share count</b>
+            You own a slice of a pizza. Is the pizza being cut into more slices?
+            <span class="g">Green: the number of slices is flat or falling.</span>
+            If management keeps cutting new slices, your piece shrinks every year even while the company
+            grows. Quietly, this can eat half your return over a decade.</div>
+
+          <div class="mo-lc"><b><i>7</i> Price &mdash; did earnings or mood drive it?</b>
+            A stock goes up for two reasons: the business earned more, or people simply decided to pay more
+            for the same earnings.
+            <span class="g">Green: the earnings did the work.</span>
+            Red means the price outran the profits, so you are paying more per dollar of earnings than a
+            year ago. Not automatically bad &mdash; but the rise was mood, and mood can reverse overnight.</div>
+        </div>
+
+        <div class="mo-lnote">
+          <b>Reading the dots.</b> A lit dot is a pass, a dull dot is a fail or no data, and the number beside
+          them is passes out of lights that could be scored. Four lights out of four is not the same as four
+          out of seven &mdash; the second company simply told you more.
+          <br><br>
+          <b>Banks are different.</b> Borrowing is what a bank sells, so lights 3 and 4 are switched off for
+          them automatically. Judge a bank on lights 1, 2, 6 and 7 only.
+          <br><br>
+          <b>Light 7 is not the same test IVA Pro runs.</b> On the chart, IVA Pro asks whether the stock is
+          cheaper than its own three-year average &mdash; it can see three years of history. Here there is only
+          today's snapshot, so this light asks the closest honest question a snapshot can answer: over the last
+          year, did profits or mood move the price? Use this one to sort the list; use IVA Pro before you buy.
+        </div>
+      </details>
     </div>
 
     <div class="section" style="margin-top:14px">
@@ -5126,6 +5192,16 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 #page-mom .mo-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}
 #page-mom .mo-bar label{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px}
 #page-mom .mo-bar input[type=number]{width:72px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 6px;color:var(--text);font-size:12px}
+#page-mom .mo-sel{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 6px;color:var(--text);font-size:12px}
+#page-mom .mo-guide summary{cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.06em;color:var(--accent);padding:2px 0}
+#page-mom .mo-guide summary::marker{color:var(--text3)}
+#page-mom .mo-lg{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px;margin-top:12px}
+#page-mom .mo-lc{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:11px 13px;font-size:12px;line-height:1.6;color:var(--text2)}
+#page-mom .mo-lc b{display:block;color:var(--text);font-size:13px;margin-bottom:5px;font-weight:700}
+#page-mom .mo-lc b i{display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;border-radius:50%;background:var(--accent);color:var(--bg);font-style:normal;font-size:11px;margin-right:7px}
+#page-mom .mo-lc .g{color:var(--green);font-weight:600}
+#page-mom .mo-lnote{margin-top:12px;padding:11px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:11.5px;line-height:1.65;color:var(--text3)}
+#page-mom .mo-lnote b{color:var(--text2)}
 #page-mom .mo-sw{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text)}
 #page-mom .mo-tg{position:relative;width:38px;height:20px;background:var(--border2);border-radius:20px;cursor:pointer;transition:.15s;flex:none}
 #page-mom .mo-tg.on{background:var(--accent)}
@@ -5165,7 +5241,8 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   const T_UNI="mom_universes", T_SNAP="mom_snapshots";
 
   let UNIS=[], SNAPS=[], curUni=null, inited=false;
-  let use3M=false, volSmooth=true, sortBy={c:"rank",d:"asc"}, topN=30, minTurn=0;
+  let use3M=false, volSmooth=true, sortBy={c:"rank",d:"asc"}, topN=30, minTurn=0, minF=0;
+  const passF=r=>minF===0||(r.fscore||0)>=minF;
   let MODEL={rows:[],churn:null,secTop:[],prev:null};
 
   const $=id=>document.getElementById(id);
@@ -5218,12 +5295,19 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     ["px",   [/^price$/i]],
     ["roe",  [/return on equity/i]],
     ["de",   [/debt to equity/i]],
-    ["gm",   [/gross margin/i]],
+    ["gm",   [/gross margin.*(trailing|ttm)/i,/gross margin(?!.*(annual|fiscal|\bfy\b))/i]],
+    ["gmfy", [/gross margin.*(annual|fiscal|\bfy\b)/i]],
+    ["roic", [/return on invested capital/i,/\broic\b/i]],
+    ["epsg", [/eps.*growth/i,/earnings per share.*growth/i]],
+    ["bby",  [/buyback yield/i]],
+    ["shg",  [/shares.*outstanding.*(growth|change|yoy)/i,/shares.*(growth|change)/i]],
     ["nm",   [/net margin/i]],
     ["rg",   [/revenue growth/i]],
     ["pe",   [/price to earnings/i,/^p\/e$/i]],
     ["eve",  [/enterprise value to ebitda/i,/ev\s*\/\s*ebitda/i]],
     ["fcf",  [/free cash flow(?!.*currency)/i]],
+    ["fcfcur",[/free cash flow.*currency/i]],
+    ["mcapcur",[/market\s*cap.*currency/i]],
     ["nd",   [/net debt(?!.*currency)/i]],
     ["ebit", [/^ebitda(?!.*currency)/i,/\bebitda\b(?!.*currency)/i]]
   ];
@@ -5237,7 +5321,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     });
     return m;
   }
-  const TEXTF=new Set(["t","n","ex","sec","ind"]);
+  const TEXTF=new Set(["t","n","ex","sec","ind","fcfcur","mcapcur"]);
   function ingest(matrix){
     const heads=matrix[0].map(h=>String(h).trim());
     const m=mapHeaders(heads);
@@ -5343,12 +5427,31 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       r.ndeb = (r.nd!=null&&r.ebit!=null&&r.ebit>0)?r.nd/r.ebit:null;
       const bank=/financ|bank/i.test(r.sec||"");
       r.bank=bank;
+      // Six of IVA Pro's seven lights, rebuilt from one screener snapshot.
+      // Light 7 (P/E below its OWN 3-year average) needs the stock's price
+      // history and cannot come from a single CSV - that one stays in IVA Pro.
+      // A light whose column is missing is null: not scored, never failed.
       const f=[];
-      f.push(r.roe!=null?r.roe>15:null);
-      f.push(r.rg!=null?r.rg>10:null);
-      f.push(bank?null:(r.ndeb!=null?r.ndeb<2:null));
-      f.push(r.fcf!=null?r.fcf>0:null);
-      f.push(r.nm!=null?r.nm>0:null);
+      r.l1src = r.roic!=null ? "ROIC" : (r.roe!=null ? "ROE" : null);
+      f.push(r.roic!=null ? r.roic>15 : (r.roe!=null ? r.roe>15 : null));      // 1 return on capital
+      f.push(r.rg!=null ? r.rg>10 : null);                                     // 2 growth
+      f.push(bank ? null : (r.ndeb!=null ? r.ndeb<2 : null));                  // 3 survival
+      // 4 FCF conversion. Net income is not exported, but it is implied:
+      //   net income = market cap / P/E,  so  conversion = FCF x P/E / mcap
+      const curOK = !r.fcfcur || !r.mcapcur || r.fcfcur===r.mcapcur;
+      const ni = (r.pe!=null && r.pe>0 && r.mcap!=null && r.mcap>0) ? r.mcap/r.pe : null;
+      r.conv = (curOK && ni && r.fcf!=null) ? r.fcf/ni : null;
+      f.push(bank ? null : (r.conv!=null ? r.conv>0.8 : null));
+      f.push((r.gm!=null && r.gmfy!=null) ? (r.gm-r.gmfy)>=-1 : null);          // 5 margin holding
+      f.push(r.bby!=null ? r.bby>=0 : (r.shg!=null ? r.shg<=0.5 : null));      // 6 share count
+      // 7 the two engines. Price return = earnings growth x multiple change, so
+      //   multiple change = (1 + price return) / (1 + earnings growth)
+      // Exact algebra, no interpolation. Below 1 means earnings drove the move
+      // and the stock got CHEAPER against its own profits; above 1 means the
+      // crowd simply agreed to pay more.
+      r.mult = (r.p1y!=null && r.epsg!=null && r.epsg>-90 && r.epsg<300)
+                 ? (1+r.p1y/100)/(1+r.epsg/100) : null;
+      f.push(r.mult!=null ? r.mult<=1 : null);
       r.flags=f; r.fscore=f.filter(x=>x===true).length; r.fmax=f.filter(x=>x!==null).length;
     });
     // dropped names (were ranked last time, absent now)
@@ -5442,11 +5545,11 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download=fname; a.click();
   }
   function exportTop(){
-    const rows=MODEL.rows.filter(r=>r.rank&&r.rank<=topN&&!r.thin).sort((a,b)=>a.rank-b.rank);
-    if(!rows.length){toast("Nothing ranked yet","error");return;}
-    const code=uniCode();
-    dl("###MOMO_"+code+"_TOP"+topN+"\n"+rows.map(sym).join(",")+"\n",
-       "momentum_"+code.toLowerCase()+"_top"+topN+".txt");
+    const rows=MODEL.rows.filter(r=>r.rank&&!r.thin&&passF(r)).sort((a,b)=>a.rank-b.rank).slice(0,topN);
+    if(!rows.length){toast("Nothing passes the current filters","error");return;}
+    const code=uniCode(), tag=minF>0?"_F"+minF:"";
+    dl("###MOMO_"+code+"_TOP"+topN+tag+"\n"+rows.map(sym).join(",")+"\n",
+       "momentum_"+code.toLowerCase()+"_top"+topN+tag.toLowerCase()+".txt");
     toast("Exported top "+rows.length,"success");
   }
   function exportMoves(){
@@ -5520,7 +5623,8 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       return;
     }
     $("moDrop2").style.display="block";
-    let rows=MODEL.rows.slice();
+    let rows=MODEL.rows.filter(passF);
+    if(!rows.length){ el.innerHTML='<div class="mo-empty">No stock has '+minF+' or more lights. Lower <b>Min F</b>, or add the extra columns to your screener export.</div>'; return; }
     const s=sortBy;
     rows.sort((a,b)=>{
       let x=a[s.c],y=b[s.c];
@@ -5544,7 +5648,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
         if(c.k==="d6")    return '<td>'+deltaCell(r.d6,false)+'</td>';
         if(c.k==="fscore"){
           const dots=(r.flags||[]).map(f=>'<span class="mo-f '+(f===true?"y":"n")+'"></span>').join("");
-          return '<td title="ROE&gt;15 · RevGrowth&gt;10 · NetDebt/EBITDA&lt;2 · FCF&gt;0 · NetMargin&gt;0'+(r.bank?" (bank: leverage flags suppressed)":"")+'">'+dots+' <span class="mo-dim">'+r.fscore+'/'+r.fmax+'</span></td>';
+          return '<td title="1 '+(r.l1src==="ROE"?"ROE (no ROIC column)":"ROIC")+'&gt;15% · 2 revenue growth&gt;10% · 3 net debt/EBITDA&lt;2x · 4 FCF conversion&gt;80% · 5 gross margin not falling · 6 share count not rising · 7 earnings drove the move, not the multiple'+(r.bank?" — bank: 3 and 4 suppressed":"")+'. See the plain-language guide below the table.">'+dots+' <span class="mo-dim">'+r.fscore+'/'+r.fmax+'</span></td>';
         }
         if(c.k==="sec")   return '<td style="text-align:left"><span class="mo-dim">'+esc((r.sec||"—").slice(0,22))+'</span></td>';
         const v=r[c.k], txt=c.f?c.f(v):(v==null?"—":v);
@@ -5561,6 +5665,9 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     h+='<div class="mo-k">Ranked<b>'+m.rows.filter(r=>r.rank).length+' / '+m.rows.length+'</b></div>';
     h+='<div class="mo-k">History<b>'+m.count+' upload'+(m.count===1?"":"s")+'</b></div>';
     h+='<div class="mo-k">Vol basis<b>'+((volSmooth&&m.count>=3)?"3-upload avg":"raw 1M")+'</b></div>';
+    const lit=m.rows.length?Math.max(...m.rows.map(r=>r.fmax||0)):0;
+    h+='<div class="mo-k'+(lit<7?" alert":"")+'" title="How many of the 7 screener lights your CSV columns can score">Lights active<b>'+lit+' / 7</b></div>';
+    if(minF>0)h+='<div class="mo-k">Min F '+minF+'<b>'+m.rows.filter(passF).length+' shown</b></div>';
     if(m.churn){
       h+='<div class="mo-k'+(m.churn.warn?" alert":"")+'">Membership<b>'+m.churn.now+' vs '+m.churn.prev+
          ' ('+m.churn.pct.toFixed(1)+'%)</b></div>';
@@ -5595,6 +5702,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     $("moTgV").onclick=function(){ volSmooth=!volSmooth; this.classList.toggle("on",volSmooth); build(); };
     $("moTopN").onchange=function(){ topN=parseInt(this.value)||30; build(); };
     $("moTurn").onchange=function(){ minTurn=parseFloat(this.value)||0; build(); };
+    $("moMinF").onchange=function(){ minF=parseInt(this.value)||0; render(); };
     $("moTgV").classList.toggle("on",volSmooth);
     load();
   }
