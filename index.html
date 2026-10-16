@@ -988,6 +988,71 @@ tr.flt-row .flt2{display:flex;gap:3px}
 #efConfirm .ef-rad label{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text);cursor:pointer}
 #efConfirm .ef-rad input{width:auto;margin:0}
 </style>
+
+<style>
+/* ══ IBKR DATA TAB ══ */
+#page-data details.ib-sec{background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden}
+#page-data details.ib-sec>summary{list-style:none;cursor:pointer;padding:12px 16px;display:flex;align-items:center;gap:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.06em;color:var(--accent);user-select:none}
+#page-data details.ib-sec>summary::-webkit-details-marker{display:none}
+#page-data details.ib-sec>summary::before{content:"▸";font-size:12px;color:var(--text3);width:10px}
+#page-data details.ib-sec[open]>summary::before{content:"▾"}
+#page-data details.ib-sec>summary .ib-sub{font-family:'Barlow',sans-serif;font-size:12px;letter-spacing:0;color:var(--text3);font-weight:400;margin-left:auto}
+#page-data .ib-body{padding:0 16px 16px}
+#page-data .ib-drop{border:2px dashed var(--accent);border-radius:10px;padding:22px;text-align:center;cursor:pointer;color:var(--accent);background:var(--bg3);transition:.15s}
+#page-data .ib-drop:hover,#page-data .ib-drop.over{background:var(--surface)}
+#page-data .ib-status{font-size:12px;margin-top:8px;color:var(--text2);line-height:1.5}
+#page-data .ib-status.ok{color:var(--green)} #page-data .ib-status.warn{color:#f5a623} #page-data .ib-status.err{color:var(--red)}
+#page-data .ib-cover{font-size:13px;margin-top:10px;color:var(--text2);line-height:1.6}
+#page-data .ib-warn{color:#f5a623;background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.35);border-radius:8px;padding:8px 12px;font-size:12px;margin-top:8px;line-height:1.5}
+#page-data .ib-ok{color:var(--green);font-size:12px;margin-top:8px}
+#page-data .ib-err{color:var(--red);font-size:12px;min-height:14px;margin-bottom:6px}
+#page-data .ib-kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+#page-data .ib-kpi{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 13px}
+#page-data .ib-kl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);font-family:'Barlow Condensed',sans-serif}
+#page-data .ib-kv{font-family:'Bebas Neue',sans-serif;font-size:22px;margin-top:4px;color:var(--text);letter-spacing:.02em}
+#page-data .ib-ks{font-size:10.5px;color:var(--text3);margin-top:2px}
+#page-data .ib-up{color:var(--green)} #page-data .ib-dn{color:var(--red)} #page-data .ib-mid{color:#f5a623} #page-data .ib-blue{color:var(--blue2)} #page-data .ib-dim{color:var(--text3)}
+#page-data .ib-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+#page-data .ib-toolbar input,#page-data .ib-toolbar select{background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:6px 9px;font-family:'Barlow Condensed',sans-serif}
+#page-data .ib-mini{background:transparent;border:1px solid var(--border);color:var(--text2);border-radius:5px;padding:3px 8px;font-size:10.5px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;margin-left:4px}
+#page-data .ib-mini:hover{color:var(--accent);border-color:var(--accent)}
+#page-data details.ib-month{border:1px solid var(--border);border-radius:9px;margin-bottom:8px;background:var(--bg3);overflow:hidden}
+#page-data details.ib-month>summary{list-style:none;cursor:pointer;padding:9px 12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;user-select:none}
+#page-data details.ib-month>summary::-webkit-details-marker{display:none}
+#page-data details.ib-month>summary::before{content:"▸";font-size:11px;color:var(--text3)}
+#page-data details.ib-month[open]>summary::before{content:"▾"}
+#page-data .ib-mt{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:.06em;color:var(--text)}
+#page-data .ib-ms{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-family:'Barlow Condensed',sans-serif;font-size:12.5px;color:var(--text2);margin-left:auto}
+#page-data .ib-ms .ib-net{font-weight:700;font-size:13.5px}
+#page-data .ib-tw{overflow:auto}
+#page-data table.ib-t{width:100%;border-collapse:collapse;font-size:12px}
+#page-data table.ib-t th{text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);padding:6px 7px;border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;background:var(--bg3)}
+#page-data table.ib-t td{text-align:right;padding:5px 7px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2);white-space:nowrap;vertical-align:middle}
+#page-data table.ib-t th:first-child,#page-data table.ib-t td:first-child,#page-data table.ib-t th:nth-child(2),#page-data table.ib-t td:nth-child(2),#page-data table.ib-t th:nth-child(3),#page-data table.ib-t td:nth-child(3),#page-data table.ib-t td.ib-dt,#page-data table.ib-t td.ib-note,#page-data table.ib-t th.ib-l{text-align:left}
+#page-data table.ib-trades th:nth-child(4),#page-data table.ib-trades th:nth-child(5),#page-data table.ib-trades th:nth-child(14){text-align:left}
+#page-data .ib-sym{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.05em;color:var(--text)!important}
+#page-data .ib-dt{font-family:'Barlow Condensed',sans-serif;font-size:11.5px}
+#page-data .ib-num{font-variant-numeric:tabular-nums}
+#page-data .ib-pnl{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.03em}
+#page-data .ib-active{color:var(--blue2)}
+#page-data .ib-badge{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;letter-spacing:.05em}
+#page-data .ib-b-win{background:rgba(61,214,140,.12);color:var(--green)} #page-data .ib-b-loss{background:rgba(240,82,82,.12);color:var(--red)}
+#page-data .ib-b-be{background:rgba(154,163,184,.12);color:var(--text2)} #page-data .ib-b-act{background:rgba(123,163,245,.14);color:var(--blue2)}
+#page-data .ib-risk{width:64px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:11.5px;padding:3px 5px;text-align:right}
+#page-data .ib-risk:focus{border-color:var(--accent);outline:none}
+#page-data .ib-note{max-width:150px;overflow:hidden;text-overflow:ellipsis;font-size:11px;color:var(--text3)}
+#page-data .ib-cl{display:inline-block;margin-left:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Barlow Condensed',sans-serif}
+#page-data .ib-inc{cursor:pointer;font-size:13px;color:var(--green)} #page-data tr.ib-excl .ib-inc{color:var(--text3)} #page-data tr.ib-excl td{opacity:.55}
+#page-data tr.ib-cldet td{background:var(--bg2);padding:9px 14px!important;text-align:left;white-space:normal}
+#page-data .ib-act{white-space:nowrap}
+#page-data .ib-empty{text-align:center;color:var(--text3);padding:28px;font-size:13px;line-height:1.6}
+#page-data .ib-chart{position:relative;height:300px}
+#page-data .ib-danger{display:flex;justify-content:flex-end;margin-top:10px}
+#page-data .ib-danger button{background:transparent;border:1px solid rgba(240,82,82,.35);color:var(--red);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:'Barlow Condensed',sans-serif}
+#ibEditInfo{font-size:12px;color:var(--text2);line-height:1.6;margin:-6px 0 14px;font-family:'Barlow Condensed',sans-serif}
+#ibEditInfo b{color:var(--text)}
+#ibEditInfo .ib-up{color:var(--green)} #ibEditInfo .ib-dn{color:var(--red)} #ibEditInfo .ib-dim{color:var(--text3)}
+</style>
 </head>
 <body>
 
@@ -1014,7 +1079,7 @@ tr.flt-row .flt2{display:flex;gap:3px}
     <div class="settings-section-title">Account</div>
     <div class="form-group" style="margin-bottom:10px">
       <div class="form-label">Starting Balance (USD)</div>
-      <input class="form-input" id="settingStartBalance" type="number" placeholder="10000">
+      <input class="form-input" id="settingStartBalance" type="number" placeholder="0 (capital now comes from your IBKR statement)">
     </div>
     <button class="btn btn-gold" style="width:100%" onclick="saveSettings()">Save Settings</button>
   </div>
@@ -1089,480 +1154,59 @@ tr.flt-row .flt2{display:flex;gap:3px}
     </div>
   </div>
 
-  <!-- ══ DATA PAGE ══ -->
+  <!-- ══ DATA PAGE (IBKR) ══ -->
   <div class="page active" id="page-data">
     <div class="section">
       <div class="section-header">
         <div class="section-title">TRADE <span>DATA</span></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-gold" onclick="openAddTrade()">+ Add Trade</button>
           <button class="btn btn-ghost btn-sm" onclick="loadData()">↻ Refresh</button>
         </div>
       </div>
+      <div class="ib-err" id="ibErr"></div>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>✓</th>
-              <th>Symbol</th>
-              <th>Date</th>
-              <th>RR Secured</th>
-              <th>Risk USD</th>
-              <th>P&amp;L (USD)</th>
-              <th>Duration (C)</th>
-              <th>Max RR</th>
-              <th>Outcome</th>
-              <th title="Entry Compliance %">Ent&nbsp;%</th>
-              <th title="Trade Management Compliance %">Mgt&nbsp;%</th>
-              <th title="Complete Trade Compliance %">Tot&nbsp;%</th>
-              <th style="color:var(--blue2)">Entry</th>
-              <th style="color:var(--purple)">Validation</th>
-              <th style="color:var(--orange)">Context</th>
-              <th>Notes</th>
-              <th>Actions</th>
-            </tr>
-            <tr class="flt-row">
-              <th><select data-flt="inc"><option value="">all</option><option value="y">✓</option><option value="n">○</option></select></th>
-              <th><input data-flt="sym" placeholder="sym"></th>
-              <th><div class="flt2"><input data-flt="d1" type="date"><input data-flt="d2" type="date"></div></th>
-              <th><div class="flt2"><input data-flt="rr1" type="number" step="0.1" placeholder="min"><input data-flt="rr2" type="number" step="0.1" placeholder="max"></div></th>
-              <th><div class="flt2"><input data-flt="rk1" type="number" placeholder="min"><input data-flt="rk2" type="number" placeholder="max"></div></th>
-              <th><div class="flt2"><input data-flt="pl1" type="number" placeholder="min"><input data-flt="pl2" type="number" placeholder="max"></div></th>
-              <th><div class="flt2"><input data-flt="du1" type="number" placeholder="min"><input data-flt="du2" type="number" placeholder="max"></div></th>
-              <th><div class="flt2"><input data-flt="mx1" type="number" step="0.1" placeholder="min"><input data-flt="mx2" type="number" step="0.1" placeholder="max"></div></th>
-              <th><select data-flt="out"><option value="">all</option><option>Win</option><option>Loss</option><option>BE</option></select></th>
-              <th><div class="flt2"><input data-flt="ce1" type="number" placeholder="min"><input data-flt="ce2" type="number" placeholder="max"></div></th>
-              <th><div class="flt2"><input data-flt="cm1" type="number" placeholder="min"><input data-flt="cm2" type="number" placeholder="max"></div></th>
-              <th><div class="flt2"><input data-flt="ct1" type="number" placeholder="min"><input data-flt="ct2" type="number" placeholder="max"></div></th>
-              <th></th><th></th><th></th>
-              <th><input data-flt="note" placeholder="notes"></th>
-              <th><button class="btn btn-ghost btn-sm" onclick="clClearFilters()">clear</button></th>
-            </tr>
-          </thead>
-          <tbody id="dataTableBody"><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">BNO</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Mar 29, 2026</td>
-      <td><span class="td-rr rr-loss">-0.82r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-neg">$-41.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
-      <td><span class="outcome-badge ob-loss">Loss</span></td>
-      <td><span class="no-link">—</span></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/39y3iqfG/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/HdUziMdT/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;0a28204e-c55c-418d-9019-e1ffe32960b3&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;0a28204e-c55c-418d-9019-e1ffe32960b3&#39;,&#39;trades&#39;)">✕</button>
+      <details class="ib-sec" id="ibSecImport" open ontoggle="window.IB&&IB.tog(this)">
+        <summary>IMPORT IBKR STATEMENT <span class="ib-sub">Activity Statement · CSV · all trades, deposits, FX and positions in one drop</span></summary>
+        <div class="ib-body">
+          <div id="ibDrop" class="ib-drop">
+            <div style="font-size:15px;font-weight:600">Drop your IBKR Activity Statement (.csv) here, or click to choose</div>
+            <div style="font-size:12px;margin-top:4px">Reports → Statements → Activity → Period: custom range → Format: CSV &nbsp;·&nbsp; overlapping periods are safe, nothing is double-counted</div>
+            <input id="ibFile" type="file" accept=".csv,text/csv" style="display:none">
+          </div>
+          <div id="ibStatus" class="ib-status">Open this tab to load your stored data…</div>
+          <div id="ibCover" class="ib-cover"></div>
+          <div id="ibRecon"></div>
+          <div id="ibUploads" style="margin-top:10px"></div>
+          <div class="ib-danger"><button id="ibClear">Clear all IBKR data</button></div>
         </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">LNG</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 6, 2026</td>
-      <td><span class="td-rr rr-loss">-0.60r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-neg">$-30.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
-      <td><span class="outcome-badge ob-loss">Loss</span></td>
-      <td><span class="no-link">—</span></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/Zr7DWbfb/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/wJwv1TAj/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;0551a072-869b-4d58-a792-44005aed9f7d&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;0551a072-869b-4d58-a792-44005aed9f7d&#39;,&#39;trades&#39;)">✕</button>
+      </details>
+
+      <details class="ib-sec" id="ibSecAccount" open ontoggle="window.IB&&IB.tog(this)">
+        <summary>ACCOUNT <span class="ib-sub">USD unless marked · equity = USD cash + positions at statement close</span></summary>
+        <div class="ib-body"><div class="ib-kpis" id="ibKpis"></div></div>
+      </details>
+
+      <details class="ib-sec" id="ibSecChart" ontoggle="window.IB&&IB.tog(this)">
+        <summary>P&amp;L CHART <span class="ib-sub">monthly realized (trades, ex long-term) + cumulative</span></summary>
+        <div class="ib-body"><div class="ib-chart"><canvas id="ibChart"></canvas></div></div>
+      </details>
+
+      <details class="ib-sec" id="ibSecTrades" open ontoggle="window.IB&&IB.tog(this)">
+        <summary>TRADES <span class="ib-sub">one row per exit · grouped by the month the trade was opened</span></summary>
+        <div class="ib-body">
+          <div class="ib-toolbar">
+            <input id="ibSearch" type="text" placeholder="Filter symbol…" style="width:130px">
+            <select id="ibStatusSel"><option value="all">All</option><option value="active">Active</option><option value="closed">Closed</option><option value="win">Wins</option><option value="loss">Losses</option></select>
+            <span style="margin-left:auto;display:flex;gap:6px"><button class="ib-mini" id="ibCollapseAll">⊟ Collapse all</button><button class="ib-mini" id="ibExpandAll">⊞ Expand all</button></span>
+          </div>
+          <div id="ibTrades"></div>
         </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">DELL</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 7, 2026</td>
-      <td><span class="td-rr rr-be">+0.00r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-zero">+$0.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
-      <td><span class="outcome-badge ob-be">BE</span></td>
-      <td><span class="no-link">—</span></td>
-      <td><span class="no-link">—</span></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/HdUziMdT/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;c4c0c69d-e393-42ad-a7a2-96c16f4ebb3b&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;c4c0c69d-e393-42ad-a7a2-96c16f4ebb3b&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">DELL</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 12, 2026</td>
-      <td><span class="td-rr rr-loss">-0.65r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-neg">$-32.50</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">3</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1r</td>
-      <td><span class="outcome-badge ob-loss">Loss</span></td>
-      <td><span class="no-link">—</span></td>
-      <td><span class="no-link">—</span></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/HdUziMdT/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;d65634b3-76e1-4539-bf6f-e7cbb6da79c2&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;d65634b3-76e1-4539-bf6f-e7cbb6da79c2&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">DELL</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 12, 2026</td>
-      <td><span class="td-rr rr-loss">-0.60r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-neg">$-30.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">3</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1r</td>
-      <td><span class="outcome-badge ob-loss">Loss</span></td>
-      <td><span class="no-link">—</span></td>
-      <td><span class="no-link">—</span></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/HdUziMdT/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;9730eca8-e326-4783-a778-b8a520feb9dc&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;9730eca8-e326-4783-a778-b8a520feb9dc&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">NOK</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 15, 2026</td>
-      <td><span class="td-rr rr-be">+0.00r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-zero">+$0.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">4</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">2r</td>
-      <td><span class="outcome-badge ob-be">BE</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/7WcEtvRL/" target="_blank">📷 Entry</a></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/f5PnJpHO/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/g8GblA4f/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;113c25b7-7ca2-4743-a50a-e606451a17d1&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;113c25b7-7ca2-4743-a50a-e606451a17d1&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">NOK</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 22, 2026</td>
-      <td><span class="td-rr rr-loss">-0.70r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-neg">$-35.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">0.5r</td>
-      <td><span class="outcome-badge ob-loss">Loss</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/jrDwzBDn/" target="_blank">📷 Entry</a></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/S9glU2hz/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/5JGIqhF9/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;7373143a-b23f-4423-b604-1d498dc61b5c&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;7373143a-b23f-4423-b604-1d498dc61b5c&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--text3);font-size:14px">○</span></td>
-      <td><span class="td-symbol">GOOGL</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 22, 2026</td>
-      <td><span class="td-rr rr-be">+0.00r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-zero">+$0.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
-      <td><span class="outcome-badge ob-be">BE</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/1O9r7h91/" target="_blank">📷 Entry</a></td>
-      <td><span class="no-link">—</span></td>
-      <td><span class="no-link">—</span></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;85451951-94a2-46f4-97a3-b269348e9f22&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;85451951-94a2-46f4-97a3-b269348e9f22&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">AMD</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 23, 2026</td>
-      <td><span class="td-rr rr-loss">-0.15r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-neg">$-7.75</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">2</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
-      <td><span class="outcome-badge ob-loss">Loss</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/wbEmVcaq/" target="_blank">📷 Entry</a></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/3iRupCk2/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/7o2di1iJ/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;2a5f0828-fcab-4a91-925f-f7d63a7e6f1a&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;2a5f0828-fcab-4a91-925f-f7d63a7e6f1a&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">DELL</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 26, 2026</td>
-      <td><span class="td-rr rr-loss">-0.60r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-neg">$-30.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">0.5r</td>
-      <td><span class="outcome-badge ob-loss">Loss</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/xvFAIl4d/" target="_blank">📷 Entry</a></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/EgPwinJU/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/5kiHoruJ/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;efdfeb6e-ad4b-4624-a778-ea937a265fe5&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;efdfeb6e-ad4b-4624-a778-ea937a265fe5&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">RMAK</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 27, 2026</td>
-      <td><span class="td-rr rr-be">+0.00r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-zero">+$0.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">0.5r</td>
-      <td><span class="outcome-badge ob-be">BE</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/yHtHVo76/" target="_blank">📷 Entry</a></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/h2WO8V8v/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/V59c9lg1/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;a2554c17-e109-4a37-b8fd-5de3d1ab235c&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;a2554c17-e109-4a37-b8fd-5de3d1ab235c&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">SNDK</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 28, 2026</td>
-      <td><span class="td-rr rr-be">+0.00r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-zero">+$0.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">0.5r</td>
-      <td><span class="outcome-badge ob-be">BE</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/H7XOLeiv/" target="_blank">📷 Entry</a></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/2pv41dOc/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/cwOuIi2o/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;4d850110-1ead-431f-96f8-642387edc243&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;4d850110-1ead-431f-96f8-642387edc243&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">SNDK</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 29, 2026</td>
-      <td><span class="td-rr rr-loss">-0.60r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-neg">$-30.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">0.5r</td>
-      <td><span class="outcome-badge ob-loss">Loss</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/zr19i73Q/" target="_blank">📷 Entry</a></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/xLJ6EFRs/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/8KsTsBcG/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;087972ca-3115-430e-92f2-19d077fed30d&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;087972ca-3115-430e-92f2-19d077fed30d&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">SNDK</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 29, 2026</td>
-      <td><span class="td-rr rr-loss">-0.20r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-neg">$-10.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">0.5r</td>
-      <td><span class="outcome-badge ob-loss">Loss</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/ZjbbNpoo/" target="_blank">📷 Entry</a></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/TsC7kb7E/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/eNF7zimi/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;d5e543ba-faf4-48e2-b1a1-ebd6d6b8e3ad&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;d5e543ba-faf4-48e2-b1a1-ebd6d6b8e3ad&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">WDC</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 30, 2026</td>
-      <td><span class="td-rr rr-loss">-0.32r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-neg">$-16.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1.2r</td>
-      <td><span class="outcome-badge ob-loss">Loss</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/SSCMoFFa/" target="_blank">📷 Entry</a></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/bCtryO0w/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/A79p73V3/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;fe46e3f6-ce2f-43b8-940a-a8716fa96dcd&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;fe46e3f6-ce2f-43b8-940a-a8716fa96dcd&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--text3);font-size:14px">○</span></td>
-      <td><span class="td-symbol">DELL</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">Apr 30, 2026</td>
-      <td><span class="td-rr rr-be">+0.00r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-zero">+$0.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
-      <td><span class="outcome-badge ob-be">BE</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/YDwEPOeP/" target="_blank">📷 Entry</a></td>
-      <td><span class="no-link">—</span></td>
-      <td><span class="no-link">—</span></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;7278b903-cef6-4be9-a42a-d4fa3a54c307&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;7278b903-cef6-4be9-a42a-d4fa3a54c307&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">NOK</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">May 4, 2026</td>
-      <td><span class="td-rr rr-loss">-1.32r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-neg">$-66.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">3</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">2r</td>
-      <td><span class="outcome-badge ob-loss">Loss</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/3DNpSwEe/" target="_blank">📷 Entry</a></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/KYdyTAQv/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/rRm8FXmS/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;67fc80bd-73c4-48fe-891c-cc27c6477065&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;67fc80bd-73c4-48fe-891c-cc27c6477065&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">MU</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">May 6, 2026</td>
-      <td><span class="td-rr rr-loss">-0.80r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-neg">$-40.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
-      <td><span class="outcome-badge ob-loss">Loss</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/b4btT6tb/" target="_blank">📷 Entry</a></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/CNS1Egay/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/sn0vRkpG/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;cc793066-9292-4ae2-bc00-5c6f807cf1ad&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;cc793066-9292-4ae2-bc00-5c6f807cf1ad&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">SNDK</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">May 7, 2026</td>
-      <td><span class="td-rr rr-be">+0.00r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-zero">+$0.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">3</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">2r</td>
-      <td><span class="outcome-badge ob-be">BE</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/puPT1KOE/" target="_blank">📷 Entry</a></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/X59EsLzV/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/csHAB5Wq/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;66f5a997-e1f2-4a96-9cd9-fbd26cdf65f5&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;66f5a997-e1f2-4a96-9cd9-fbd26cdf65f5&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">INTC</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">May 11, 2026</td>
-      <td><span class="td-rr rr-big">+27.48r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-pos">+$1374.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">21</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">34.75r</td>
-      <td><span class="outcome-badge ob-win">Win</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/7daVGnyk/" target="_blank">📷 Entry</a></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/CdiVfqyT/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/QyeRuGDN/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="Entered: 2026-04-10">Entered: 2026-04-10</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;e6fe47a1-1e08-4839-9774-5f903eb0c974&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;e6fe47a1-1e08-4839-9774-5f903eb0c974&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr><tr>
-      <td><span style="color:var(--green);font-size:14px">✓</span></td>
-      <td><span class="td-symbol">CIEN</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;font-size:12px;color:var(--text2)">May 12, 2026</td>
-      <td><span class="td-rr rr-loss">-1.00r</span></td>
-      <td><span class="td-risk">$50</span></td>
-      <td><span class="td-pnl pnl-neg">$-50.00</span></td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">1</td>
-      <td style="font-family:&#39;Barlow Condensed&#39;,sans-serif;color:var(--text2)">—</td>
-      <td><span class="outcome-badge ob-loss">Loss</span></td>
-      <td><a class="screenshot-link link-entry" href="https://www.tradingview.com/x/0ZCuoOD7/" target="_blank">📷 Entry</a></td>
-      <td><a class="screenshot-link link-validation" href="https://www.tradingview.com/x/VLm0IDK8/" target="_blank">📷 Val</a></td>
-      <td><a class="screenshot-link link-context" href="https://www.tradingview.com/x/kGGRy9em/" target="_blank">📷 Ctx</a></td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="">—</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade(&#39;57be5c36-52f5-42e4-ad5c-95fb858794aa&#39;)">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete(&#39;57be5c36-52f5-42e4-ad5c-95fb858794aa&#39;,&#39;trades&#39;)">✕</button>
-        </div>
-      </td>
-    </tr></tbody>
-        </table>
-      </div>
+      </details>
+
+      <details class="ib-sec" id="ibSecLT" open ontoggle="window.IB&&IB.tog(this)">
+        <summary>LONG-TERM HOLDINGS <span class="ib-sub">recurring / investment positions · kept out of trade stats</span></summary>
+        <div class="ib-body"><div id="ibLT"></div></div>
+      </details>
     </div>
   </div>
 
@@ -1633,16 +1277,16 @@ tr.flt-row .flt2{display:flex;gap:3px}
         <div class="balance-item">
           <div class="balance-label">Trading P&amp;L</div>
           <div class="balance-val" id="aTradePnL" style="color:var(--green)">$0</div>
-          <div class="balance-sub">from trades only</div>
+          <div class="balance-sub">closed trades · net of fees · ex long-term</div>
         </div>
         <div class="balance-item">
           <div class="balance-label">Net Contributions</div>
           <div class="balance-val" id="aContrib" style="color:var(--blue2)">$0</div>
-          <div class="balance-sub">deposits − withdrawals</div>
+          <div class="balance-sub">USD bought via FX (from statements)</div>
         </div>
         <div class="balance-item">
-          <div class="balance-label">Current Balance</div>
-          <div class="balance-val" id="aBalance" style="color:var(--accent)">$0</div>
+          <div class="balance-label">Trading Balance</div>
+          <div class="balance-val" id="aBalance" style="color:var(--accent)" title="Starting balance + contributions + closed-trade P&amp;L. Live equity (cash + open positions) is in the top bar and the Data tab.">$0</div>
           <div class="balance-sub" id="aROI">0% total return</div>
         </div>
         <div class="balance-item">
@@ -2272,45 +1916,18 @@ tr.flt-row .flt2{display:flex;gap:3px}
 <!-- ADD TRADE MODAL -->
 <div class="modal-bg" id="tradeModal">
   <div class="modal">
-    <h3 id="tradeModalTitle">ADD TRADE</h3>
-    <div class="modal-sub" id="tradeModalSub">Log a new trade entry</div>
+    <h3 id="tradeModalTitle">EDIT TRADE</h3>
+    <div class="modal-sub" id="tradeModalSub"></div>
     <input type="hidden" id="tradeEditId">
+    <div id="ibEditInfo"></div>
     <div class="form-grid">
       <div class="form-group">
-        <div class="form-label">Symbol *</div>
-        <input class="form-input" id="fSymbol" placeholder="e.g. AAPL" style="text-transform:uppercase">
+        <div class="form-label">Symbol</div>
+        <input class="form-input" id="fSymbol" readonly style="opacity:.7">
       </div>
       <div class="form-group">
-        <div class="form-label">Date *</div>
-        <input class="form-input" id="fDate" type="date">
-      </div>
-      <div class="form-group">
-        <div class="form-label">RR Secured *</div>
-        <input class="form-input" id="fRR" type="number" step="0.01" placeholder="e.g. 2.5 or -1">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Risk USD * (your $ risk)</div>
-        <input class="form-input" id="fRiskUSD" type="number" step="1" placeholder="e.g. 50 or 100">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Duration (Candles)</div>
-        <input class="form-input" id="fDuration" type="number" placeholder="e.g. 35">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Max RR Available</div>
-        <input class="form-input" id="fMaxRR" type="number" step="0.01" placeholder="e.g. 10">
-      </div>
-      <div class="form-group span2">
-        <div class="form-label" style="color:var(--blue2)">📷 Entry Screenshot (TradingView URL)</div>
-        <input class="form-input" id="fEntry" placeholder="https://www.tradingview.com/x/...">
-      </div>
-      <div class="form-group span2">
-        <div class="form-label" style="color:var(--purple)">📷 Validation Screenshot (TradingView URL)</div>
-        <input class="form-input" id="fValidation" placeholder="https://www.tradingview.com/x/...">
-      </div>
-      <div class="form-group span2">
-        <div class="form-label" style="color:var(--orange)">📷 Context Screenshot (TradingView URL)</div>
-        <input class="form-input" id="fContext" placeholder="https://www.tradingview.com/x/...">
+        <div class="form-label">Risk USD (optional · drives RR)</div>
+        <input class="form-input" id="fRiskUSD" type="number" step="1" min="0" placeholder="e.g. 50">
       </div>
       <div class="form-group span2">
         <div class="form-label">Notes</div>
@@ -2322,14 +1939,14 @@ tr.flt-row .flt2{display:flex;gap:3px}
       </div>
     </div>
     <div class="cl-head">
-      <div class="cl-head-t">COMPLIANCE CHECKLIST</div>
+      <div class="cl-head-t">COMPLIANCE CHECKLIST <span style="font-family:'Barlow',sans-serif;font-size:11px;color:var(--text3);letter-spacing:0">(optional — leave untouched and no score is stored)</span></div>
       <div id="clHeadScore"></div>
     </div>
     <div class="cl-hint" style="margin-bottom:8px">Click a box to cycle: <b style="color:var(--red)">✗ missed</b> → <b style="color:var(--green)">✓ met</b> → <b>N/A</b> (doesn't apply — removed from the maths).</div>
     <div class="cl-box" id="clBox"></div>
     <div class="modal-btns">
       <button class="btn btn-ghost" onclick="closeTradeModal()">Cancel</button>
-      <button class="btn btn-gold" id="tradeSubmitBtn" onclick="saveTrade()">Save Trade</button>
+      <button class="btn btn-gold" id="tradeSubmitBtn" onclick="saveTrade()">Save</button>
     </div>
   </div>
 </div>
@@ -2384,7 +2001,7 @@ const SB_KEY = 'sb_publishable_SKiVUnE0b4BkDh9JPRT0Ng_pYgjLErJ';
 
 let allTrades = [];
 let allFunds = [];
-let settings = { startBalance: 10000, password: 'trader123' };
+let settings = { startBalance: 0, password: 'trader123' };
 /* ═════════════ COMPLIANCE CHECKLIST (CL) ═════════════ */
 const CL_DEFAULT = {
   entryWeight: 80,
@@ -2541,7 +2158,7 @@ async function clSaveTemplate(){
   try{
     const ex = await sb('settings?select=id&limit=1');
     if(ex && ex.length) await sb('settings?id=eq.'+ex[0].id,'PATCH',{ checklist: CL });
-    else await sb('settings','POST',{ startBalance: settings.startBalance||10000, password: settings.password||'trader123', checklist: CL });
+    else await sb('settings','POST',{ startBalance: startBalance(), password: settings.password||'trader123', checklist: CL });
     toast('Checklist saved ✓','success');
   }catch(e){ toast('Save failed: '+e.message+' — was the checklist column added?','error'); }
 }
@@ -2682,7 +2299,7 @@ async function loadSettings() {
     if (data && data.length > 0) {
       const row = data[0];
       // Handle both column name variants
-      settings.startBalance = row.startBalance || row["startBalance"] || 10000;
+      settings.startBalance = (row.startBalance !== null && row.startBalance !== undefined) ? row.startBalance : 0;
       settings.password = row.password || 'trader123';
       settings.id = row.id;
       if (row.checklist) {
@@ -2730,7 +2347,7 @@ async function changePassword() {
     if (existing && existing.length > 0) {
       await sb(`settings?id=eq.${existing[0].id}`, 'PATCH', { "password": nw });
     } else {
-      await sb('settings', 'POST', { "startBalance": settings.startBalance || 10000, "password": nw });
+      await sb('settings', 'POST', { "startBalance": startBalance(), "password": nw });
     }
     settings.password = nw;
     document.getElementById('pwCurrent').value = '';
@@ -2744,7 +2361,7 @@ function toggleSettings() {
   const p = document.getElementById('settingsPanel');
   p.classList.toggle('show');
   if (p.classList.contains('show')) {
-    document.getElementById('settingStartBalance').value = settings.startBalance || '';
+    document.getElementById('settingStartBalance').value = startBalance();
   }
 }
 function closeSettings() { document.getElementById('settingsPanel').classList.remove('show'); }
@@ -2773,85 +2390,23 @@ function showPage(name, btn) {
 // ══ DATA ══
 async function loadData() {
   try {
-    const [trades, funds, sets] = await Promise.all([
-      sb('trades?select=*&order=trade_date.asc'),
+    const [funds, sets] = await Promise.all([
       sb('funds?select=*&order=fund_date.asc'),
       sb('settings?select=*&limit=1')
     ]);
-    allTrades = trades || [];
     allFunds = funds || [];
     if (sets && sets.length > 0) settings = { ...settings, ...sets[0] };
-    renderTrades();
+    if (window.IB) { IB.init(); await IB.load(); }   // builds allTrades from IBKR executions + renders the Data tab
+    else { allTrades = []; renderTrades(); }
     updateTopbarBalance();
   } catch(e) { toast('Failed to load data', 'error'); }
 }
 
-function renderTrades() {
-  const tbody = document.getElementById('dataTableBody');
-  if (!allTrades.length) {
-    tbody.innerHTML = `<tr><td colspan="17"><div class="empty"><div class="empty-icon">📊</div><h3>No Trades Yet</h3><p>Click + Add Trade to start logging</p></div></td></tr>`;
-    clBindFilters();
-    return;
-  }
-  const _shown = allTrades.filter(clFilterMatch);
-  if (!_shown.length) {
-    tbody.innerHTML = `<tr><td colspan="17"><div class="empty"><div class="empty-icon">🔍</div><h3>No Trades Match</h3><p>Adjust or clear the filters above</p></div></td></tr>`;
-    clBindFilters();
-    return;
-  }
+function renderTrades() { if (window.IB) IB.render(); }
 
-  tbody.innerHTML = _shown.map(t => {
-    const rr = parseFloat(t.rr_secured) || 0;
-    const risk = parseFloat(t.risk_usd) || 0;
-    const pnl = rr * risk;
-    const outcome = rr > 0.1 ? 'Win' : rr < -0.05 ? 'Loss' : 'BE';
-    const rrClass = Math.abs(rr) >= 5 ? 'rr-big' : rr > 0.1 ? 'rr-win' : rr < -0.05 ? 'rr-loss' : 'rr-be';
-    const pnlClass = pnl > 0 ? 'pnl-pos' : pnl < 0 ? 'pnl-neg' : 'pnl-zero';
-    const obClass = outcome === 'Win' ? 'ob-win' : outcome === 'Loss' ? 'ob-loss' : 'ob-be';
-
-    const entryLink = t.screenshot_entry
-      ? `<a class="screenshot-link link-entry" href="${t.screenshot_entry}" target="_blank">📷 Entry</a>`
-      : `<span class="no-link">—</span>`;
-    const valLink = t.screenshot_validation
-      ? `<a class="screenshot-link link-validation" href="${t.screenshot_validation}" target="_blank">📷 Val</a>`
-      : `<span class="no-link">—</span>`;
-    const ctxLink = t.screenshot_context
-      ? `<a class="screenshot-link link-context" href="${t.screenshot_context}" target="_blank">📷 Ctx</a>`
-      : `<span class="no-link">—</span>`;
-
-    return `<tr>
-      <td><span style="color:${t.include_analysis ? 'var(--green)' : 'var(--text3)'};font-size:14px">${t.include_analysis ? '✓' : '○'}</span></td>
-      <td><span class="td-symbol">${t.symbol || '—'}</span></td>
-      <td style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--text2)">${t.trade_date ? new Date(t.trade_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'}</td>
-      <td><span class="td-rr ${rrClass}">${rr >= 0 ? '+' : ''}${rr.toFixed(2)}r</span></td>
-      <td><span class="td-risk">$${risk.toFixed(0)}</span></td>
-      <td><span class="td-pnl ${pnlClass}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</span></td>
-      <td style="font-family:'Barlow Condensed',sans-serif;color:var(--text2)">${t.duration_candles || '—'}</td>
-      <td style="font-family:'Barlow Condensed',sans-serif;color:var(--text2)">${t.max_rr ? t.max_rr + 'r' : '—'}</td>
-      <td><span class="outcome-badge ${obClass}">${outcome}</span></td>
-      <td class="cl-cell ${clPctClass((t.compliance||{}).e)}" onclick="clToggleDetail('${t.id}')" title="Click for detail">${clPctTxt((t.compliance||{}).e)}</td>
-      <td class="cl-cell ${clPctClass((t.compliance||{}).m)}" onclick="clToggleDetail('${t.id}')" title="Click for detail">${clPctTxt((t.compliance||{}).m)}</td>
-      <td class="cl-cell ${clPctClass((t.compliance||{}).tot)}" onclick="clToggleDetail('${t.id}')" title="Click for detail">${clPctTxt((t.compliance||{}).tot)}</td>
-      <td>${entryLink}</td>
-      <td>${valLink}</td>
-      <td>${ctxLink}</td>
-      <td style="font-size:11px;color:var(--text3);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="${t.notes||''}">${t.notes || '—'}</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="editTrade('${t.id}')">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="openDelete('${t.id}','trades')">✕</button>
-        </div>
-      </td>
-    </tr>
-    <tr class="cl-detail" id="cld-${t.id}" style="display:none"><td colspan="17">${clDetailHtml(t)}</td></tr>`;
-  }).join('');
-  clBindFilters();
-}
-
-// ══ ANALYSIS ══
 function renderAnalysis() {
   const trades = allTrades.filter(t => t.include_analysis);
-  const startBal = parseFloat(settings.startBalance) || 10000;
+  const startBal = startBalance();
 
   if (!trades.length) {
     ['aTrades','aRSecured','aAvgWin','aEV','aPF','aAvgDDR','aAvgDDP','aMaxDDR','aMaxDDP'].forEach(id => {
@@ -2861,27 +2416,29 @@ function renderAnalysis() {
     return;
   }
 
-  const wins = trades.filter(t => parseFloat(t.rr_secured) > 0.1);
-  const losses = trades.filter(t => parseFloat(t.rr_secured) < -0.05);
-  const bes = trades.filter(t => {
-    const r = parseFloat(t.rr_secured);
-    return r >= -0.05 && r <= 0.1;
-  });
+  // Risk $ is optional: W/L/BE and profit factor use real $ P&L for every trade;
+  // R-based figures (R secured, avg win, EV, drawdown, risk of ruin) use only trades with Risk $ set.
+  const hasRisk = t => parseFloat(t.risk_usd) > 0;
+  const cls = t => { if (hasRisk(t)) { const r = parseFloat(t.rr_secured); return r > 0.1 ? 'W' : r < -0.05 ? 'L' : 'BE'; } const p = tPnl(t); return p > 1 ? 'W' : p < -1 ? 'L' : 'BE'; };
+  const wins = trades.filter(t => cls(t) === 'W');
+  const losses = trades.filter(t => cls(t) === 'L');
+  const bes = trades.filter(t => cls(t) === 'BE');
+  const rT = trades.filter(hasRisk), rWins = rT.filter(t => cls(t) === 'W'), rLosses = rT.filter(t => cls(t) === 'L');
 
-  const totalR = trades.reduce((s, t) => s + (parseFloat(t.rr_secured) || 0), 0);
-  const avgWin = wins.length ? wins.reduce((s,t) => s + parseFloat(t.rr_secured), 0) / wins.length : 0;
-  const avgLoss = losses.length ? Math.abs(losses.reduce((s,t) => s + parseFloat(t.rr_secured), 0) / losses.length) : 0;
+  const totalR = rT.reduce((s, t) => s + (parseFloat(t.rr_secured) || 0), 0);
+  const avgWin = rWins.length ? rWins.reduce((s,t) => s + parseFloat(t.rr_secured), 0) / rWins.length : 0;
+  const avgLoss = rLosses.length ? Math.abs(rLosses.reduce((s,t) => s + parseFloat(t.rr_secured), 0) / rLosses.length) : 0;
   const winRate = trades.length ? wins.length / trades.length : 0;
   const lossRate = trades.length ? losses.length / trades.length : 0;
   const ev = (winRate * avgWin) - (lossRate * avgLoss);
-  const grossWin = wins.reduce((s,t) => s + parseFloat(t.rr_secured), 0);
-  const grossLoss = Math.abs(losses.reduce((s,t) => s + parseFloat(t.rr_secured), 0));
+  const grossWin = wins.reduce((s,t) => s + tPnl(t), 0);
+  const grossLoss = Math.abs(losses.reduce((s,t) => s + tPnl(t), 0));
   const pf = grossLoss > 0 ? grossWin / grossLoss : grossWin > 0 ? 999 : 0;
 
-  // DD calculation
+  // DD calculation (in R, trades with Risk $ only)
   let runningR = 0, peak = 0, maxDD = 0;
   const dds = [];
-  trades.forEach(t => {
+  rT.forEach(t => {
     runningR += parseFloat(t.rr_secured) || 0;
     if (runningR > peak) peak = runningR;
     const dd = runningR - peak;
@@ -2889,14 +2446,16 @@ function renderAnalysis() {
     if (dd < maxDD) maxDD = dd;
   });
   const avgDD = dds.length ? dds.reduce((s,d) => s+d, 0) / dds.length : 0;
-  const avgDDPct = startBal > 0 ? (avgDD / startBal) * 100 : 0;
-  const maxDDPct = startBal > 0 ? (maxDD / startBal) * 100 : 0;
+  const capBase0 = startBal + allFunds.reduce((s,f) => s + (parseFloat(f.amount_usd)||0), 0);
+  const avgDDPct = capBase0 > 0 ? (avgDD / capBase0) * 100 : 0;
+  const maxDDPct = capBase0 > 0 ? (maxDD / capBase0) * 100 : 0;
 
   // P&L in USD
-  const tradingPnL = trades.reduce((s,t) => s + (parseFloat(t.rr_secured)||0) * (parseFloat(t.risk_usd)||0), 0);
+  const tradingPnL = trades.reduce((s,t) => s + tPnl(t), 0);
   const netContrib = allFunds.reduce((s,f) => s + (parseFloat(f.amount_usd)||0), 0);
   const currentBal = startBal + tradingPnL + netContrib;
-  const roi = startBal > 0 ? ((currentBal - startBal) / startBal) * 100 : 0;
+  const capBase = startBal + netContrib;
+  const roi = capBase > 0 ? (tradingPnL / capBase) * 100 : 0;
 
   // Risk of Ruin (Ralph Vince)
   let ror = 0;
@@ -2920,6 +2479,7 @@ function renderAnalysis() {
   document.getElementById('aTrades').textContent = trades.length;
   document.getElementById('aWBL').textContent = `${wins.length} W / ${bes.length} BE / ${losses.length} L`;
   document.getElementById('aRSecured').textContent = (totalR >= 0 ? '+' : '') + totalR.toFixed(2) + 'r';
+  document.getElementById('aRSecured').title = rT.length + ' of ' + trades.length + ' trades have Risk $ set — R figures use only those';
   document.getElementById('aAvgWin').textContent = '+' + avgWin.toFixed(2) + 'r';
   document.getElementById('aEV').textContent = (ev >= 0 ? '+' : '') + ev.toFixed(2);
   document.getElementById('aPF').textContent = pf >= 999 ? '∞' : pf.toFixed(2);
@@ -2985,7 +2545,7 @@ function renderCurves(trades, funds, startBal) {
   // Build sorted timeline events — trades and fund entries merged by date
   const events = [];
   trades.forEach((t,i) => {
-    const pnl = (parseFloat(t.rr_secured)||0) * (parseFloat(t.risk_usd)||0);
+    const pnl = tPnl(t);
     events.push({ date: t.trade_date, tradePnL: pnl, contrib: 0, type: 'trade', label: t.symbol || ('T'+(i+1)), rawAmt: null });
   });
   funds.forEach(f => {
@@ -3146,8 +2706,8 @@ function renderFunds() {
       const isPos = amt >= 0;
       return `<tr>
         <td style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--text2)">${new Date(f.fund_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</td>
-        <td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:${isPos?'var(--green)':'var(--red)'}">${isPos?'+':''}\$${Math.abs(amt).toFixed(2)}</span></td>
-        <td><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:${isPos?'rgba(61,214,140,0.1)':'rgba(240,82,82,0.1)'};color:${isPos?'var(--green)':'var(--red)'}">${isPos?'DEPOSIT':'WITHDRAWAL'}</span></td>
+        <td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:${isPos?'var(--green)':'var(--red)'}">${isPos?'+':''}\$${fmtNum(Math.abs(amt))}</span></td>
+        <td><span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:${isPos?'rgba(61,214,140,0.1)':'rgba(240,82,82,0.1)'};color:${isPos?'var(--green)':'var(--red)'}">${isPos?'DEPOSIT':'WITHDRAWAL'}</span>${f.ibkr_key?' <span title="Imported from your IBKR statement (FX conversion). If deleted it comes back on the next import." style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(91,141,239,0.12);color:var(--blue2)">IBKR</span>':''}</td>
         <td style="font-size:12px;color:var(--text3)">${f.note||'—'}</td>
         <td><div style="display:flex;gap:4px">
           <button class="btn btn-ghost btn-sm" onclick="editFund('${f.id}')">Edit</button>
@@ -3161,7 +2721,7 @@ function renderFunds() {
   const deposits = allFunds.filter(f => parseFloat(f.amount_usd) > 0).reduce((s,f) => s + parseFloat(f.amount_usd), 0);
   const withdrawals = Math.abs(allFunds.filter(f => parseFloat(f.amount_usd) < 0).reduce((s,f) => s + parseFloat(f.amount_usd), 0));
   const net = deposits - withdrawals;
-  const tradePnL = allTrades.filter(t=>t.include_analysis).reduce((s,t) => s + (parseFloat(t.rr_secured)||0)*(parseFloat(t.risk_usd)||0), 0);
+  const tradePnL = allTrades.filter(t=>t.include_analysis).reduce((s,t) => s + tPnl(t), 0);
   document.getElementById('fTotalDeposit').textContent = '+$' + fmtNum(deposits);
   document.getElementById('fTotalWithdraw').textContent = '-$' + fmtNum(withdrawals);
   document.getElementById('fNetContrib').textContent = (net>=0?'+':'') + '$' + fmtNum(net);
@@ -3170,8 +2730,10 @@ function renderFunds() {
 }
 
 function updateTopbarBalance() {
-  const startBal = parseFloat(settings.startBalance) || 10000;
-  const tradePnL = allTrades.filter(t=>t.include_analysis).reduce((s,t) => s + (parseFloat(t.rr_secured)||0)*(parseFloat(t.risk_usd)||0), 0);
+  const el = document.getElementById('topbarBalance');
+  if (window.IB && IB.equity() !== null) { el.textContent = '$' + fmtNum(IB.equity()); el.title = 'USD equity (cash + positions) as of ' + IB.asOf(); return; }
+  const startBal = startBalance();
+  const tradePnL = allTrades.filter(t=>t.include_analysis).reduce((s,t) => s + tPnl(t), 0);
   const netContrib = allFunds.reduce((s,f) => s + (parseFloat(f.amount_usd)||0), 0);
   document.getElementById('topbarBalance').textContent = '$' + fmtNum(startBal + tradePnL + netContrib);
 }
@@ -3214,88 +2776,12 @@ async function savePlan() {
 }
 
 // ══ TRADE MODAL ══
-function openAddTrade() {
-  document.getElementById('tradeModalTitle').textContent = 'ADD TRADE';
-  document.getElementById('tradeModalSub').textContent = 'Log a new trade entry';
-  document.getElementById('tradeEditId').value = '';
-  ['fSymbol','fRR','fRiskUSD','fDuration','fMaxRR','fEntry','fValidation','fContext','fNotes'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
-  document.getElementById('fInclude').checked = true;
-  clTicks = {};
-  clRenderModal();
-  document.getElementById('tradeModal').classList.add('show');
-  setTimeout(() => document.getElementById('fSymbol').focus(), 100);
-}
-
-function editTrade(id) {
-  const t = allTrades.find(x => x.id === id);
-  if (!t) return;
-  document.getElementById('tradeModalTitle').textContent = 'EDIT TRADE';
-  document.getElementById('tradeModalSub').textContent = `Editing ${t.symbol} — ${t.trade_date}`;
-  document.getElementById('tradeEditId').value = id;
-  document.getElementById('fSymbol').value = t.symbol || '';
-  document.getElementById('fDate').value = t.trade_date || '';
-  document.getElementById('fRR').value = t.rr_secured || '';
-  document.getElementById('fRiskUSD').value = t.risk_usd || '';
-  document.getElementById('fDuration').value = t.duration_candles || '';
-  document.getElementById('fMaxRR').value = t.max_rr || '';
-  document.getElementById('fEntry').value = t.screenshot_entry || '';
-  document.getElementById('fValidation').value = t.screenshot_validation || '';
-  document.getElementById('fContext').value = t.screenshot_context || '';
-  document.getElementById('fNotes').value = t.notes || '';
-  document.getElementById('fInclude').checked = t.include_analysis !== false;
-  clTicks = (t.compliance && t.compliance.t) ? JSON.parse(JSON.stringify(t.compliance.t)) : {};
-  clRenderModal();
-  document.getElementById('tradeModal').classList.add('show');
-}
+function openAddTrade() { toast("Trades are imported from your IBKR statement", "info"); }
+function editTrade(key) { if (window.IB) IB.edit(key); }
 
 function closeTradeModal() { document.getElementById('tradeModal').classList.remove('show'); }
 
-async function saveTrade() {
-  const symbol = document.getElementById('fSymbol').value.trim().toUpperCase();
-  const date = document.getElementById('fDate').value;
-  const rr = document.getElementById('fRR').value;
-  const risk = document.getElementById('fRiskUSD').value;
-  if (!symbol || !date || rr === '' || !risk) return toast('Symbol, Date, RR and Risk USD are required', 'error');
-
-  const row = {
-    symbol,
-    trade_date: date,
-    rr_secured: parseFloat(rr),
-    risk_usd: parseFloat(risk),
-    duration_candles: document.getElementById('fDuration').value ? parseInt(document.getElementById('fDuration').value) : null,
-    max_rr: document.getElementById('fMaxRR').value ? parseFloat(document.getElementById('fMaxRR').value) : null,
-    screenshot_entry: document.getElementById('fEntry').value.trim() || null,
-    screenshot_validation: document.getElementById('fValidation').value.trim() || null,
-    screenshot_context: document.getElementById('fContext').value.trim() || null,
-    notes: document.getElementById('fNotes').value.trim() || null,
-    include_analysis: document.getElementById('fInclude').checked
-  };
-  const _cs = clScores(clTicks);
-  row.compliance = { t: clTicks, e: _cs.entry, m: _cs.mgmt, tot: _cs.total };
-
-  const btn = document.getElementById('tradeSubmitBtn');
-  btn.innerHTML = '<span class="spin"></span> Saving...';
-  btn.disabled = true;
-
-  const editId = document.getElementById('tradeEditId').value;
-  try {
-    if (editId) {
-      await sb(`trades?id=eq.${editId}`, 'PATCH', row);
-      toast(`${symbol} updated`, 'success');
-    } else {
-      await sb('trades', 'POST', row);
-      toast(`${symbol} added`, 'success');
-    }
-    closeTradeModal();
-    await loadData();
-  } catch(e) {
-    toast('Save failed: ' + e.message, 'error');
-    console.error('Trade save error:', e);
-  } finally { btn.innerHTML = 'Save Trade'; btn.disabled = false; }
-}
+async function saveTrade() { if (window.IB) await IB.saveTrade(); }
 
 // ══ FUND MODAL ══
 function openAddFund() {
@@ -3374,6 +2860,8 @@ async function exportAllData() {
       sb('settings?select=*&limit=1'),
       sb('trading_plan?select=*&limit=1')
     ]);
+    const ibkr = {};
+    for (const t of ['ibkr_uploads','ibkr_executions','ibkr_cash','ibkr_positions','ibkr_trade_meta']) { try { ibkr[t] = await sb(t + '?select=*'); } catch(e) { ibkr[t] = []; } }
 
     const exportData = {
       exportDate: new Date().toISOString(),
@@ -3383,7 +2871,8 @@ async function exportAllData() {
         trades:       trades       || [],
         funds:        funds        || [],
         settings:     fundsSettings || [],
-        trading_plan: plan         || []
+        trading_plan: plan         || [],
+        ibkr:         ibkr
       },
       counts: {
         trades:  (trades       || []).length,
@@ -3488,6 +2977,13 @@ async function importAllData(event) {
 }
 
 // ══ UTILS ══
+// P&L of a trade: real $ from IBKR when present, otherwise legacy RR × risk
+function tPnl(t) {
+  if (t && t.pnl_usd !== undefined && t.pnl_usd !== null) return parseFloat(t.pnl_usd) || 0;
+  return (parseFloat(t.rr_secured) || 0) * (parseFloat(t.risk_usd) || 0);
+}
+function startBalance() { const v = parseFloat(settings.startBalance); return isNaN(v) ? 0 : v; }
+
 function fmtNum(n) {
   return parseFloat(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -4903,7 +4399,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     try{
       const ex=await sb("settings?select=id&limit=1");
       if(ex&&ex.length) await sb("settings?id=eq."+ex[0].id,"PATCH",{etf_cfg:K.CFG});
-      else await sb("settings","POST",{startBalance:10000,password:"trader123",etf_cfg:K.CFG});
+      else await sb("settings","POST",{startBalance:0,password:"trader123",etf_cfg:K.CFG});
       toast("ETF settings saved ✓","success"); refresh();
     }catch(e){ toast("Save failed: "+e.message,"error"); }
   }
@@ -5993,4 +5489,502 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 })();
 </script>
 
+<script>
+/* ═══════════ IBKR CORE — parser + FIFO engine (pure, no DOM) ═══════════ */
+(function(){
+  const EPS = 1e-9;
+
+  /* ---------- CSV (quoted fields, commas inside quotes) ---------- */
+  function parseCSV(text){
+    const rows=[]; let i=0, f="", row=[], q=false;
+    const t = text.replace(/^﻿/,'').replace(/\r\n?/g,"\n");
+    while(i<t.length){ const c=t[i];
+      if(q){ if(c==='"'){ if(t[i+1]==='"'){f+='"';i++;} else q=false; } else f+=c; }
+      else { if(c==='"') q=true;
+             else if(c===','){ row.push(f); f=""; }
+             else if(c==="\n"){ row.push(f); rows.push(row); row=[]; f=""; }
+             else f+=c; }
+      i++; }
+    if(f!==""||row.length){ row.push(f); rows.push(row); }
+    return rows.filter(r=>r.length>1 || (r.length===1 && r[0].trim()!==""));
+  }
+  function num(v){
+    if(v===null||v===undefined) return null;
+    let s=String(v).trim(); if(!s||s==='--'||s==='-') return null;
+    s=s.replace(/,/g,'').replace(/[−–—]/g,'-');
+    const n=parseFloat(s); return isNaN(n)?null:n;
+  }
+  const MONTHS={january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12};
+  function parseLongDate(s){ // "July 1, 2026"
+    const m=String(s||'').trim().match(/^([A-Za-z]+)\s+(\d{1,2}),\s*(\d{4})$/);
+    if(!m) return null; const mo=MONTHS[m[1].toLowerCase()]; if(!mo) return null;
+    return m[3]+'-'+String(mo).padStart(2,'0')+'-'+String(+m[2]).padStart(2,'0');
+  }
+  function normDT(s){ // "2026-09-16, 09:58:29" -> "2026-09-16 09:58:29"
+    const m=String(s||'').trim().match(/^(\d{4}-\d{2}-\d{2})(?:,?\s*(\d{2}:\d{2}:\d{2}))?/);
+    if(!m) return null; return m[1]+' '+(m[2]||'00:00:00');
+  }
+  const codeHas=(code,c)=>String(code||'').split(';').map(x=>x.trim()).includes(c);
+
+  /* ---------- statement parser ---------- */
+  function parseStatement(text){
+    const rows=parseCSV(text);
+    const out={ period:{start:null,end:null}, account:null, execs:[], fx:[], cash:[], positions:[],
+                nav_cad:null, usd_cash:null, cad_cash:null, warnings:[] };
+    const headers={};             // section -> latest header array
+    const seen={};
+    const keyOf=(s)=>{ seen[s]=(seen[s]||0)+1; return s+'#'+seen[s]; };
+    let idx=0;
+    for(const r of rows){
+      const sec=r[0], kind=r[1];
+      if(kind==='Header'){ headers[sec]=r.slice(2).map(x=>x.trim()); continue; }
+      if(kind!=='Data' && !(sec==='Open Positions' && kind==='Data')) continue;
+      const H=headers[sec]||[]; const d=r.slice(2);
+      const get=(name)=>{ const j=H.indexOf(name); return j>=0? d[j] : undefined; };
+      if(sec==='Statement'){
+        if(d[0]==='Period'){ const p=String(d[1]||'').split(' - '); out.period.start=parseLongDate(p[0]); out.period.end=parseLongDate(p[1]); }
+        continue;
+      }
+      if(sec==='Account Information'){ if(d[0]==='Account') out.account=d[1]; continue; }
+      if(sec==='Net Asset Value'){ if(d[0]==='Total') out.nav_cad=num(d[4]); continue; }
+      if(sec==='Cash Report'){
+        if(d[0]==='Ending Cash'){ if(d[1]==='USD') out.usd_cash=num(d[2]); if(d[1]==='CAD') out.cad_cash=num(d[2]); }
+        continue;
+      }
+      if(sec==='Trades'){
+        if(get('DataDiscriminator')!=='Order') continue;
+        const asset=get('Asset Category'), sym=get('Symbol'), dt=normDT(get('Date/Time'));
+        const qtyS=String(get('Quantity')||'').replace(/,/g,''), pxS=String(get('T. Price')||'');
+        const proceeds=num(get('Proceeds'));
+        if(asset==='Stocks'){
+          const e={ asset, currency:get('Currency'), symbol:sym, dt, qty:num(qtyS), price:num(pxS),
+                    proceeds, comm:num(get('Comm/Fee')), basis:num(get('Basis')), realized:num(get('Realized P/L')),
+                    mtm:num(get('MTM P/L')), code:String(get('Code')||'').trim(), raw_idx:idx++ };
+          e.exec_key=keyOf(['S',sym,dt,qtyS,pxS,String(proceeds)].join('|'));
+          out.execs.push(e);
+        } else if(asset==='Forex'){
+          const commIdx=H.findIndex(h=>/^Comm/.test(h));
+          const f={ symbol:sym, dt, usd:num(qtyS), rate:num(pxS), cad:proceeds, fee:num(commIdx>=0?d[commIdx]:null)||0,
+                    code:String(get('Code')||'').trim() };
+          f.cash_key=keyOf(['fx',dt,qtyS,pxS].join('|'));
+          out.fx.push(f);
+        }
+        continue;
+      }
+      if(sec==='Deposits & Withdrawals'){
+        const cur=get('Currency'); if(!cur||cur==='Total') continue;
+        const c={ kind:(num(get('Amount'))||0)>=0?'deposit':'withdrawal', currency:cur, dt:String(get('Settle Date')||'').slice(0,10),
+                  description:get('Description')||'', amount:num(get('Amount')) };
+        c.cash_key=keyOf(['dep',cur,c.dt,String(c.amount),c.description].join('|'));
+        out.cash.push(c); continue;
+      }
+      if(sec==='Interest'){
+        const cur=get('Currency'); if(!cur||cur==='Total') continue;
+        const c={ kind:'interest', currency:cur, dt:String(get('Date')||'').slice(0,10), description:get('Description')||'', amount:num(get('Amount')) };
+        c.cash_key=keyOf(['int',cur,c.dt,String(c.amount)].join('|'));
+        out.cash.push(c); continue;
+      }
+      if(sec==='Open Positions'){
+        if(get('DataDiscriminator')!=='Summary') continue;
+        out.positions.push({ symbol:get('Symbol'), currency:get('Currency'), qty:num(get('Quantity')), cost_price:num(get('Cost Price')),
+          cost_basis:num(get('Cost Basis')), close_price:num(get('Close Price')), value:num(get('Value')), unrealized:num(get('Unrealized P/L')) });
+        continue;
+      }
+    }
+    if(!out.period.start||!out.period.end) out.warnings.push('Could not read the statement period.');
+    if(!out.execs.length && !out.fx.length && !out.cash.length && !out.positions.length) out.warnings.push('No trades, cash events or positions found — is this an IBKR Activity Statement (CSV)?');
+    return out;
+  }
+
+  /* ---------- FIFO engine ----------
+     execs: stored executions (any order). positions: latest snapshot.
+     meta: {trade_key:{risk_usd,notes,include_analysis,compliance}}.
+     longterm: Set of symbols treated as long-term holdings.           */
+  function build(execs, positions, meta, longterm, asOf){
+    meta=meta||{}; longterm=longterm||new Set();
+    const posBy={}; (positions||[]).forEach(p=>posBy[p.symbol]=p);
+    const sorted=execs.slice().sort((a,b)=> a.dt!==b.dt ? (a.dt<b.dt?-1:1) : ((a.raw_idx||0)-(b.raw_idx||0)));
+    const lots={}, closed=[], unmatched=[];
+    for(const e of sorted){
+      const s=e.symbol; if(!lots[s]) lots[s]=[];
+      const isClose = codeHas(e.code,'C') || (!codeHas(e.code,'O') && (e.qty||0)<0);
+      const q=Math.abs(e.qty||0), comm=Math.abs(e.comm||0);
+      if(!isClose){
+        lots[s].push({ key:e.exec_key, sym:s, dt:e.dt, qty:q, rem:q, px:e.price, comm, code:e.code });
+        continue;
+      }
+      let remain=q; const consumed=[];
+      while(remain>EPS && lots[s].length){
+        const lot=lots[s][0]; const take=Math.min(remain, lot.rem);
+        consumed.push({lot, take}); lot.rem-=take; remain-=take;
+        if(lot.rem<=EPS) lots[s].shift();
+      }
+      const feesOpen=consumed.reduce((a,c)=>a+c.lot.comm*(c.take/c.lot.qty),0);
+      const entry=consumed.length? consumed.reduce((a,c)=>a+c.lot.px*c.take,0)/consumed.reduce((a,c)=>a+c.take,0) : null;
+      const row={ key:e.exec_key, sym:s, openDt:consumed.length?consumed[0].lot.dt:null, closeDt:e.dt, qty:q,
+                  entry, exit:e.price, feesOpen, feesClose:comm, fees:feesOpen+comm,
+                  net:(e.realized!==null&&e.realized!==undefined)?e.realized:((e.price-(entry||e.price))*q-feesOpen-comm),
+                  lots:consumed.map(c=>({key:c.lot.key, take:c.take, qty:c.lot.qty, dt:c.lot.dt, px:c.lot.px})),
+                  unmatched: remain>EPS ? remain : 0 };
+      if(remain>EPS) unmatched.push({sym:s, qty:remain, dt:e.dt});
+      row.gross=row.net+row.fees;
+      closed.push(row);
+    }
+    const active=[];
+    for(const s in lots) for(const lot of lots[s]) if(lot.rem>EPS){
+      const p=posBy[s]; const cp=p?p.close_price:null;
+      const basis=lot.px*lot.rem + lot.comm*(lot.rem/lot.qty);
+      active.push({ key:lot.key, sym:s, openDt:lot.dt, closeDt:null, qty:lot.rem, entry:lot.px, exit:cp,
+                    feesOpen:lot.comm*(lot.rem/lot.qty), feesClose:0, fees:lot.comm*(lot.rem/lot.qty),
+                    net: cp!==null? cp*lot.rem - basis : null, basis, lots:[] });
+    }
+    // meta + risk inheritance
+    const applyMeta=(r)=>{
+      const m=meta[r.key]||{};
+      let risk = (m.risk_usd!==undefined&&m.risk_usd!==null&&m.risk_usd!=='') ? parseFloat(m.risk_usd) : null;
+      if((risk===null||isNaN(risk)) && r.lots && r.lots.length){
+        let sum=0, any=false;
+        r.lots.forEach(l=>{ const lm=meta[l.key]; const lr=lm&&lm.risk_usd!=null&&lm.risk_usd!==''?parseFloat(lm.risk_usd):NaN;
+          if(!isNaN(lr)&&lr>0){ any=true; sum+=lr*(l.take/l.qty); } });
+        risk = any? sum : null;
+        r.riskInherited = any;
+      }
+      r.risk = (risk!==null&&!isNaN(risk)&&risk>0)? risk : null;
+      r.rr = (r.risk&&r.net!==null)? r.net/r.risk : null;
+      r.notes = m.notes||'';
+      r.include = m.include_analysis!==false;
+      r.compliance = m.compliance||null;
+      r.lt = longterm.has(r.sym);
+      const o=r.openDt?r.openDt.slice(0,10):null, c=r.closeDt?r.closeDt.slice(0,10):(asOf||null);
+      r.days = (o&&c)? Math.max(0,Math.round((new Date(c+'T00:00:00')-new Date(o+'T00:00:00'))/86400000)) : null;
+      r.status = r.closeDt ? (r.net>1?'WIN':r.net<-1?'LOSS':'BE') : 'ACTIVE';
+      return r;
+    };
+    closed.forEach(applyMeta); active.forEach(applyMeta);
+    // reconciliation vs positions
+    const recon=[]; const byS={};
+    active.forEach(a=>{ byS[a.sym]=(byS[a.sym]||0)+a.qty; });
+    const symsAll=new Set([...Object.keys(byS), ...Object.keys(posBy)]);
+    symsAll.forEach(s=>{ const mine=byS[s]||0, theirs=posBy[s]?posBy[s].qty:0;
+      if(Math.abs(mine-theirs)>1e-4) recon.push({sym:s, computed:mine, statement:theirs}); });
+    // long-term symbol summaries
+    const ltSyms=[...longterm].sort();
+    const lt=ltSyms.map(s=>{
+      const a=active.filter(x=>x.sym===s), c=closed.filter(x=>x.sym===s), p=posBy[s]||null;
+      const qty=a.reduce((x,y)=>x+y.qty,0), basis=a.reduce((x,y)=>x+y.basis,0);
+      return { sym:s, qty, basis, avg:qty?basis/qty:null, close:p?p.close_price:null, value:p?p.value:(qty&&a[0]&&a[0].exit?qty*a[0].exit:null),
+               unreal:a.reduce((x,y)=>x+(y.net||0),0), realized:c.reduce((x,y)=>x+y.net,0), fees:a.reduce((x,y)=>x+y.fees,0)+c.reduce((x,y)=>x+y.fees,0),
+               lots:a, sells:c, buys:sorted.filter(e=>e.symbol===s && !(codeHas(e.code,'C')||(!codeHas(e.code,'O')&&(e.qty||0)<0))) };
+    });
+    return { closed, active, unmatched, recon, lt, posBy };
+  }
+
+  /* ---------- FX → funds rows (USD inflows), derived from ALL stored fx ---------- */
+  function fxToFunds(fxRows){
+    const f2=x=>(Math.round((Math.abs(x)+1e-9)*100)/100).toFixed(2);   // half-up, avoids 2.775 -> '2.77'
+    const manual=[], autoByDay={};
+    fxRows.forEach(f=>{
+      const day=(f.dt||'').slice(0,10); const usd=f.usd||0;
+      const isAuto = codeHas(f.code,'AFx') || Math.abs(usd)<1;
+      if(isAuto){ const a=autoByDay[day]=autoByDay[day]||{day,usd:0,cad:0,fee:0,n:0}; a.usd+=usd; a.cad+=Math.abs(f.cad||0)*(usd>=0?1:-1); a.fee+=Math.abs(f.fee||0); a.n++; }
+      else manual.push(f);
+    });
+    const rows=[];
+    manual.forEach(f=>{ const day=(f.dt||'').slice(0,10);
+      rows.push({ ibkr_key:'fx|'+day+'|'+String(f.usd), fund_date:day, amount_usd:Math.round((f.usd||0)*100)/100,
+        note:'FX conversion · CAD '+Math.abs(f.cad||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+             +' @ '+(f.rate||0).toFixed(4)+(f.fee?' · fee CAD '+f2(f.fee):'') }); });
+    Object.values(autoByDay).forEach(a=>{ if(Math.abs(a.usd)<0.005) return;
+      rows.push({ ibkr_key:'fxauto|'+a.day, fund_date:a.day, amount_usd:Math.round(a.usd*100)/100,
+        note:'Auto-FX ('+a.n+') · CAD '+f2(a.cad)+(a.fee?' · fee CAD '+f2(a.fee):'') }); });
+    return rows.sort((x,y)=>x.fund_date<y.fund_date?-1:1);
+  }
+
+  const api={parseCSV,num,parseStatement,build,fxToFunds,codeHas,normDT,parseLongDate};
+  if(typeof module!=='undefined'&&module.exports) module.exports=api;
+  if(typeof window!=='undefined') window.IB_CORE=api;
+})();
+
+</script>
+<script>
+/* ═══════════ IBKR DATA TAB — Supabase I/O + rendering ═══════════ */
+(function(){
+  const K=window.IB_CORE;
+  const T_EX='ibkr_executions', T_CASH='ibkr_cash', T_POS='ibkr_positions', T_UP='ibkr_uploads', T_META='ibkr_trade_meta';
+  let EX=[], CASH=[], POS=[], UPS=[], META={}, LT=new Set(), M=null, AS_OF=null, inited=false, ready=false;
+  let fSym='', fStat='all', chart=null, editKey=null;
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const r2=x=>Math.round((x+1e-9)*100)/100;
+  const money=(v,sign)=>{ if(v===null||v===undefined||isNaN(v)) return '—'; const s=v<0?'-':(sign&&v>0?'+':''); return s+'$'+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dfmt=d=>{ if(!d) return '—'; const p=String(d).slice(0,10).split('-'); return MN[+p[1]-1]+' '+(+p[2])+', '+p[0]; };
+  const mfmt=k=>{ const p=k.split('-'); return MN[+p[1]-1].toUpperCase()+' '+p[0]; };
+  const qf=q=>(Math.round(q*10000)/10000).toString();
+  const pxf=p=>p===null||p===undefined?'—':(+p).toFixed(2);
+  const HDR={apikey:SB_KEY,Authorization:'Bearer '+SB_KEY};
+  const HDRJ={...HDR,'Content-Type':'application/json'};
+
+  /* ---------- supabase helpers ---------- */
+  async function fetchAll(table,order){
+    let all=[],from=0; const page=1000;
+    while(true){
+      const res=await fetch(SB_URL+'/rest/v1/'+table+'?select=*'+(order?'&order='+order:''),{headers:{...HDR,'Range-Unit':'items',Range:from+'-'+(from+page-1)}});
+      if(!res.ok) throw new Error(table+' '+res.status+': '+(await res.text()));
+      const d=await res.json(); all=all.concat(d); if(d.length<page) break; from+=page;
+    }
+    return all;
+  }
+  async function upsert(table,rows,conflict){
+    for(let i=0;i<rows.length;i+=400){
+      const res=await fetch(SB_URL+'/rest/v1/'+table+(conflict?'?on_conflict='+conflict:''),{method:'POST',headers:{...HDRJ,Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(rows.slice(i,i+400))});
+      if(!res.ok) throw new Error(table+' '+res.status+': '+(await res.text()));
+    }
+  }
+  async function del(table,filter){
+    const res=await fetch(SB_URL+'/rest/v1/'+table+'?'+filter,{method:'DELETE',headers:{...HDR,Prefer:'return=minimal'}});
+    if(!res.ok) throw new Error(table+' '+res.status+': '+(await res.text()));
+  }
+  function setStatus(m,c){ const e=$('ibStatus'); if(e){ e.innerHTML=m; e.className='ib-status '+(c||''); } }
+
+  /* ---------- load + compute ---------- */
+  async function load(){
+    try{
+      const [ex,cash,pos,ups,meta]=await Promise.all([fetchAll(T_EX,'dt.asc,raw_idx.asc'),fetchAll(T_CASH,'dt.asc'),fetchAll(T_POS,'symbol.asc'),fetchAll(T_UP,'period_start.asc'),fetchAll(T_META)]);
+      EX=ex; CASH=cash; POS=pos; UPS=ups; META={}; meta.forEach(m=>META[m.trade_key]=m);
+      const cfg=settings&&settings.ibkr_cfg?(typeof settings.ibkr_cfg==='string'?JSON.parse(settings.ibkr_cfg):settings.ibkr_cfg):null;
+      LT=new Set((cfg&&cfg.longterm)||[]);
+      ready=true; const e=$('ibErr'); if(e) e.textContent='';
+    }catch(err){ ready=false; const e=$('ibErr'); if(e) e.textContent='Could not load IBKR data: '+err.message+' — have the IBKR tables been created in Supabase?'; }
+    compute(); publish(); render();
+    const st=$('ibStatus');
+    if(st && !/\b(ok|warn|err)\b/.test(st.className)){
+      if(!ready) setStatus('IBKR tables not found — run <b>ibkr_setup.sql</b> in Supabase first (see steps).','err');
+      else if(!UPS.length) setStatus('No statements imported yet — drop your first IBKR Activity Statement (CSV) above.');
+      else setStatus('Loaded '+EX.length+' executions from '+UPS.length+' statement'+(UPS.length!==1?'s':'')+' · '+M.closed.length+' closed · '+M.active.length+' open lots');
+    }
+  }
+  function compute(){
+    AS_OF = UPS.length ? UPS.map(u=>u.period_end).sort().slice(-1)[0] : new Date().toISOString().slice(0,10);
+    M = K.build(EX,POS,META,LT,AS_OF);
+  }
+  function publish(){ // feed Analysis / Funds / topbar (closed trades, ex long-term)
+    allTrades = M.closed.filter(r=>!r.lt).sort((a,b)=>a.closeDt<b.closeDt?-1:1).map(r=>({
+      id:r.key, symbol:r.sym, trade_date:r.closeDt.slice(0,10), open_date:r.openDt?r.openDt.slice(0,10):null,
+      rr_secured:r.rr, risk_usd:r.risk, pnl_usd:r.net, include_analysis:r.include, notes:r.notes, compliance:r.compliance }));
+  }
+  function equity(){ const u=latestUpload(); if(!u||u.usd_cash===null||u.usd_cash===undefined) return null; return (+u.usd_cash)+POS.reduce((a,p)=>a+(+p.value||0),0); }
+  function latestUpload(){ return UPS.length? UPS.slice().sort((a,b)=>a.period_end<b.period_end?1:-1)[0] : null; }
+
+  /* ---------- import ---------- */
+  async function importFile(file){
+    if(!ready){ toast('IBKR tables not ready — run the SQL first','error'); return; }
+    try{
+      setStatus('Reading '+esc(file.name)+'…');
+      const text=await file.text(); const S=K.parseStatement(text);
+      if(S.warnings.length){ setStatus(S.warnings.join(' '),'err'); toast(S.warnings[0],'error'); return; }
+      // gap warning
+      const cov=coverage(); let gapNote='';
+      if(cov.end && S.period.start){ const next=addDays(cov.end,1); if(S.period.start>next) gapNote=' ⚠ Gap: previous statements end '+dfmt(cov.end)+' but this one starts '+dfmt(S.period.start)+'. Trades in between are missing — download that range too.'; }
+      setStatus('Saving '+S.execs.length+' executions, '+S.fx.length+' FX, '+S.cash.length+' cash events…');
+      await upsert(T_EX,S.execs.map(e=>({exec_key:e.exec_key,asset:e.asset,currency:e.currency,symbol:e.symbol,dt:e.dt,qty:e.qty,price:e.price,proceeds:e.proceeds,comm:e.comm,basis:e.basis,realized:e.realized,mtm:e.mtm,code:e.code,raw_idx:e.raw_idx})),'exec_key');
+      const cashRows=S.cash.map(c=>({cash_key:c.cash_key,kind:c.kind,currency:c.currency,dt:c.dt,description:c.description,amount:c.amount,cad:null,rate:null,fee:0,code:''}))
+        .concat(S.fx.map(f=>({cash_key:f.cash_key,kind:'fx',currency:'USD',dt:f.dt,description:f.symbol,amount:f.usd,cad:f.cad,rate:f.rate,fee:f.fee,code:f.code})));
+      if(cashRows.length) await upsert(T_CASH,cashRows,'cash_key');
+      // positions: replace only if this statement is the newest
+      const curAsOf = POS.length && UPS.length ? UPS.map(u=>u.period_end).sort().slice(-1)[0] : null;
+      if(!curAsOf || S.period.end>=curAsOf){
+        await del(T_POS,'symbol=neq.__none__');
+        if(S.positions.length) await upsert(T_POS,S.positions.map(p=>({...p,as_of:S.period.end})),'symbol');
+      }
+      await upsert(T_UP,[{filename:file.name,period_start:S.period.start,period_end:S.period.end,uploaded_at:new Date().toISOString(),n_trades:S.execs.length,n_fx:S.fx.length,n_cash:S.cash.length,nav_cad:S.nav_cad,usd_cash:S.usd_cash,cad_cash:S.cad_cash,account:S.account}],'period_start,period_end');
+      // funds (USD inflows) derived from ALL stored fx
+      const allFx=(await fetchAll(T_CASH,'dt.asc')).filter(c=>c.kind==='fx').map(c=>({dt:c.dt,usd:+c.amount,cad:+c.cad,rate:+c.rate,fee:+c.fee,code:c.code}));
+      const fundRows=K.fxToFunds(allFx);
+      if(fundRows.length) await upsert('funds',fundRows,'ibkr_key');
+      setStatus('Imported <b>'+esc(file.name)+'</b> · '+dfmt(S.period.start)+' → '+dfmt(S.period.end)+' · '+S.execs.length+' executions'+gapNote, gapNote?'warn':'ok');
+      toast('Statement imported ✓','success');
+      await loadData();          // reloads funds + settings, then IB.load()
+      if(typeof renderFunds==='function' && document.getElementById('page-funds').classList.contains('active')) renderFunds();
+    }catch(err){ setStatus('Import failed: '+esc(err.message),'err'); toast('Import failed: '+err.message,'error'); }
+  }
+  function coverage(){ if(!UPS.length) return {start:null,end:null,gaps:[]};
+    const s=UPS.slice().sort((a,b)=>a.period_start<b.period_start?-1:1); const gaps=[]; let end=s[0].period_end;
+    for(let i=1;i<s.length;i++){ if(s[i].period_start>addDays(end,1)) gaps.push([addDays(end,1),addDays(s[i].period_start,-1)]); if(s[i].period_end>end) end=s[i].period_end; }
+    return {start:s[0].period_start,end,gaps}; }
+  function addDays(d,n){ const x=new Date(d+'T00:00:00'); x.setDate(x.getDate()+n); return x.toISOString().slice(0,10); }
+  async function clearAll(){
+    if(!confirm('Delete ALL imported IBKR data (executions, cash events, positions, upload history, imported FX fund entries and per-trade notes/risk)?\n\nThis cannot be undone. You can re-import your statements afterwards.')) return;
+    try{
+      await del(T_EX,'exec_key=neq.__none__'); await del(T_CASH,'cash_key=neq.__none__'); await del(T_POS,'symbol=neq.__none__');
+      await del(T_UP,'id=gt.0'); await del(T_META,'trade_key=neq.__none__'); await del('funds','ibkr_key=not.is.null');
+      setStatus('IBKR data cleared.'); toast('IBKR data cleared','success'); await loadData();
+    }catch(err){ toast('Clear failed: '+err.message,'error'); }
+  }
+
+  /* ---------- meta edits ---------- */
+  async function saveMeta(key,patch){
+    const cur=META[key]||{trade_key:key}; const row={...cur,...patch,trade_key:key,updated_at:new Date().toISOString()};
+    delete row.id; META[key]=row;
+    try{ await upsert(T_META,[row],'trade_key'); }catch(err){ toast('Save failed: '+err.message,'error'); }
+    compute(); publish(); render(); if(typeof updateTopbarBalance==='function') updateTopbarBalance();
+  }
+  function setRisk(key,val){ const v=val===''?null:parseFloat(val); if(v!==null&&(isNaN(v)||v<0)) return; saveMeta(key,{risk_usd:v}); }
+  function toggleInclude(key){ const cur=META[key]; saveMeta(key,{include_analysis: cur? cur.include_analysis===false : false}); }
+  async function toggleLT(sym){
+    if(LT.has(sym)){ if(!confirm('Move '+sym+' back into trades?')) return; LT.delete(sym); }
+    else { if(!confirm('Mark '+sym+' as a LONG-TERM holding?\n\nAll '+sym+' activity (past and future buys, sells, recurring purchases) will sit in the Long-term section and be excluded from trade statistics.')) return; LT.add(sym); }
+    const cfg=Object.assign({},(settings&&settings.ibkr_cfg&&typeof settings.ibkr_cfg==='object')?settings.ibkr_cfg:{},{longterm:[...LT]});
+    try{ const ex=await sb('settings?select=id&limit=1'); if(ex&&ex.length) await sb('settings?id=eq.'+ex[0].id,'PATCH',{ibkr_cfg:cfg}); else await sb('settings','POST',{startBalance:0,password:settings.password||'trader123',ibkr_cfg:cfg}); settings.ibkr_cfg=cfg; }
+    catch(err){ toast('Could not save: '+err.message,'error'); }
+    compute(); publish(); render(); if(typeof updateTopbarBalance==='function') updateTopbarBalance();
+  }
+  function findRow(key){ return M.closed.find(r=>r.key===key)||M.active.find(r=>r.key===key)||null; }
+  function editTrade(key){
+    const r=findRow(key); if(!r) return; editKey=key; const m=META[key]||{};
+    $('tradeModalTitle').textContent='EDIT TRADE'; $('tradeModalSub').textContent=r.sym+' · '+dfmt(r.openDt)+(r.closeDt?' → '+dfmt(r.closeDt):' · ACTIVE');
+    $('tradeEditId').value=key; $('fSymbol').value=r.sym;
+    $('ibEditInfo').innerHTML='Qty <b>'+qf(r.qty)+'</b> · Entry <b>'+pxf(r.entry)+'</b> · '+(r.closeDt?'Exit <b>'+pxf(r.exit)+'</b> · Net <b class="'+(r.net>=0?'ib-up':'ib-dn')+'">'+money(r.net,true)+'</b>':'Last <b>'+pxf(r.exit)+'</b> · Unrealized <b class="'+((r.net||0)>=0?'ib-up':'ib-dn')+'">'+money(r.net,true)+'</b>')+' · Fees <b>'+money(r.fees)+'</b>'+(r.riskInherited?'<br><span class="ib-dim">Risk below is inherited from the opening lot — type a value to override for this exit.</span>':'');
+    $('fRiskUSD').value=(m.risk_usd!==undefined&&m.risk_usd!==null)?m.risk_usd:(r.risk!==null&&!r.riskInherited?r.risk:'');
+    $('fRiskUSD').placeholder=r.riskInherited&&r.risk?('inherited '+r2(r.risk)):'e.g. 50';
+    $('fNotes').value=m.notes||''; $('fInclude').checked=m.include_analysis!==false;
+    clTicks=(m.compliance&&m.compliance.t)?JSON.parse(JSON.stringify(m.compliance.t)):{}; if(typeof clRenderModal==='function') clRenderModal();
+    $('tradeModal').classList.add('show');
+  }
+  async function saveTrade(){
+    if(!editKey) return; const btn=$('tradeSubmitBtn'); btn.disabled=true; btn.textContent='Saving…';
+    const risk=$('fRiskUSD').value.trim();
+    const touched=Object.keys(clTicks||{}).some(k=>clTicks[k]&&clTicks[k]!=='n');   // untouched checklist => no score stored
+    const cs=(touched&&typeof clScores==='function')?clScores(clTicks):null;
+    await saveMeta(editKey,{risk_usd:risk===''?null:parseFloat(risk), notes:$('fNotes').value.trim()||null, include_analysis:$('fInclude').checked,
+      compliance: cs?{t:clTicks,e:cs.entry,m:cs.mgmt,tot:cs.total}:null});
+    btn.disabled=false; btn.textContent='Save'; $('tradeModal').classList.remove('show'); toast('Trade updated ✓','success');
+  }
+
+  /* ---------- render ---------- */
+  function render(){ if(!$('ibTrades')) return; renderImport(); renderAccount(); renderTrades(); renderLT(); if(isOpen('ibSecChart')) renderChart(); }
+  function isOpen(id){ const d=$(id); return d&&d.open; }
+  function renderImport(){
+    const cov=coverage(); const c=$('ibCover');
+    if(!UPS.length){ c.innerHTML='<span class="ib-dim">No statements imported yet. Download an <b>Activity Statement</b> from IBKR (Reports → Statements → Activity → Format: <b>CSV</b>) and drop it above.</span>'; }
+    else { let h='Statements cover <b>'+dfmt(cov.start)+' → '+dfmt(cov.end)+'</b> &nbsp;·&nbsp; next time download <b>from '+dfmt(addDays(cov.end,1))+'</b>';
+      cov.gaps.forEach(g=>h+='<div class="ib-warn">⚠ Missing range: '+dfmt(g[0])+' → '+dfmt(g[1])+' — download and import that period.</div>'); c.innerHTML=h; }
+    const u=$('ibUploads'); const list=UPS.slice().sort((a,b)=>a.period_start<b.period_start?1:-1);
+    u.innerHTML=list.length?'<table class="ib-t"><thead><tr><th>Period</th><th>Imported</th><th>Execs</th><th>FX</th><th>NAV CAD</th><th>USD cash</th></tr></thead><tbody>'+list.map(x=>'<tr><td>'+dfmt(x.period_start)+' → '+dfmt(x.period_end)+'</td><td class="ib-dim">'+(x.uploaded_at?new Date(x.uploaded_at).toLocaleString():'')+'</td><td>'+(x.n_trades||0)+'</td><td>'+(x.n_fx||0)+'</td><td>'+money(x.nav_cad)+'</td><td>'+money(x.usd_cash)+'</td></tr>').join('')+'</tbody></table>':'';
+    const rc=$('ibRecon'); if(M.recon.length||M.unmatched.length){
+      rc.innerHTML='<div class="ib-warn">⚠ Position check: '+M.recon.map(x=>'<b>'+esc(x.sym)+'</b> computed '+qf(x.computed)+' vs statement '+qf(x.statement)).join(' · ')+(M.unmatched.length?' · sells without a matching buy: '+M.unmatched.map(x=>esc(x.sym)+' '+qf(x.qty)).join(', '):'')+'. Usually means executions before your first statement are missing — import an earlier period.</div>'; }
+    else rc.innerHTML=UPS.length?'<div class="ib-ok">✓ Open positions reconcile with the statement.</div>':'';
+  }
+  function renderAccount(){
+    const k=$('ibKpis'); if(!UPS.length){ k.innerHTML=''; return; }
+    const u=latestUpload(); const eq=equity(); const posVal=POS.reduce((a,p)=>a+(+p.value||0),0);
+    const tr=M.closed.filter(r=>!r.lt), ac=M.active.filter(r=>!r.lt);
+    const realized=tr.reduce((a,r)=>a+r.net,0), unreal=ac.reduce((a,r)=>a+(r.net||0),0);
+    const ltR=M.lt.reduce((a,l)=>a+l.realized,0), ltU=M.lt.reduce((a,l)=>a+l.unreal,0);
+    const usdIn=(allFunds||[]).filter(f=>f.ibkr_key).reduce((a,f)=>a+(+f.amount_usd||0),0);
+    const cadDep=CASH.filter(c=>c.kind==='deposit'||c.kind==='withdrawal').reduce((a,c)=>a+(+c.amount||0),0);
+    const fxFee=CASH.filter(c=>c.kind==='fx').reduce((a,c)=>a+Math.abs(+c.fee||0),0);
+    const cadConv=CASH.filter(c=>c.kind==='fx').reduce((a,c)=>a+Math.abs(+c.cad||0),0);
+    const fees=M.closed.reduce((a,r)=>a+r.fees,0)+M.active.reduce((a,r)=>a+r.fees,0);
+    const tile=(l,v,cls,sub)=>'<div class="ib-kpi"><div class="ib-kl">'+l+'</div><div class="ib-kv '+(cls||'')+'">'+v+'</div>'+(sub?'<div class="ib-ks">'+sub+'</div>':'')+'</div>';
+    k.innerHTML=tile('Equity (USD)',money(eq),'','as of '+dfmt(u.period_end))+tile('USD cash',money(+u.usd_cash))+tile('Positions value',money(posVal))
+      +tile('Deposited (USD via FX)',money(usdIn),'ib-blue')+tile('Realized · trades',money(realized,true),realized>=0?'ib-up':'ib-dn',tr.length+' closed')
+      +tile('Unrealized · trades',money(unreal,true),unreal>=0?'ib-up':'ib-dn',ac.length+' open')
+      +tile('Long-term',money(ltR+ltU,true),(ltR+ltU)>=0?'ib-up':'ib-dn','realized '+money(ltR,true)+' · unrl '+money(ltU,true))
+      +tile('Trading fees (USD)',money(fees),'ib-dn')+tile('CAD deposited (net)','C$'+(cadDep).toLocaleString('en-US',{minimumFractionDigits:2}),'','converted C$'+cadConv.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}))
+      +tile('Conversion fees','C$'+r2(fxFee).toFixed(2),'ib-dn')+tile('CAD cash','C$'+(+u.cad_cash||0).toFixed(2))+tile('NAV (CAD, statement)','C$'+(+u.nav_cad||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}));
+  }
+  function rowHtml(r){
+    const act=!r.closeDt; const cls=act?'ib-active':(r.net>=0?'ib-up':'ib-dn');
+    const badge=act?'<span class="ib-badge ib-b-act">ACTIVE</span>':'<span class="ib-badge '+(r.status==='WIN'?'ib-b-win':r.status==='LOSS'?'ib-b-loss':'ib-b-be')+'">'+r.status+'</span>';
+    const cl=r.compliance&&r.compliance.tot!=null?'<span class="ib-cl '+(r.compliance.tot>=90?'ib-up':r.compliance.tot>=70?'ib-mid':'ib-dn')+'" title="Entry '+Math.round(r.compliance.e||0)+'% · Mgmt '+Math.round(r.compliance.m||0)+'% · Total '+Math.round(r.compliance.tot)+'%" onclick="IB.cl(\''+esc(r.key)+'\')">'+Math.round(r.compliance.tot)+'%</span>':'';
+    const riskVal=(META[r.key]&&META[r.key].risk_usd!=null)?META[r.key].risk_usd:(r.riskInherited?'':(r.risk||''));
+    return '<tr class="ib-row '+(r.include?'':'ib-excl')+'" data-key="'+esc(r.key)+'">'
+      +'<td><span class="ib-inc" title="Include in analysis" onclick="IB.inc(\''+esc(r.key)+'\')">'+(r.include?'✓':'○')+'</span></td>'
+      +'<td class="ib-sym">'+esc(r.sym)+'</td><td>'+badge+'</td>'
+      +'<td class="ib-dt">'+dfmt(r.openDt)+'</td><td class="ib-dt">'+(act?'<span class="ib-dim">—</span>':dfmt(r.closeDt))+'</td>'
+      +'<td class="ib-num ib-dim">'+(r.days===null?'—':r.days+'d')+'</td><td class="ib-num">'+qf(r.qty)+'</td>'
+      +'<td class="ib-num">'+pxf(r.entry)+'</td><td class="ib-num'+(act?' ib-dim':'')+'">'+pxf(r.exit)+'</td>'
+      +'<td class="ib-num ib-dim">'+money(r.fees)+'</td>'
+      +'<td class="ib-num ib-pnl '+cls+'">'+(act?'<i>'+money(r.net,true)+'</i>':money(r.net,true))+'</td>'
+      +'<td><input class="ib-risk" type="number" min="0" step="1" value="'+esc(riskVal)+'" placeholder="'+(r.riskInherited&&r.risk?('↳'+r2(r.risk)):'—')+'" title="Risk $ for this trade" onchange="IB.risk(\''+esc(r.key)+'\',this.value)"></td>'
+      +'<td class="ib-num '+(r.rr===null?'ib-dim':cls)+'">'+(r.rr===null?'—':(act?'<i>':'')+(r.rr>=0?'+':'')+r.rr.toFixed(2)+'r'+(act?'</i>':''))+'</td>'
+      +'<td class="ib-note" title="'+esc(r.notes)+'">'+esc(r.notes)+cl+'</td>'
+      +'<td class="ib-act"><button class="ib-mini" onclick="IB.edit(\''+esc(r.key)+'\')">Edit</button><button class="ib-mini" title="Mark as long-term holding" onclick="IB.lt(\''+esc(r.sym)+'\')">LT</button></td></tr>'
+      +'<tr class="ib-cldet" id="ibcl-'+esc(r.key)+'" style="display:none"><td colspan="15">'+(typeof clDetailHtml==='function'?clDetailHtml({compliance:r.compliance}):'')+'</td></tr>';
+  }
+  function renderTrades(){
+    const box=$('ibTrades'); const q=fSym.toUpperCase();
+    let rows=M.closed.concat(M.active).filter(r=>!r.lt).filter(r=>!q||r.sym.includes(q));
+    if(fStat==='active') rows=rows.filter(r=>!r.closeDt); else if(fStat==='closed') rows=rows.filter(r=>!!r.closeDt);
+    else if(fStat==='win') rows=rows.filter(r=>r.status==='WIN'); else if(fStat==='loss') rows=rows.filter(r=>r.status==='LOSS');
+    if(!rows.length){ box.innerHTML='<div class="ib-empty">'+(UPS.length?'No trades match.':'Import an IBKR statement to populate your trades.')+'</div>'; return; }
+    const byM={}; rows.forEach(r=>{ const k=(r.openDt||r.closeDt).slice(0,7); (byM[k]=byM[k]||[]).push(r); });
+    const months=Object.keys(byM).sort().reverse();
+    const head='<thead><tr><th>✓</th><th>Symbol</th><th>Status</th><th>Opened</th><th>Closed</th><th>Days</th><th>Qty</th><th>Entry</th><th>Exit</th><th>Fees</th><th>Net P&amp;L</th><th>Risk $</th><th>RR</th><th>Notes</th><th></th></tr></thead>';
+    box.innerHTML=months.map(mk=>{
+      const list=byM[mk].sort((a,b)=>(b.openDt||'')<(a.openDt||'')?-1:(b.openDt||'')>(a.openDt||'')?1:0);
+      const cl=list.filter(r=>r.closeDt), ac=list.filter(r=>!r.closeDt);
+      const p=cl.filter(r=>r.net>0).reduce((a,r)=>a+r.net,0), l=cl.filter(r=>r.net<0).reduce((a,r)=>a+r.net,0), un=ac.reduce((a,r)=>a+(r.net||0),0);
+      const open=lsGet('ibm_'+mk,true);
+      return '<details class="ib-month" id="ibm_'+mk+'"'+(open?' open':'')+' ontoggle="window.IB&&IB.tog(this)"><summary><span class="ib-mt">'+mfmt(mk)+'</span>'
+        +'<span class="ib-ms"><span>'+list.length+' trade'+(list.length!==1?'s':'')+'</span><span class="ib-b-act ib-badge">'+ac.length+' active</span>'+(ac.length?'<span class="'+(un>=0?'ib-up':'ib-dn')+'"><i>'+money(un,true)+' unrl</i></span>':'')
+        +'<span>'+cl.length+' closed</span><span class="ib-up">'+money(p,true)+'</span><span class="ib-dn">'+money(l)+'</span><span class="ib-net '+((p+l)>=0?'ib-up':'ib-dn')+'">net '+money(p+l,true)+'</span></span></summary>'
+        +'<div class="ib-tw"><table class="ib-t ib-trades">'+head+'<tbody>'+list.map(rowHtml).join('')+'</tbody></table></div></details>';
+    }).join('');
+  }
+  const codeLabel=c=>String(c||'').split(';').map(x=>x.trim()).filter(Boolean).map(x=>({O:'opening',C:'closing',P:'partial',RI:'recurring investment',AFx:'auto FX',R:'reversal',L:'liquidation'})[x]||x).join(' · ');
+  function renderLT(){
+    const box=$('ibLT'); const sec=$('ibSecLT');
+    if(!M.lt.length){ box.innerHTML='<div class="ib-empty">No long-term holdings. Use the <b>LT</b> button on any trade row to mark that symbol as a long-term holding (e.g. a recurring gold or index position).</div>'; return; }
+    box.innerHTML=M.lt.map(l=>{
+      const open=lsGet('iblt_'+l.sym,false);
+      return '<details class="ib-month" id="iblt_'+l.sym+'"'+(open?' open':'')+' ontoggle="window.IB&&IB.tog(this)"><summary><span class="ib-mt">'+esc(l.sym)+'</span><span class="ib-ms">'
+        +'<span>'+qf(l.qty)+' sh</span><span>avg '+pxf(l.avg)+'</span><span>basis '+money(l.basis)+'</span><span>value '+money(l.value)+'</span>'
+        +'<span class="'+(l.unreal>=0?'ib-up':'ib-dn')+'">unrl '+money(l.unreal,true)+'</span><span class="'+(l.realized>=0?'ib-up':'ib-dn')+'">realized '+money(l.realized,true)+'</span><span class="ib-dim">fees '+money(l.fees)+'</span>'
+        +'<button class="ib-mini" onclick="event.preventDefault();IB.lt(\''+esc(l.sym)+'\')">↩ back to trades</button></span></summary>'
+        +'<div class="ib-tw"><table class="ib-t"><thead><tr><th>Date</th><th>Type</th><th>Qty</th><th>Price</th><th>Fees</th><th>P&amp;L</th><th>Note</th></tr></thead><tbody>'
+        +l.buys.map(b=>'<tr><td class="ib-dt">'+dfmt(b.dt)+'</td><td><span class="ib-badge ib-b-act">BUY'+(K.codeHas(b.code,'RI')?' · recurring':'')+'</span></td><td class="ib-num">'+qf(Math.abs(b.qty))+'</td><td class="ib-num">'+pxf(b.price)+'</td><td class="ib-num ib-dim">'+money(Math.abs(b.comm))+'</td><td class="ib-dim">—</td><td class="ib-dim">'+esc(codeLabel(b.code))+'</td></tr>')
+          .concat(l.sells.map(s=>'<tr><td class="ib-dt">'+dfmt(s.closeDt)+'</td><td><span class="ib-badge '+(s.net>=0?'ib-b-win':'ib-b-loss')+'">SELL</span></td><td class="ib-num">'+qf(s.qty)+'</td><td class="ib-num">'+pxf(s.exit)+'</td><td class="ib-num ib-dim">'+money(s.fees)+'</td><td class="ib-num '+(s.net>=0?'ib-up':'ib-dn')+'">'+money(s.net,true)+'</td><td class="ib-dim">entry '+pxf(s.entry)+' · '+(s.days||0)+'d</td></tr>'))
+          .join('')+'</tbody></table></div></details>';
+    }).join('');
+  }
+  function renderChart(){
+    if(!M) return;                       // toggled open before data loaded — render() will draw it later
+    if(typeof Chart==='undefined'){ setTimeout(renderChart,300); return; }
+    const cv=$('ibChart'); if(!cv) return;
+    const tr=M.closed.filter(r=>!r.lt&&r.include).sort((a,b)=>a.closeDt<b.closeDt?-1:1);
+    const byM={}; tr.forEach(r=>{ const k=r.closeDt.slice(0,7); byM[k]=(byM[k]||0)+r.net; });
+    const keys=Object.keys(byM).sort(); let cum=0; const cumArr=keys.map(k=>cum+=byM[k]);
+    if(chart){ try{chart.destroy();}catch(e){} chart=null; }
+    if(!keys.length){ return; }
+    chart=new Chart(cv.getContext('2d'),{data:{labels:keys.map(k=>MN[+k.slice(5,7)-1]+' '+k.slice(0,4)),datasets:[
+      {type:'bar',label:'Monthly realized (trades)',data:keys.map(k=>byM[k]),backgroundColor:keys.map(k=>byM[k]>=0?'rgba(61,214,140,.55)':'rgba(240,82,82,.55)'),borderColor:keys.map(k=>byM[k]>=0?'#3dd68c':'#f05252'),borderWidth:1,order:2},
+      {type:'line',label:'Cumulative realized',data:cumArr,borderColor:'#e8b84b',backgroundColor:'rgba(232,184,75,.12)',fill:true,tension:.3,pointRadius:3,order:1}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9aa3b8'}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+money(c.parsed.y,true)}}},
+        scales:{x:{ticks:{color:'#9aa3b8'},grid:{color:'rgba(45,52,69,.5)'}},y:{ticks:{color:'#9aa3b8',callback:v=>'$'+v},grid:{color:'rgba(45,52,69,.5)'}}}}});
+  }
+  function lsGet(k,d){ try{ const v=localStorage.getItem(k); return v===null?d:v==='1'; }catch(e){ return d; } }
+  function tog(el){ try{ localStorage.setItem(el.id,el.open?'1':'0'); }catch(e){} if(el.id==='ibSecChart'&&el.open) renderChart(); }
+  function setAll(open){ document.querySelectorAll('#ibTrades details.ib-month').forEach(d=>{ d.open=open; try{localStorage.setItem(d.id,open?'1':'0');}catch(e){} }); }
+  function clToggle(key){ const r=$('ibcl-'+key); if(r) r.style.display=r.style.display==='none'?'':'none'; }
+
+  function init(){
+    if(inited) return; inited=true;
+    const drop=$('ibDrop'), file=$('ibFile');
+    drop.addEventListener('click',()=>file.click());
+    file.addEventListener('change',e=>{ if(e.target.files[0]) importFile(e.target.files[0]); e.target.value=''; });
+    ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over');}));
+    drop.addEventListener('dragleave',e=>{e.preventDefault();drop.classList.remove('over');});
+    drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('over');if(e.dataTransfer.files[0])importFile(e.dataTransfer.files[0]);});
+    $('ibSearch').addEventListener('input',e=>{fSym=e.target.value.trim();renderTrades();});
+    $('ibStatusSel').addEventListener('change',e=>{fStat=e.target.value;renderTrades();});
+    $('ibCollapseAll').addEventListener('click',()=>setAll(false)); $('ibExpandAll').addEventListener('click',()=>setAll(true));
+    $('ibClear').addEventListener('click',clearAll);
+    ['ibSecImport','ibSecAccount','ibSecChart','ibSecTrades','ibSecLT'].forEach(id=>{ const d=$(id); if(d){ d.open=lsGet(id,id!=='ibSecChart'); } });
+  }
+  window.IB={init,load,render,equity,asOf:()=>AS_OF,edit:editTrade,saveTrade,risk:setRisk,inc:toggleInclude,lt:toggleLT,tog,cl:clToggle,clearAll};
+})();
+
+</script>
 </body></html>
