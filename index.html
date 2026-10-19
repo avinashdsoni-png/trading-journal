@@ -1146,7 +1146,7 @@ tr.flt-row .flt2{display:flex;gap:3px}
       <button class="nav-btn" onclick="showPage(&#39;plan&#39;,this)">📐 Trading Plan</button>
       <button class="nav-btn" onclick="showPage(&#39;rs&#39;,this); if(window.RS) RS.ensureInit(); if(window.RS2) RS2.ensureInit();">📈 RS Score</button>
       <button class="nav-btn" onclick="showPage(&#39;etf&#39;,this); if(window.EF) EF.ensureInit();">🧭 ETF Flow</button>
-      <button class="nav-btn" onclick="showPage(&#39;mom&#39;,this); if(window.MO) MO.ensureInit(); if(window.MX) MX.init();">🚀 Momentum</button>
+      <button class="nav-btn" onclick="showPage(&#39;mom&#39;,this); if(window.MO) MO.ensureInit(); if(window.MX) MX.init(); if(window.RX) RX.init();">🚀 Momentum</button>
     </div>
     <div class="topbar-right">
       <div class="balance-chip">Balance: <strong id="topbarBalance">$10,764.09</strong></div>
@@ -1882,6 +1882,40 @@ tr.flt-row .flt2{display:flex;gap:3px}
         lists place a name &mdash; a high value with <b>SPLIT</b> means price and manager behaviour are telling
         different stories, which is worth a look either way. Under <b>All names</b>, a stock missing from one
         list counts as neutral there, never as worst &mdash; no ETF coverage is not evidence against a stock.
+      </div>
+    </div>
+
+    <div class="section" style="margin-top:14px" id="rxSec">
+      <div class="section-header">
+        <div class="section-title">INTERSECT <span>RS SCORE x MOMENTUM</span></div>
+        <div class="mo-dim" style="font-size:10.5px">automatic &middot; RS Step 3 names at/above the cutoff &times; the same number of top momentum names</div>
+      </div>
+
+      <div class="rx-bar">
+        <label>Momentum run <select id="rxRun" class="mo-sel" style="max-width:360px"></select></label>
+        <label>RS table <select id="rxTab" class="mo-sel"><option value="z">Z-Score (combined)</option><option value="p">Percentile (combined)</option></select></label>
+        <label title="Only RS Step 3 names whose Total is at or above this number are used. 50 = level with the index.">RS cutoff &ge; <input type="number" id="rxCut" min="0" max="100" step="1" value="50"></label>
+        <button class="btn btn-ghost btn-sm" id="rxRefresh" title="Re-read the RS Score tab and the momentum snapshots">&#8635; Refresh</button>
+      </div>
+
+      <div class="rx-sync" id="rxSync">Open this tab to run the intersect&hellip;</div>
+
+      <div class="rx-bar" id="rxBar2" style="display:none">
+        <label title="Slide toward RS to trust relative strength more, toward momentum to trust the momentum rank more.">Weight RS / momentum
+          <input type="range" id="rxW" min="0" max="100" step="5" value="50">
+          <span id="rxWL" style="min-width:48px">50 / 50</span></label>
+        <label>Export top <input type="number" id="rxTopN" min="1" max="500" value="30"></label>
+        <span class="mo-dim" id="rxStat" style="font-size:11px"></span>
+        <button class="btn btn-gold btn-sm" id="rxExport" style="margin-left:auto">Export &rarr;TV</button>
+      </div>
+
+      <div style="overflow:auto;max-height:52vh;border:1px solid var(--border);border-radius:8px" id="rxOut"><div class="mo-empty">Nothing to intersect yet.</div></div>
+
+      <div class="mo-note">
+        <b>How it works.</b> 1&nbsp;&middot; From the RS Score tab's last table (Step 3, combined) every name with <b>Total at or above the cutoff</b> is taken, in RS order &mdash; say K names.
+        2&nbsp;&middot; From the selected momentum run the <b>top K names by momentum rank</b> are taken (the Momentum tab's Min&nbsp;F / turnover filters apply, exactly as in its own export).
+        3&nbsp;&middot; Only names on <b>both</b> lists survive. 4&nbsp;&middot; Each survivor's position in each list becomes a percentile and the slider blends them &mdash; <b>Combined</b> runs 0&ndash;100, higher is better; <b>Disagree</b> is how far apart the two lists place it.
+        The intersect is <b>blocked</b> when the RS Step 1 upload and the momentum upload are more than <b>10 minutes</b> apart, so both always describe the same screener moment. RS totals are whatever the RS Score tab currently computes (its weights, blend mode and index).
       </div>
     </div>
   </div>
@@ -3478,7 +3512,8 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   }
 
   /* ---------- compute ---------- */
-  function compute(){
+  function compute(){ computeCore(); if(window.RX&&RX.onRS) RX.onRS(); }
+  function computeCore(){
     const st=window.RS&&window.RS.getState?window.RS.getState():null;
     if(!st||!st.MODEL||!st.MODEL.length){
       $("rs2Tbody").innerHTML='<tr><td class="rs-empty" colspan="10">Load your stock list in Step 1 first.</td></tr>';
@@ -3703,11 +3738,19 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     $("rs3ResetW").addEventListener("click",()=>{W3={...baseW()};renderWGrid(3);compute();});
     $("rs3Mode").addEventListener("change",()=>{explain();compute();});
     $("rs3Blend").addEventListener("input",()=>{explain();compute();});
-    if(window.RS)window.RS.onChange=()=>{compute();};
+    if(window.RS)window.RS.onChange=()=>{stockStamp().then(()=>compute());};   // re-read the Step 1 upload time whenever Step 1 changes
     explain();
     cloudLoad();
   }
-  window.RS2={ensureInit:init};
+  function getStep3(){            // read by the RS x Momentum intersect on the Momentum tab
+    let reason="";
+    const st=window.RS&&window.RS.getState?window.RS.getState():null;
+    if(!st||!st.MODEL||!st.MODEL.length) reason="Step 1 stock list not loaded";
+    else if(!IDXROW) reason="Step 2 index file not loaded";
+    else if(stockAt&&indexAt&&Math.abs(stockAt-indexAt)>MS24&&!overrideStale) reason="Step 1 and Step 2 files are more than 24 hours apart";
+    return { rows:M3.map(m=>({ticker:m.ticker,exportSym:m.exportSym,totZ:m.totZ,totP:m.totP,rankZ:m.rankZ,rankP:m.rankP})), tab:tab3, stockAt, indexAt, reason };
+  }
+  window.RS2={ensureInit:init,getStep3};
 })();
 
 </script>
@@ -4751,7 +4794,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 (function(){
   const T_UNI="mom_universes", T_SNAP="mom_snapshots";
 
-  let UNIS=[], SNAPS=[], curUni=null, inited=false;
+  let UNIS=[], SNAPS=[], curUni=null, inited=false, stampMissing=false;
   let use3M=false, volSmooth=true, sortBy={c:"rank",d:"asc"}, topN=30, minTurn=0, minF=0;
   const passF=r=>minF===0||(r.fscore||0)>=minF;
   let MODEL={rows:[],churn:null,secTop:[],prev:null};
@@ -4916,6 +4959,39 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     rows.filter(r=>r.score!==null).sort((x,y)=>y.score-x.score).forEach((r,i)=>r.rank=i+1);
     return rows;
   }
+  function enrich(r){   // turnover flag, bank test and the seven lights — used by build() and by rankFor()
+    r.turn = (r.px!=null&&r.avol!=null)?r.px*r.avol:null;
+    r.thin = (minTurn>0&&r.turn!=null)?r.turn<minTurn*1e6:false;
+    r.ndeb = (r.nd!=null&&r.ebit!=null&&r.ebit>0)?r.nd/r.ebit:null;
+    const bank=/financ|bank/i.test(r.sec||"");
+    r.bank=bank;
+    // Six of IVA Pro's seven lights, rebuilt from one screener snapshot.
+    // Light 7 (P/E below its OWN 3-year average) needs the stock's price
+    // history and cannot come from a single CSV - that one stays in IVA Pro.
+    // A light whose column is missing is null: not scored, never failed.
+    const f=[];
+    r.l1src = r.roic!=null ? "ROIC" : (r.roe!=null ? "ROE" : null);
+    f.push(r.roic!=null ? r.roic>15 : (r.roe!=null ? r.roe>15 : null));      // 1 return on capital
+    f.push(r.rg!=null ? r.rg>10 : null);                                     // 2 growth
+    f.push(bank ? null : (r.ndeb!=null ? r.ndeb<2 : null));                  // 3 survival
+    // 4 FCF conversion. Net income is not exported, but it is implied:
+    //   net income = market cap / P/E,  so  conversion = FCF x P/E / mcap
+    const curOK = !r.fcfcur || !r.mcapcur || r.fcfcur===r.mcapcur;
+    const ni = (r.pe!=null && r.pe>0 && r.mcap!=null && r.mcap>0) ? r.mcap/r.pe : null;
+    r.conv = (curOK && ni && r.fcf!=null) ? r.fcf/ni : null;
+    f.push(bank ? null : (r.conv!=null ? r.conv>0.8 : null));
+    f.push((r.gm!=null && r.gmfy!=null) ? (r.gm-r.gmfy)>=-1 : null);          // 5 margin holding
+    f.push(r.bby!=null ? r.bby>=0 : (r.shg!=null ? r.shg<=0.5 : null));      // 6 share count
+    // 7 the two engines. Price return = earnings growth x multiple change, so
+    //   multiple change = (1 + price return) / (1 + earnings growth)
+    // Exact algebra, no interpolation. Below 1 means earnings drove the move
+    // and the stock got CHEAPER against its own profits; above 1 means the
+    // crowd simply agreed to pay more.
+    r.mult = (r.p1y!=null && r.epsg!=null && r.epsg>-90 && r.epsg<300)
+               ? (1+r.p1y/100)/(1+r.epsg/100) : null;
+    f.push(r.mult!=null ? r.mult<=1 : null);
+    r.flags=f; r.fscore=f.filter(x=>x===true).length; r.fmax=f.filter(x=>x!==null).length;
+  }
   function build(){
     const uid=curUni; MODEL={rows:[],churn:null,secTop:[],prev:null};
     if(!uid){render();return;}
@@ -4933,37 +5009,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       r.d3 = (r.rank&&R3[r.t])?R3[r.t]-r.rank:null;
       r.d6 = (r.rank&&R6[r.t])?R6[r.t]-r.rank:null;
       r.isNew = p1 ? !(r.t in R1) : false;
-      r.turn = (r.px!=null&&r.avol!=null)?r.px*r.avol:null;
-      r.thin = (minTurn>0&&r.turn!=null)?r.turn<minTurn*1e6:false;
-      r.ndeb = (r.nd!=null&&r.ebit!=null&&r.ebit>0)?r.nd/r.ebit:null;
-      const bank=/financ|bank/i.test(r.sec||"");
-      r.bank=bank;
-      // Six of IVA Pro's seven lights, rebuilt from one screener snapshot.
-      // Light 7 (P/E below its OWN 3-year average) needs the stock's price
-      // history and cannot come from a single CSV - that one stays in IVA Pro.
-      // A light whose column is missing is null: not scored, never failed.
-      const f=[];
-      r.l1src = r.roic!=null ? "ROIC" : (r.roe!=null ? "ROE" : null);
-      f.push(r.roic!=null ? r.roic>15 : (r.roe!=null ? r.roe>15 : null));      // 1 return on capital
-      f.push(r.rg!=null ? r.rg>10 : null);                                     // 2 growth
-      f.push(bank ? null : (r.ndeb!=null ? r.ndeb<2 : null));                  // 3 survival
-      // 4 FCF conversion. Net income is not exported, but it is implied:
-      //   net income = market cap / P/E,  so  conversion = FCF x P/E / mcap
-      const curOK = !r.fcfcur || !r.mcapcur || r.fcfcur===r.mcapcur;
-      const ni = (r.pe!=null && r.pe>0 && r.mcap!=null && r.mcap>0) ? r.mcap/r.pe : null;
-      r.conv = (curOK && ni && r.fcf!=null) ? r.fcf/ni : null;
-      f.push(bank ? null : (r.conv!=null ? r.conv>0.8 : null));
-      f.push((r.gm!=null && r.gmfy!=null) ? (r.gm-r.gmfy)>=-1 : null);          // 5 margin holding
-      f.push(r.bby!=null ? r.bby>=0 : (r.shg!=null ? r.shg<=0.5 : null));      // 6 share count
-      // 7 the two engines. Price return = earnings growth x multiple change, so
-      //   multiple change = (1 + price return) / (1 + earnings growth)
-      // Exact algebra, no interpolation. Below 1 means earnings drove the move
-      // and the stock got CHEAPER against its own profits; above 1 means the
-      // crowd simply agreed to pay more.
-      r.mult = (r.p1y!=null && r.epsg!=null && r.epsg>-90 && r.epsg<300)
-                 ? (1+r.p1y/100)/(1+r.epsg/100) : null;
-      f.push(r.mult!=null ? r.mult<=1 : null);
-      r.flags=f; r.fscore=f.filter(x=>x===true).length; r.fmax=f.filter(x=>x!==null).length;
+      enrich(r);
     });
     // dropped names (were ranked last time, absent now)
     const nowSet=new Set(cur.map(r=>r.t));
@@ -4986,7 +5032,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   async function load(){
     try{
       UNIS=await sb(T_UNI+"?select=*&order=sort.asc,id.asc")||[];
-      SNAPS=await sb(T_SNAP+"?select=id,universe_id,as_of,filename,n_rows,rows&order=as_of.asc")||[];
+      SNAPS=await sb(T_SNAP+"?select=*&order=as_of.asc")||[];
       $("moErr").textContent="";
     }catch(e){
       $("moErr").textContent="Load failed: "+e.message+" — has momentum_setup.sql been run in Supabase?";
@@ -4995,6 +5041,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     if(!curUni&&UNIS.length)curUni=UNIS[0].id;
     if(curUni&&!UNIS.some(u=>u.id===curUni))curUni=UNIS.length?UNIS[0].id:null;
     renderUnis(); build();
+    if(window.RX&&RX.onMO)RX.onMO();
   }
   async function addUni(){
     const n=prompt("Universe name (e.g. Nifty 200):"); if(!n||!n.trim())return;
@@ -5018,7 +5065,9 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   async function saveSnap(rows,fname,asOf){
     try{
       await sb(T_SNAP+"?universe_id=eq."+curUni+"&as_of=eq."+asOf,"DELETE");
-      await sb(T_SNAP,"POST",{universe_id:curUni,as_of:asOf,filename:fname,n_rows:rows.length,rows:rows});
+      const rec={universe_id:curUni,as_of:asOf,filename:fname,n_rows:rows.length,rows:rows,uploaded_at:new Date().toISOString()};
+      try{ await sb(T_SNAP,"POST",rec); stampMissing=false; }
+      catch(e1){ if(/uploaded_at/i.test(String(e1.message||e1))){ delete rec.uploaded_at; stampMissing=true; await sb(T_SNAP,"POST",rec); } else throw e1; }
       await load();
       toast("Imported "+rows.length+" rows","success");
     }catch(e){ $("moErr").textContent="Save failed: "+e.message; toast("Save failed","error"); }
@@ -5305,8 +5354,20 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     load();
   }
 
+  /* ---------- read by the RS x Momentum intersect ---------- */
+  function runs(){
+    return SNAPS.map(sn=>{ const u=UNIS.find(x=>x.id===sn.universe_id);
+      return {id:sn.id, uniId:sn.universe_id, uniName:u?u.name:"Universe", code:u?(u.code||u.name):"", as_of:sn.as_of, n:sn.n_rows||0, uploaded_at:sn.uploaded_at||sn.created_at||null}; });
+  }
+  function rankFor(id){
+    const sn=SNAPS.find(x=>x.id===id); if(!sn) return null;
+    const list=snapsFor(sn.universe_id), idx=list.findIndex(x=>x.id===id); if(idx<0) return null;
+    const rows=rankSnapshot(list,idx,{use3M,smooth:volSmooth})||[]; rows.forEach(enrich);
+    return { rows, uni:UNIS.find(x=>x.id===sn.universe_id)||null, snap:{id:sn.id,as_of:sn.as_of,uploaded_at:sn.uploaded_at||sn.created_at||null,n:sn.n_rows||0},
+             filters:{minF,minTurn,use3M,volSmooth}, pass:r=>!!r.rank&&!r.thin&&passF(r) };
+  }
   window.MO={
-    ensureInit:init,
+    ensureInit:init, runs, rankFor, current:()=>curUni, stampMissing:()=>stampMissing,
     pick:id=>{curUni=id;renderUnis();build();},
     delUni, delSnap,
     sort:c=>{ if(sortBy.c===c)sortBy.d=sortBy.d==="asc"?"desc":"asc"; else sortBy={c:c,d:(c==="rank"||c==="t"||c==="n"||c==="sec")?"asc":"desc"}; render(); },
@@ -5341,6 +5402,17 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 #page-mom .mx-m{background:rgba(91,141,238,.18);color:var(--blue2)}
 #page-mom .mx-e{background:rgba(155,114,245,.18);color:var(--purple)}
 #page-mom .mx-gap{background:rgba(240,120,80,.18);color:var(--orange)}
+#page-mom .rx-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:10px}
+#page-mom .rx-bar label{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px}
+#page-mom .rx-bar input[type=number]{width:64px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 6px;color:var(--text);font-size:12px}
+#page-mom .rx-bar input[type=range]{width:110px}
+#page-mom .rx-sync{font-size:11.5px;line-height:1.55;padding:8px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);margin-bottom:10px}
+#page-mom .rx-sync.ok{border-color:rgba(61,214,140,.35)}
+#page-mom .rx-sync.warn{border-color:rgba(245,166,35,.45);color:var(--text)}
+#page-mom .rx-sync.err{border-color:rgba(240,82,82,.5);color:var(--text)}
+#page-mom .rx-foot{font-size:11px;color:var(--text3);padding:8px 10px;line-height:1.6}
+#page-mom .rx-foot summary{cursor:pointer;color:var(--text2)}
+#page-mom .rx-foot div{margin-top:4px;word-break:break-word}
 </style>
 
 <script>
@@ -5487,6 +5559,181 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     }
   };
 })();
+</script>
+
+<script>
+/* ===== INTERSECT 2: RS Score (Step 3, at/above cutoff) x Momentum — automatic ===== */
+(function(){
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const MAXGAP=10*60*1000;                       // RS upload and momentum upload must be within 10 minutes
+  let inited=false, snapId=null, rsTab=null, cut=50, wRS=50, topN=30, sortBy={c:"rank",d:"asc"};
+  let BASE=null;                                  // {rs:[], mom:[], K, uni, snap, ...} — inputs of the last successful run
+  let ROWS=[];                                    // ranked common names (recomputed on slider change)
+  let busy=false, rerun=false;
+
+  const bare=t=>String(t||"").trim().toUpperCase().split(":").pop().replace(/[^A-Z0-9.\-&]/g,"");
+  const fmtT=d=>{ if(!d) return "unknown"; const x=new Date(d); return isNaN(x)?"unknown":x.toLocaleString([], {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}); };
+  const mins=ms=>{ const m=Math.round(ms/60000); if(m<60) return m+" min"; if(m<48*60) return (m/60).toFixed(1)+" h"; return Math.round(m/1440)+" days"; };
+  const pctOf=(r,n)=> n>1 ? (r-1)/(n-1) : 0;      // 0 = best, 1 = worst
+  const SB_URL="https://jpkniqmqoizscqdkaxag.supabase.co", SB_KEY="sb_publishable_SKiVUnE0b4BkDh9JPRT0Ng_pYgjLErJ";
+
+  async function rsStamp(){                       // Step 1 (stocks) upload time, read live so it is never stale
+    try{ const r=await fetch(SB_URL+"/rest/v1/rs_dataset?id=eq.1&select=uploaded_at,filename",{headers:{apikey:SB_KEY,Authorization:"Bearer "+SB_KEY}});
+      if(!r.ok) return {at:null,file:""}; const a=await r.json(); return a.length?{at:a[0].uploaded_at?new Date(a[0].uploaded_at):null,file:a[0].filename||""}:{at:null,file:""}; }
+    catch(e){ return {at:null,file:""}; }
+  }
+  function setSync(html,cls){ const e=$("rxSync"); if(e){ e.innerHTML=html; e.className="rx-sync "+(cls||""); } }
+  function showBar(on){ const b=$("rxBar2"); if(b) b.style.display=on?"flex":"none"; }
+  function empty(msg){ ROWS=[]; BASE=null; showBar(false); const st=$("rxStat"); if(st) st.textContent=""; const o=$("rxOut"); if(o) o.innerHTML='<div class="mo-empty">'+msg+'</div>'; }
+
+  /* ---------- momentum run picker ---------- */
+  let known=null;                                 // snapshot ids seen so far — a brand-new upload is auto-selected
+  function refreshRuns(){
+    const sel=$("rxRun"); if(!sel||!window.MO||!MO.runs) return;
+    const runs=MO.runs();
+    let prev=snapId;
+    if(known&&known.size){ const fresh=runs.filter(r=>!known.has(r.id)); if(fresh.length) prev=fresh.sort((a,b)=>b.id-a.id)[0].id; }
+    known=new Set(runs.map(r=>r.id));
+    sel.innerHTML="";
+    if(!runs.length){ sel.innerHTML='<option value="">— no momentum snapshots yet —</option>'; snapId=null; return; }
+    const byU={}; runs.forEach(r=>{ const k=r.uniName||"Universe"; (byU[k]=byU[k]||[]).push(r); });
+    Object.keys(byU).forEach(k=>{
+      const og=document.createElement("optgroup"); og.label=k;
+      byU[k].slice().sort((a,b)=>a.as_of<b.as_of?1:-1).forEach(r=>{
+        const o=document.createElement("option"); o.value=r.id;
+        o.textContent=r.as_of+" · "+(r.n||0)+" rows · uploaded "+fmtT(r.uploaded_at);
+        og.appendChild(o);
+      });
+      sel.appendChild(og);
+    });
+    // keep the previous choice if it still exists; otherwise the newest snapshot of the universe open in the Momentum tab
+    if(prev&&runs.some(r=>r.id===prev)) snapId=prev;
+    else { const cur=MO.current&&MO.current(); const mine=runs.filter(r=>r.uniId===cur).sort((a,b)=>a.as_of<b.as_of?1:-1);
+           snapId=(mine[0]||runs.slice().sort((a,b)=>a.as_of<b.as_of?1:-1)[0]).id; }
+    sel.value=String(snapId);
+  }
+
+  /* ---------- the run ---------- */
+  async function run(){
+    if(!inited) return;
+    if(busy){ rerun=true; return; } busy=true;
+    try{ await runCore(); } finally{ busy=false; if(rerun){ rerun=false; run(); } }
+  }
+  async function runCore(){
+    const s3=(window.RS2&&RS2.getStep3)?RS2.getStep3():null;
+    if(rsTab===null&&s3) rsTab=s3.tab||"z";
+    if($("rxTab")&&rsTab) $("rxTab").value=rsTab;
+    if(!snapId){ setSync("No momentum snapshot to compare with — upload one in the Momentum tab first.","warn"); empty("Nothing to intersect yet."); return; }
+    if(!s3||!s3.rows||!s3.rows.length){
+      setSync("RS Step 3 table is empty"+(s3&&s3.reason?" — "+esc(s3.reason):"")+". Open the <b>RS Score</b> tab and make sure the Step 1 stock file and the Step 2 index file are both loaded.","warn");
+      empty("Waiting for the RS Score tab…"); return;
+    }
+    const run=MO.rankFor(snapId);
+    if(!run){ setSync("That momentum snapshot is gone — pick another.","warn"); refreshRuns(); empty("Pick a momentum run."); return; }
+    const st=await rsStamp();
+    const momAt=run.snap.uploaded_at?new Date(run.snap.uploaded_at):null;
+    const head='RS Step 1 uploaded <b>'+fmtT(st.at)+'</b>'+(st.file?' <span class="mo-dim">('+esc(st.file)+')</span>':'')
+              +' &nbsp;·&nbsp; Momentum <b>'+esc(run.uni?run.uni.name:"")+' '+esc(run.snap.as_of)+'</b> uploaded <b>'+fmtT(momAt)+'</b>';
+    if(!st.at){ setSync(head+'<br>⛔ The RS dataset has no upload time — re-upload the Step 1 file in the RS Score tab, then press Refresh.',"err"); empty("Blocked until both uploads are fresh."); return; }
+    if(!momAt){ setSync(head+'<br>⛔ This momentum snapshot has no upload time (it was saved before the time stamp existed'+(MO.stampMissing&&MO.stampMissing()?', or <b>momentum_uploaded_at.sql</b> has not been run in Supabase yet':'')+'). Re-upload the snapshot in the Momentum tab, then press Refresh.',"err"); empty("Blocked until both uploads are fresh."); return; }
+    const gap=Math.abs(st.at-momAt);
+    if(gap>MAXGAP){
+      setSync(head+'<br>⛔ These uploads are <b>'+mins(gap)+'</b> apart (limit 10 min). Export the screener again and upload it to <b>both</b> tabs within 10 minutes, then press Refresh.',"err");
+      empty("Blocked — the RS and momentum data do not describe the same moment."); return;
+    }
+    // ---- 1) RS names at/above the cutoff, in RS order
+    const tab=rsTab||"z";
+    const rs=s3.rows.map(r=>({key:bare(r.ticker),sym:r.exportSym||r.ticker,total:tab==="z"?r.totZ:r.totP}))
+                    .filter(r=>r.key&&r.total!==null&&r.total!==undefined&&r.total>=cut)
+                    .sort((a,b)=>b.total-a.total);
+    const seen=new Set(); const rsU=rs.filter(r=>{ if(seen.has(r.key)) return false; seen.add(r.key); return true; });
+    rsU.forEach((r,i)=>r.rank=i+1);
+    const K=rsU.length;
+    if(!K){ setSync(head+' &nbsp;·&nbsp; <span style="color:var(--green)">in sync ('+mins(gap)+' apart)</span>',"ok"); empty("No RS name scores "+cut+" or more on the "+(tab==="z"?"Z-Score":"Percentile")+" (combined) table — lower the cutoff or wait for a stronger tape."); return; }
+    // ---- 2) the same number of names from the top of the momentum ranking (Momentum-tab filters apply)
+    const momAll=run.rows.filter(run.pass).sort((a,b)=>a.rank-b.rank);
+    const mom=momAll.slice(0,K); mom.forEach((r,i)=>r.krank=i+1);
+    BASE={rs:rsU,mom,K,uni:run.uni,snap:run.snap,filters:run.filters,tab,gap,momTotal:momAll.length};
+    setSync(head+' &nbsp;·&nbsp; <span style="color:var(--green)">in sync ('+mins(gap)+' apart)</span>',"ok");
+    combine(); render();
+  }
+  function combine(){
+    if(!BASE){ ROWS=[]; return; }
+    const w=wRS/100, mm={}; BASE.mom.forEach(m=>mm[bare(m.t)]=m);
+    ROWS=BASE.rs.filter(r=>mm[r.key]).map(r=>{
+      const m=mm[r.key], pa=pctOf(r.rank,BASE.K), pb=pctOf(m.krank,BASE.mom.length);
+      return {t:r.key, sym:r.sym||((m.ex?m.ex+":":"")+m.t), n:m.n||"", sec:m.sec||"", rsRank:r.rank, rsTotal:r.total, mRank:m.krank, mScore:m.score,
+              f:m.fscore, fmax:m.fmax, pa, pb, comb:w*pa+(1-w)*pb, gap:Math.abs(pa-pb)};
+    });
+    ROWS.sort((x,y)=>x.comb-y.comb || x.rsRank-y.rsRank).forEach((r,i)=>r.rank=i+1);
+  }
+
+  /* ---------- render ---------- */
+  function render(){
+    const el=$("rxOut"); if(!el) return;
+    if(!BASE){ return; }
+    showBar(true);
+    const mm=new Set(BASE.mom.map(m=>bare(m.t))), rk=new Set(BASE.rs.map(r=>r.key));
+    const rsOnly=BASE.rs.filter(r=>!mm.has(r.key)).map(r=>r.key), momOnly=BASE.mom.filter(m=>!rk.has(bare(m.t))).map(m=>bare(m.t));
+    const f=BASE.filters, fl=[]; if(f.minF>0) fl.push("Min F "+f.minF); if(f.minTurn>0) fl.push("turnover ≥ $"+f.minTurn+"M"); if(f.use3M) fl.push("3M included");
+    $("rxStat").innerHTML='<b>'+BASE.K+'</b> RS names ≥ '+cut+' &nbsp;→&nbsp; top <b>'+BASE.mom.length+'</b> momentum'+(BASE.mom.length<BASE.K?' (only '+BASE.momTotal+' ranked)':'')+' &nbsp;→&nbsp; <b>'+ROWS.length+'</b> in both'
+      +(fl.length?' &nbsp;<span class="mo-dim">· momentum filters: '+esc(fl.join(", "))+'</span>':'');
+    const tn=$("rxTopN"); if(tn){ tn.max=Math.max(1,ROWS.length); if(parseInt(tn.value)>ROWS.length&&ROWS.length) tn.value=ROWS.length; topN=parseInt(tn.value)||ROWS.length; }
+    if(!ROWS.length){ el.innerHTML='<div class="mo-empty">No name is on both lists. The '+BASE.K+' RS names ≥ '+cut+' and the top '+BASE.mom.length+' momentum names do not overlap at all.</div>'+foot(rsOnly,momOnly); return; }
+    const s=sortBy, out=ROWS.slice();
+    out.sort((x,y)=>{ let a=x[s.c],b=y[s.c]; if(a==null)a=s.d==="asc"?Infinity:-Infinity; if(b==null)b=s.d==="asc"?Infinity:-Infinity;
+      if(typeof a==="string") return s.d==="asc"?a.localeCompare(b):b.localeCompare(a); return s.d==="asc"?a-b:b-a; });
+    const H=[["rank","#"],["t","Ticker"],["rsRank","RS rank /"+BASE.K],["rsTotal","RS total"],["mRank","Mom rank /"+BASE.mom.length],["mScore","Mom score"],["f","F"],["comb","Combined"],["gap","Disagree"]];
+    let h='<table class="mx-t"><thead><tr>'+H.map(([k,t])=>'<th onclick="RX.sort(\''+k+'\')">'+t+(s.c===k?'<span style="font-size:9px"> '+(s.d==="asc"?"▲":"▼")+'</span>':'')+'</th>').join("")+'</tr></thead><tbody>';
+    out.forEach(r=>{
+      h+='<tr><td class="mx-rk">'+r.rank+'</td>'
+        +'<td style="font-weight:600" title="'+esc(r.n)+(r.sec?' · '+esc(r.sec):'')+'">'+esc(r.t)+(r.gap>0.5?' <span class="mx-tag mx-gap" title="RS and momentum place this name very differently">SPLIT</span>':'')+'</td>'
+        +'<td>'+r.rsRank+'</td><td>'+(r.rsTotal==null?'—':r.rsTotal.toFixed(1))+'</td>'
+        +'<td>'+r.mRank+'</td><td>'+(r.mScore==null?'—':(r.mScore>=0?'+':'')+r.mScore.toFixed(2))+'</td>'
+        +'<td><span class="mo-dim">'+(r.fmax?r.f+'/'+r.fmax:'—')+'</span></td>'
+        +'<td style="font-weight:700;color:var(--accent)">'+(100-r.comb*100).toFixed(1)+'</td>'
+        +'<td>'+(r.gap*100).toFixed(0)+'</td></tr>';
+    });
+    el.innerHTML=h+'</tbody></table>'+foot(rsOnly,momOnly);
+  }
+  function foot(rsOnly,momOnly){
+    return '<details class="rx-foot"><summary>Names on only one list — '+rsOnly.length+' RS-only · '+momOnly.length+' momentum-only (not ranked)</summary>'
+      +'<div><b>RS ≥ '+cut+' but not in momentum top '+(BASE?BASE.mom.length:0)+':</b> '+(rsOnly.length?esc(rsOnly.join(", ")):"—")+'</div>'
+      +'<div><b>Momentum top '+(BASE?BASE.mom.length:0)+' but not RS ≥ '+cut+':</b> '+(momOnly.length?esc(momOnly.join(", ")):"—")+'</div></details>';
+  }
+  function exportTop(){
+    if(!ROWS.length){ toast("Nothing to export","error"); return; }
+    const n=Math.max(1,Math.min(parseInt($("rxTopN").value)||ROWS.length,ROWS.length));
+    const rows=ROWS.slice().sort((a,b)=>a.rank-b.rank).slice(0,n);
+    const code=((BASE.uni&&(BASE.uni.code||BASE.uni.name))||"UNIVERSE").toUpperCase().replace(/[^A-Z0-9]/g,"");
+    const txt="###RSxMOMO_"+code+"_TOP"+rows.length+"\n"+rows.map(r=>r.sym).join(",")+"\n";
+    const b=new Blob([txt],{type:"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b);
+    a.download="rs_x_momentum_"+code.toLowerCase()+"_top"+rows.length+".txt"; a.click();
+    toast("Exported "+rows.length+" tickers · RS "+wRS+" / momentum "+(100-wRS),"success");
+  }
+
+  /* ---------- wiring ---------- */
+  function init(){
+    if(inited) return; inited=true;
+    $("rxRun").onchange=function(){ snapId=parseInt(this.value)||null; run(); };
+    $("rxTab").onchange=function(){ rsTab=this.value; run(); };
+    $("rxCut").onchange=function(){ cut=parseFloat(this.value); if(isNaN(cut)) cut=50; this.value=cut; run(); };
+    $("rxRefresh").onclick=()=>{ if(window.RS) RS.ensureInit(); if(window.RS2) RS2.ensureInit(); refreshRuns(); run(); };
+    $("rxW").oninput=function(){ wRS=parseInt(this.value); $("rxWL").textContent=wRS+" / "+(100-wRS); combine(); render(); };
+    $("rxTopN").onchange=function(){ topN=parseInt(this.value)||topN; };
+    $("rxExport").onclick=exportTop;
+    if(window.RS) RS.ensureInit(); if(window.RS2) RS2.ensureInit();     // RS tables are needed even if the RS tab was never opened
+    refreshRuns(); run();
+  }
+  window.RX={
+    init,
+    onRS:()=>{ if(inited) run(); },                       // RS Step 3 recomputed
+    onMO:()=>{ if(inited){ refreshRuns(); run(); } },    // momentum snapshots (re)loaded
+    sort:c=>{ if(sortBy.c===c) sortBy.d=sortBy.d==="asc"?"desc":"asc"; else sortBy={c:c,d:(c==="t"||c==="rank"||c==="rsRank"||c==="mRank")?"asc":"desc"}; render(); }
+  };
+})();
+
 </script>
 
 <script>
