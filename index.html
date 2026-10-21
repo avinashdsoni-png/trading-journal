@@ -1053,6 +1053,126 @@ tr.flt-row .flt2{display:flex;gap:3px}
 #ibEditInfo b{color:var(--text)}
 #ibEditInfo .ib-up{color:var(--green)} #ibEditInfo .ib-dn{color:var(--red)} #ibEditInfo .ib-dim{color:var(--text3)}
 </style>
+
+<style>
+/* ===== Orange List (scoped) ===== */
+#page-orange .or-dim{color:var(--text3);font-size:10.5px}
+#page-orange .or-err{color:var(--red);font-size:12px;margin-bottom:8px;min-height:0}
+#page-orange .or-top{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:10px}
+#page-orange .or-drop{border:2px dashed var(--border2);border-radius:9px;padding:14px;text-align:center;cursor:pointer;color:var(--text2);background:var(--bg3);font-size:12.5px;transition:.15s}
+#page-orange .or-drop b{color:var(--accent)}
+#page-orange .or-drop span{display:block;margin-top:3px}
+#page-orange .or-drop:hover,#page-orange .or-drop.over{border-color:var(--accent);background:var(--surface)}
+#page-orange .or-status{font-size:11.5px;color:var(--text2);padding:6px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);line-height:1.5}
+#page-orange .or-status.ok{border-color:rgba(61,214,140,.35)} #page-orange .or-status.err{border-color:rgba(240,82,82,.5);color:var(--red)} #page-orange .or-status.warn{border-color:rgba(245,166,35,.45)}
+#page-orange .or-kpis{display:flex;gap:8px;flex-wrap:wrap}
+#page-orange .or-k{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:6px 10px;font-size:11px;color:var(--text2);cursor:default}
+#page-orange .or-k b{color:var(--text);font-size:14px;display:block;font-weight:700}
+#page-orange .or-k.alert{border-color:var(--orange)} #page-orange .or-k.alert b{color:var(--orange)}
+#page-orange .or-k.click{cursor:pointer} #page-orange .or-k.click:hover{border-color:var(--accent)}
+#page-orange .or-sec{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0 16px 14px;margin-top:14px}
+#page-orange .or-sec>summary{list-style:none;cursor:pointer;padding:12px 0;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+#page-orange .or-sec>summary::-webkit-details-marker{display:none}
+#page-orange .or-sec>summary::before{content:"\25B8";color:var(--text3);font-size:11px;margin-right:-4px}
+#page-orange .or-sec[open]>summary::before{content:"\25BE"}
+#page-orange .or-st{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--accent)}
+#page-orange .or-sel{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 6px;color:var(--text);font-size:12px}
+#page-orange .or-tog{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px;cursor:pointer}
+/* changes */
+#page-orange .or-chg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+#page-orange .or-chgbox{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11.5px;line-height:1.6}
+#page-orange .or-chgbox h5{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:0 0 4px}
+#page-orange .or-chgbox .t{font-weight:700;color:var(--text);cursor:pointer} #page-orange .or-chgbox .t:hover{color:var(--accent)}
+/* calendar */
+#page-orange .or-strip{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px;margin-bottom:10px}
+#page-orange .or-sd{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:5px 4px;min-height:58px}
+#page-orange .or-sd.wk{opacity:.45} #page-orange .or-sd.today{border-color:var(--accent)}
+#page-orange .or-sd .d{font-family:'Barlow Condensed',sans-serif;font-size:10.5px;color:var(--text3);text-align:center;letter-spacing:.04em}
+#page-orange .or-sd.today .d{color:var(--accent)}
+#page-orange .or-calbar{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+#page-orange .or-calbar b{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;color:var(--text);min-width:150px;text-align:center}
+#page-orange .or-cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+#page-orange .or-cal .h{font-family:'Barlow Condensed',sans-serif;font-size:10.5px;letter-spacing:.08em;color:var(--text3);text-align:center;padding:2px 0}
+#page-orange .or-cd{background:var(--bg3);border:1px solid var(--border);border-radius:7px;min-height:64px;padding:4px 5px}
+#page-orange .or-cd.out{opacity:.35} #page-orange .or-cd.wk{background:var(--bg2)} #page-orange .or-cd.today{border-color:var(--accent)}
+#page-orange .or-cd .d{font-size:10.5px;color:var(--text3);text-align:right} #page-orange .or-cd.today .d{color:var(--accent);font-weight:700}
+#page-orange .or-chip{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:700;padding:1px 5px;border-radius:4px;margin:2px 2px 0 0;cursor:pointer;border:1px solid transparent;white-space:nowrap}
+#page-orange .or-chip i{font-style:normal;font-weight:400;opacity:.8;font-size:9.5px}
+#page-orange .or-chip.off{opacity:.45;text-decoration:line-through}
+#page-orange .or-chip:hover{border-color:var(--text)}
+/* rating colours (shared with the card) */
+.or-sb{background:rgba(61,214,140,.22);color:var(--green)} .or-b{background:rgba(61,214,140,.11);color:var(--green2)} .or-n{background:rgba(154,163,184,.14);color:var(--text2)} .or-s{background:rgba(240,82,82,.12);color:var(--red)} .or-ss{background:rgba(240,82,82,.24);color:var(--red)} .or-x{background:transparent;color:var(--text3)}
+.or-tag{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-right:3px;white-space:nowrap}
+.or-tag.g{background:rgba(61,214,140,.16);color:var(--green)} .or-tag.r{background:rgba(240,82,82,.16);color:var(--red)} .or-tag.o{background:rgba(240,120,80,.18);color:var(--orange)} .or-tag.b{background:rgba(91,141,238,.18);color:var(--blue2)} .or-tag.p{background:rgba(155,114,245,.18);color:var(--purple)} .or-tag.gr{background:rgba(154,163,184,.14);color:var(--text2)}
+/* street */
+#page-orange .or-street{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+@media(max-width:1000px){#page-orange .or-street{grid-template-columns:1fr}}
+#page-orange .or-chartwrap{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px}
+#page-orange .or-chartbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px;font-size:11px;color:var(--text2)}
+#page-orange .or-board{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:11.5px}
+#page-orange .or-board h5{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:0 0 6px}
+#page-orange .or-stack{display:flex;height:22px;border-radius:5px;overflow:hidden;margin-bottom:8px}
+#page-orange .or-stack div{display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;cursor:pointer;min-width:0}
+#page-orange .or-stack div:hover{filter:brightness(1.25)}
+#page-orange .or-bl{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);cursor:pointer}
+#page-orange .or-bl:hover{color:var(--accent)} #page-orange .or-bl:last-child{border-bottom:0}
+/* table */
+#page-orange .or-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+#page-orange .or-search{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--text);font-size:12px;width:190px}
+#page-orange .or-chips{display:flex;flex-wrap:wrap;gap:4px}
+#page-orange .or-fc{font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:12px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer}
+#page-orange .or-fc.on{border-color:var(--accent);color:var(--accent);background:rgba(232,184,75,.08)}
+#page-orange .or-tw{overflow:auto;max-height:62vh;border:1px solid var(--border);border-radius:8px}
+#page-orange table.or-t{border-collapse:collapse;width:100%;font-size:12px;min-width:1500px}
+#page-orange table.or-t th,#page-orange table.or-t td{padding:5px 7px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text);vertical-align:middle}
+#page-orange table.or-t th{position:sticky;top:0;background:var(--surface);color:var(--accent);font-size:10px;text-transform:uppercase;letter-spacing:.05em;z-index:2;cursor:pointer;font-family:'Barlow Condensed',sans-serif}
+#page-orange table.or-t td.l,#page-orange table.or-t th.l{text-align:left}
+#page-orange table.or-t tbody tr:hover{background:var(--bg3)}
+#page-orange table.or-t tr.off td{opacity:.5}
+#page-orange .or-tk{font-weight:700;cursor:pointer;color:var(--text)} #page-orange .or-tk:hover{color:var(--accent)}
+#page-orange .or-nm{display:block;font-size:10px;color:var(--text3);font-weight:400;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+#page-orange .or-ck{cursor:pointer;font-size:14px;color:var(--green)} #page-orange .or-ck.off{color:var(--text3)}
+#page-orange .or-x{cursor:pointer;color:var(--text3)} #page-orange .or-x:hover{color:var(--red)}
+#page-orange .or-ll{display:inline-flex;flex-direction:column;gap:1px;vertical-align:middle;margin-right:5px}
+#page-orange .or-ll i{display:block;width:18px;height:3px;border-radius:1px}
+#page-orange .or-ll i.y{background:var(--green)} #page-orange .or-ll i.n{background:rgba(240,82,82,.55)} #page-orange .or-ll i.u{background:transparent;border:1px solid var(--border2);height:1px}
+#page-orange .or-up{color:var(--green)} #page-orange .or-dn{color:var(--red)} #page-orange .or-mid{color:var(--text2)}
+#page-orange .or-nt{cursor:pointer;color:var(--text3)} #page-orange .or-nt.has{color:var(--accent)}
+#page-orange .or-note{font-size:11px;color:var(--text3);line-height:1.6;margin-top:8px}
+#page-orange .or-empty{padding:26px;text-align:center;color:var(--text3);font-size:12.5px}
+#page-orange .or-ut{width:100%;border-collapse:collapse;font-size:12px}
+#page-orange .or-ut th,#page-orange .or-ut td{padding:5px 8px;text-align:left;border-bottom:1px solid var(--border)}
+#page-orange .or-ut th{color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:.06em;font-family:'Barlow Condensed',sans-serif}
+/* card */
+#orCard .or-cardbox{width:980px;max-width:96vw;padding:22px 24px}
+#orCard .or-ch{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;margin-bottom:10px}
+#orCard .or-ch h3{margin:0;font-size:30px}
+#orCard .or-ch .sub{font-size:12px;color:var(--text2)}
+#orCard .or-links a{font-size:11px;color:var(--blue2);margin-right:10px;text-decoration:none} #orCard .or-links a:hover{text-decoration:underline}
+#orCard .or-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:860px){#orCard .or-grid{grid-template-columns:1fr}}
+#orCard .or-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px}
+#orCard .or-box h5{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:0 0 7px}
+#orCard .or-kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:12px}
+#orCard .or-kv span:nth-child(odd){color:var(--text3)} #orCard .or-kv span:nth-child(even){text-align:right;color:var(--text)}
+#orCard .or-big{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px}
+#orCard .or-lights{display:flex;flex-direction:column}
+#orCard .or-light{display:grid;grid-template-columns:1.3fr 1.6fr auto;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--border);margin-top:-1px;font-size:12px;cursor:help}
+#orCard .or-light:first-child{border-radius:6px 6px 0 0} #orCard .or-light:last-child{border-radius:0 0 6px 6px}
+#orCard .or-light.y{background:rgba(61,214,140,.15);border-color:rgba(61,214,140,.45)} #orCard .or-light.n{background:rgba(240,82,82,.13);border-color:rgba(240,82,82,.45)} #orCard .or-light.u{background:rgba(154,163,184,.06);color:var(--text3)}
+#orCard .or-light .ln{font-weight:700} #orCard .or-light .lv{color:var(--text2)} #orCard .or-light .lr{font-size:10px;font-weight:700;letter-spacing:.06em}
+#orCard .or-light.y .lr{color:var(--green)} #orCard .or-light.n .lr{color:var(--red)} #orCard .or-light.u .lr{color:var(--text3)}
+#orCard .or-perf{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+#orCard .or-pc{border-radius:5px;padding:5px 2px;text-align:center;font-size:11.5px} #orCard .or-pc small{display:block;font-size:9.5px;color:var(--text3)}
+#orCard .or-ema{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:8px}
+#orCard .or-ec{border-radius:5px;padding:5px 2px;text-align:center;font-size:11px;border:1px solid var(--border)} #orCard .or-ec small{display:block;font-size:9.5px;color:var(--text3)}
+#orCard .or-ec.a{background:rgba(61,214,140,.12);border-color:rgba(61,214,140,.4)} #orCard .or-ec.b{background:rgba(240,82,82,.1);border-color:rgba(240,82,82,.4)}
+#orCard textarea.or-ta{width:100%;min-height:64px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:6px 8px;resize:vertical;font-family:inherit}
+#orCard input.or-in{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:5px 8px}
+#orCard .or-upb{height:8px;border-radius:4px;background:var(--bg);overflow:hidden;margin-top:4px;position:relative}
+#orCard .or-upb i{position:absolute;top:0;bottom:0}
+#orCard .or-hist{font-size:11px;color:var(--text2);line-height:1.6}
+</style>
 </head>
 <body>
 
@@ -1145,8 +1265,9 @@ tr.flt-row .flt2{display:flex;gap:3px}
       <button class="nav-btn" onclick="showPage(&#39;funds&#39;,this)">💰 Funds</button>
       <button class="nav-btn" onclick="showPage(&#39;plan&#39;,this)">📐 Trading Plan</button>
       <button class="nav-btn" onclick="showPage(&#39;rs&#39;,this); if(window.RS) RS.ensureInit(); if(window.RS2) RS2.ensureInit();">📈 RS Score</button>
+      <button class="nav-btn" onclick="showPage(&#39;mom&#39;,this); if(window.MO) MO.ensureInit();">🚀 Momentum</button>
+      <button class="nav-btn" onclick="showPage(&#39;orange&#39;,this); if(window.OR) OR.init();">🟠 Orange</button>
       <button class="nav-btn" onclick="showPage(&#39;etf&#39;,this); if(window.EF) EF.ensureInit();">🧭 ETF Flow</button>
-      <button class="nav-btn" onclick="showPage(&#39;mom&#39;,this); if(window.MO) MO.ensureInit(); if(window.MX) MX.init(); if(window.RX) RX.init();">🚀 Momentum</button>
     </div>
     <div class="topbar-right">
       <div class="balance-chip">Balance: <strong id="topbarBalance">$10,764.09</strong></div>
@@ -1850,74 +1971,81 @@ tr.flt-row .flt2{display:flex;gap:3px}
       </details>
     </div>
 
-    <div class="section" style="margin-top:14px">
+  </div>
+
+  <!-- ══ ORANGE PAGE ══ -->
+  <div class="page" id="page-orange">
+    <div class="section">
       <div class="section-header">
-        <div class="section-title">INTERSECT <span>ETF x MOMENTUM</span></div>
-        <div class="mo-dim" style="font-size:10.5px">rank order inside each file is the join key</div>
-      </div>
-
-      <div class="mx-grid">
-        <div class="mx-drop" id="mxDropA"><b>Momentum list</b>drop the .txt exported from the table above<div class="mx-meta">top N, in rank order</div></div>
-        <div class="mx-drop" id="mxDropB"><b>ETF list</b>drop the .txt exported from the ETF Flow tab<div class="mx-meta">matching universe</div></div>
-      </div>
-
-      <div class="mx-bar" id="mxBar" style="display:none">
-        <div class="mx-seg" id="mxMode">
-          <button data-m="both" class="on">Both lists</button>
-          <button data-m="all">All names</button>
+        <div class="section-title">ORANGE <span>LIST</span></div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <span class="or-dim" id="orMeta"></span>
+          <button class="btn btn-ghost btn-sm" id="orRefresh" title="Re-read the list and the other tabs' data">&#8635; Refresh</button>
         </div>
-        <label title="Slide toward momentum to trust price more, toward ETF to trust manager behaviour more.">Weight mom / etf
-          <input type="range" id="mxW" min="0" max="100" step="5" value="50">
-          <span id="mxWL" style="min-width:48px">50 / 50</span></label>
-        <label>Export top <input type="number" id="mxTopN" min="5" max="500" value="100"></label>
-        <span class="mo-dim" id="mxStat" style="font-size:11px"></span>
-        <button class="btn btn-gold btn-sm" id="mxExport" style="margin-left:auto">Export combined &rarr;TV</button>
       </div>
-
-      <div style="overflow:auto;max-height:52vh;border:1px solid var(--border);border-radius:8px" id="mxOut"></div>
-
-      <div class="mo-note">
-        <b>Combined</b> runs 0-100, higher is better: each list becomes a percentile first, so lists of
-        different lengths merge fairly, then the slider blends them. <b>Disagree</b> is how far apart the two
-        lists place a name &mdash; a high value with <b>SPLIT</b> means price and manager behaviour are telling
-        different stories, which is worth a look either way. Under <b>All names</b>, a stock missing from one
-        list counts as neutral there, never as worst &mdash; no ETF coverage is not evidence against a stock.
+      <div class="or-err" id="orErr"></div>
+      <div class="or-top">
+        <div class="or-drop" id="orDrop">Drop your <b>Orange List</b> screener export (.csv) here, or click to choose
+          <span class="or-dim">same TradingView layout every time &middot; a name missing from the newest file is unticked, never lost</span></div>
+        <div class="or-status" id="orStatus">Open this tab to load the list&hellip;</div>
       </div>
+      <div class="or-kpis" id="orKpis"></div>
     </div>
 
-    <div class="section" style="margin-top:14px" id="rxSec">
-      <div class="section-header">
-        <div class="section-title">INTERSECT <span>RS SCORE x MOMENTUM</span></div>
-        <div class="mo-dim" style="font-size:10.5px">automatic &middot; RS Step 3 names at/above the cutoff &times; the same number of top momentum names</div>
+    <details class="or-sec" id="orSecChanges" open ontoggle="window.OR&&OR.tog(this)">
+      <summary><span class="or-st">WHAT CHANGED</span><span class="or-dim" id="orChangesSub"></span></summary>
+      <div id="orChanges"></div>
+    </details>
+
+    <details class="or-sec" id="orSecCal" open ontoggle="window.OR&&OR.tog(this)">
+      <summary><span class="or-st">EARNINGS CALENDAR</span><span class="or-dim">next 14 days, then the month &middot; chip colour = analyst rating &middot; number = lights &middot; click a chip for the card</span></summary>
+      <div class="or-strip" id="orStrip"></div>
+      <div class="or-calbar">
+        <button class="btn btn-ghost btn-sm" id="orCalPrev">&#9664;</button>
+        <b id="orCalTitle"></b>
+        <button class="btn btn-ghost btn-sm" id="orCalNext">&#9654;</button>
+        <button class="btn btn-ghost btn-sm" id="orCalToday">Today</button>
+        <label class="or-tog"><input type="checkbox" id="orCalOff"> include unticked names</label>
       </div>
+      <div class="or-cal" id="orCal"></div>
+    </details>
 
-      <div class="rx-bar">
-        <label>Momentum run <select id="rxRun" class="mo-sel" style="max-width:360px"></select></label>
-        <label>RS table <select id="rxTab" class="mo-sel"><option value="z">Z-Score (combined)</option><option value="p">Percentile (combined)</option></select></label>
-        <label title="Only RS Step 3 names whose Total is at or above this number are used. 50 = level with the index.">RS cutoff &ge; <input type="number" id="rxCut" min="0" max="100" step="1" value="50"></label>
-        <button class="btn btn-ghost btn-sm" id="rxRefresh" title="Re-read the RS Score tab and the momentum snapshots">&#8635; Refresh</button>
+    <details class="or-sec" id="orSecStreet" open ontoggle="window.OR&&OR.tog(this)">
+      <summary><span class="or-st">STREET vs TAPE</span><span class="or-dim">analyst target and rating against what the price has actually done</span></summary>
+      <div class="or-street">
+        <div class="or-chartwrap">
+          <div class="or-chartbar">
+            <label>Y axis <select id="orScY" class="or-sel">
+              <option value="p6m">6-month performance %</option><option value="p1y">1-year performance %</option><option value="p1m">1-month performance %</option>
+              <option value="rs">RS Step 3 total (RS Score tab)</option><option value="mo">Momentum rank (Momentum tab)</option></select></label>
+            <span class="or-dim">x = Street upside % (1-year target vs price) &middot; colour = analyst rating &middot; click a dot for the card</span>
+          </div>
+          <div style="height:330px;position:relative"><canvas id="orScatter"></canvas></div>
+        </div>
+        <div class="or-board" id="orBoard"></div>
       </div>
+    </details>
 
-      <div class="rx-sync" id="rxSync">Open this tab to run the intersect&hellip;</div>
-
-      <div class="rx-bar" id="rxBar2" style="display:none">
-        <label title="Slide toward RS to trust relative strength more, toward momentum to trust the momentum rank more.">Weight RS / momentum
-          <input type="range" id="rxW" min="0" max="100" step="5" value="50">
-          <span id="rxWL" style="min-width:48px">50 / 50</span></label>
-        <label>Export top <input type="number" id="rxTopN" min="1" max="500" value="30"></label>
-        <span class="mo-dim" id="rxStat" style="font-size:11px"></span>
-        <button class="btn btn-gold btn-sm" id="rxExport" style="margin-left:auto">Export &rarr;TV</button>
+    <details class="or-sec" id="orSecList" open ontoggle="window.OR&&OR.tog(this)">
+      <summary><span class="or-st">WATCHLIST</span><span class="or-dim" id="orListSub"></span></summary>
+      <div class="or-bar">
+        <input class="or-search" id="orSearch" placeholder="ticker / name / sector&hellip;">
+        <div class="or-chips" id="orChips"></div>
+        <label class="or-tog"><input type="checkbox" id="orShowOff"> show unticked</label>
+        <button class="btn btn-gold btn-sm" id="orExport" style="margin-left:auto" title="Exports the names currently shown, in the current order, as a TradingView watchlist file">Export view &rarr;TV</button>
       </div>
-
-      <div style="overflow:auto;max-height:52vh;border:1px solid var(--border);border-radius:8px" id="rxOut"><div class="mo-empty">Nothing to intersect yet.</div></div>
-
-      <div class="mo-note">
-        <b>How it works.</b> 1&nbsp;&middot; From the RS Score tab's last table (Step 3, combined) every name with <b>Total at or above the cutoff</b> is taken, in RS order &mdash; say K names.
-        2&nbsp;&middot; From the selected momentum run the <b>top K names by momentum rank</b> are taken (the Momentum tab's Min&nbsp;F / turnover filters apply, exactly as in its own export).
-        3&nbsp;&middot; Only names on <b>both</b> lists survive. 4&nbsp;&middot; Each survivor's position in each list becomes a percentile and the slider blends them &mdash; <b>Combined</b> runs 0&ndash;100, higher is better; <b>Disagree</b> is how far apart the two lists place it.
-        The intersect is <b>blocked</b> when the RS Step 1 upload and the momentum upload are more than <b>10 minutes</b> apart, so both always describe the same screener moment. RS totals are whatever the RS Score tab currently computes (its weights, blend mode and index).
+      <div class="or-tw" id="orTable"></div>
+      <div class="or-note">
+        <b>Lights</b> are the same seven tests as the Momentum tab (solid = pass, dull = fail, hollow = no column) &mdash; open the card for the stacked view with values and plain-English explanations.
+        <b>&rarr;20 EMA</b> is the distance from the 20-day EMA in ATR(14) units, the same reading as your EVC indicator.
+        <b>&Delta;</b> compares with the previous upload. <b>RS</b> / <b>Mom</b> / <b>ETFs</b> / <b>IBKR</b> come from the other tabs &mdash; open those tabs once if they show &ldquo;&mdash;&rdquo;.
       </div>
-    </div>
+    </details>
+
+    <details class="or-sec" id="orSecUploads" ontoggle="window.OR&&OR.tog(this)">
+      <summary><span class="or-st">UPLOADS</span><span class="or-dim">every file is kept &mdash; that is what makes the &ldquo;what changed&rdquo; panel and the history charts work</span></summary>
+      <div id="orUploads"></div>
+    </details>
   </div>
 
 </div><!-- end app -->
@@ -1946,6 +2074,13 @@ tr.flt-row .flt2{display:flex;gap:3px}
   </div>
 </div>
 
+
+<!-- ORANGE STOCK CARD -->
+<div class="modal-bg" id="orCard">
+  <div class="modal or-cardbox">
+    <div id="orCardBody"></div>
+  </div>
+</div>
 
 <!-- ADD TRADE MODAL -->
 <div class="modal-bg" id="tradeModal">
@@ -2896,6 +3031,8 @@ async function exportAllData() {
     ]);
     const ibkr = {};
     for (const t of ['ibkr_uploads','ibkr_executions','ibkr_cash','ibkr_positions','ibkr_trade_meta']) { try { ibkr[t] = await sb(t + '?select=*'); } catch(e) { ibkr[t] = []; } }
+    const orange = {};
+    for (const t of ['orange_uploads','orange_stocks','orange_rows']) { try { orange[t] = await sb(t + '?select=*'); } catch(e) { orange[t] = []; } }
 
     const exportData = {
       exportDate: new Date().toISOString(),
@@ -2906,7 +3043,8 @@ async function exportAllData() {
         funds:        funds        || [],
         settings:     fundsSettings || [],
         trading_plan: plan         || [],
-        ibkr:         ibkr
+        ibkr:         ibkr,
+        orange:       orange
       },
       counts: {
         trades:  (trades       || []).length,
@@ -3512,7 +3650,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   }
 
   /* ---------- compute ---------- */
-  function compute(){ computeCore(); if(window.RX&&RX.onRS) RX.onRS(); }
+  function compute(){ computeCore(); if(window.OR&&OR.onRS) OR.onRS(); }
   function computeCore(){
     const st=window.RS&&window.RS.getState?window.RS.getState():null;
     if(!st||!st.MODEL||!st.MODEL.length){
@@ -4091,6 +4229,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     }catch(e){ $("efErr").textContent="Load failed: "+e.message+"  — have the ETF tables been created?"; }
     if(!applySavedSet()) applyRefDefaults();
     K.setData(NODES,SNAPS,SEL); renderTree(); refresh(); renderCfg();
+    if(window.OR&&OR.onEF)OR.onEF();
   }
 
   /* ───────── recommended structure ─────────
@@ -4706,8 +4845,18 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     $("efResetCfg").addEventListener("click",()=>{K.CFG=JSON.parse(JSON.stringify(K.DEF_CFG));renderCfg();refresh();});
     load();
   }
+  function heldBy(t){   // read by the Orange tab
+    t=String(t||"").toUpperCase(); const out=[];
+    NODES.filter(n=>n.kind==="etf").forEach(e=>{
+      const ss=SNAPS.filter(x=>x.etf_id===e.id).sort((a,b)=>a.as_of<b.as_of?-1:1); if(!ss.length) return;
+      const cur=ss[ss.length-1], prev=ss.length>1?ss[ss.length-2]:null;
+      const w=(cur.holdings||[]).find(h=>String(h.t).toUpperCase()===t), pw=prev?(prev.holdings||[]).find(h=>String(h.t).toUpperCase()===t):null;
+      if(w||(pw&&cur.complete)) out.push({etf:tickerOf(e.name)||e.name,name:e.name,w:w?+w.w:0,pw:pw?+pw.w:null,hasPrev:!!prev,asOf:cur.as_of,held:!!w});
+    });
+    return out.sort((a,b)=>b.w-a.w);
+  }
   window.EF={ensureInit:init,tg:k=>{OPEN[k]=!OPEN[k];renderTree();},tn:toggleNode,ts:toggleSnap,tm:toggleMonth,
-             addEtf,delNode,delSnap,paste:pasteText,editDesc,fav};
+             addEtf,delNode,delSnap,paste:pasteText,editDesc,fav,heldBy};
 })();
 
 </script>
@@ -5041,7 +5190,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     if(!curUni&&UNIS.length)curUni=UNIS[0].id;
     if(curUni&&!UNIS.some(u=>u.id===curUni))curUni=UNIS.length?UNIS[0].id:null;
     renderUnis(); build();
-    if(window.RX&&RX.onMO)RX.onMO();
+    if(window.OR&&OR.onMO)OR.onMO();
   }
   async function addUni(){
     const n=prompt("Universe name (e.g. Nifty 200):"); if(!n||!n.trim())return;
@@ -5376,362 +5525,470 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 })();
 </script>
 
-<style>
-#page-mom .mx-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-@media(max-width:900px){#page-mom .mx-grid{grid-template-columns:1fr}}
-#page-mom .mx-drop{border:2px dashed var(--border2);border-radius:9px;padding:18px 14px;text-align:center;cursor:pointer;color:var(--text3);background:var(--bg3);font-size:12px;transition:.15s}
-#page-mom .mx-drop:hover,#page-mom .mx-drop.over{border-color:var(--accent);color:var(--accent);background:var(--surface)}
-#page-mom .mx-drop.has{border-style:solid;border-color:var(--green2);color:var(--text);background:var(--surface)}
-#page-mom .mx-drop b{display:block;font-size:13px;color:var(--text);margin-bottom:3px}
-#page-mom .mx-drop .mx-meta{font-size:10.5px;color:var(--text3);margin-top:4px}
-#page-mom .mx-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:10px}
-#page-mom .mx-bar label{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px}
-#page-mom .mx-bar input[type=number]{width:64px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 6px;color:var(--text);font-size:12px}
-#page-mom .mx-bar input[type=range]{width:110px}
-#page-mom .mx-seg{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden}
-#page-mom .mx-seg button{background:var(--bg3);border:0;color:var(--text2);padding:5px 10px;font-size:11px;cursor:pointer;font-weight:600}
-#page-mom .mx-seg button.on{background:var(--accent);color:var(--bg)}
-#page-mom table.mx-t{border-collapse:collapse;width:100%;font-size:12px}
-#page-mom table.mx-t th,#page-mom table.mx-t td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text)}
-#page-mom table.mx-t th:nth-child(2),#page-mom table.mx-t td:nth-child(2){text-align:left}
-#page-mom table.mx-t th{position:sticky;top:0;background:var(--surface);color:var(--accent);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;z-index:2;cursor:pointer}
-#page-mom table.mx-t tbody tr:hover{background:var(--bg3)}
-#page-mom td.mx-rk{font-weight:700;color:var(--accent);text-align:center}
-#page-mom .mx-tag{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700}
-#page-mom .mx-both{background:rgba(61,214,140,.16);color:var(--green)}
-#page-mom .mx-m{background:rgba(91,141,238,.18);color:var(--blue2)}
-#page-mom .mx-e{background:rgba(155,114,245,.18);color:var(--purple)}
-#page-mom .mx-gap{background:rgba(240,120,80,.18);color:var(--orange)}
-#page-mom .rx-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:10px}
-#page-mom .rx-bar label{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px}
-#page-mom .rx-bar input[type=number]{width:64px;background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:4px 6px;color:var(--text);font-size:12px}
-#page-mom .rx-bar input[type=range]{width:110px}
-#page-mom .rx-sync{font-size:11.5px;line-height:1.55;padding:8px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);margin-bottom:10px}
-#page-mom .rx-sync.ok{border-color:rgba(61,214,140,.35)}
-#page-mom .rx-sync.warn{border-color:rgba(245,166,35,.45);color:var(--text)}
-#page-mom .rx-sync.err{border-color:rgba(240,82,82,.5);color:var(--text)}
-#page-mom .rx-foot{font-size:11px;color:var(--text3);padding:8px 10px;line-height:1.6}
-#page-mom .rx-foot summary{cursor:pointer;color:var(--text2)}
-#page-mom .rx-foot div{margin-top:4px;word-break:break-word}
-</style>
-
 <script>
-/* ===== INTERSECT: combine an ETF list with a Momentum list ===== */
+/* ═══════════ ORANGE LIST — watchlist cockpit (isolated module) ═══════════ */
 (function(){
-  let A=null, B=null;              // A = momentum list, B = etf list
-  let mode="both", wM=50, topN=100, sortBy={c:"rank",d:"asc"};
+  const T_UP="orange_uploads", T_ST="orange_stocks", T_ROW="orange_rows";
   const $=id=>document.getElementById(id);
   const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const HDR={apikey:SB_KEY,Authorization:"Bearer "+SB_KEY}, HDRJ={...HDR,"Content-Type":"application/json"};
+  const MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"], MF=["January","February","March","April","May","June","July","August","September","October","November","December"], DN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  let UPS=[], STOCKS=[], ROWS={}, PREV={}, LAST={}, HIST={}, L=null, P=null, MODEL=[], BY={};
+  let inited=false, ready=false, filt="all", q="", showOff=false, calOff=false, sortBy={c:"earnDays",d:"asc"}, calYM=null, scY="p6m";
+  let chart=null, hchart=null, cardSym=null, xTimer=null;
 
-  // A TradingView watchlist .txt has no scores — but it is written in rank
-  // order, so a ticker's POSITION in the file is its rank. That is the join key
-  // for everything below.
-  function parseList(text){
-    const out=[], seen=new Set();
-    String(text||"").split(/[\n,;]+/).forEach(tok=>{
-      let s=tok.trim();
-      if(!s||s.charAt(0)==="#")return;              // ###SECTION headers
-      const parts=s.split(":");
-      const ex=parts.length>1?parts[0].trim().toUpperCase():"";
-      let t=(parts.length>1?parts.slice(1).join(":"):parts[0]).trim().toUpperCase();
-      t=t.replace(/[^A-Z0-9.\-&]/g,"");
-      if(!t||seen.has(t))return;
-      seen.add(t);
-      out.push({t:t,ex:ex,rank:out.length+1});
-    });
-    return out;
+  /* ---------- small helpers ---------- */
+  function num(v){ if(v===null||v===undefined) return null; let s=String(v).trim(); if(s===""||/^(n\/?a|--|—|-|null)$/i.test(s)) return null;
+    let neg=false; if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1);} s=s.replace(/[%,\s$]/g,"").replace(/[−–—]/g,"-"); const f=parseFloat(s); return isNaN(f)?null:(neg?-f:f); }
+  const pad=n=>String(n).padStart(2,"0");
+  const todayISO=()=>{ const d=new Date(); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); };
+  const dOf=s=>new Date(String(s).slice(0,10)+"T00:00:00");
+  const days=(a,b)=>Math.round((dOf(b)-dOf(a))/86400000);
+  const addDays=(s,n)=>{ const x=dOf(s); x.setDate(x.getDate()+n); return x.getFullYear()+"-"+pad(x.getMonth()+1)+"-"+pad(x.getDate()); };
+  const dfmt=s=>{ if(!s) return "—"; const p=String(s).slice(0,10).split("-"); return MN[+p[1]-1]+" "+(+p[2]); };
+  const dfmtY=s=>{ if(!s) return "—"; const p=String(s).slice(0,10).split("-"); return MN[+p[1]-1]+" "+(+p[2])+", "+p[0]; };
+  const sgn=(v,dp)=>v==null?"—":(v>0?"+":"")+v.toFixed(dp==null?1:dp);
+  const f1=v=>v==null?"—":v.toFixed(1), f2=v=>v==null?"—":v.toFixed(2);
+  const money=v=>v==null?"—":"$"+Math.abs(v).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+  const big=v=>{ if(v==null) return "—"; const a=Math.abs(v), s=v<0?"-":""; if(a>=1e12) return s+(a/1e12).toFixed(2)+"T"; if(a>=1e9) return s+(a/1e9).toFixed(1)+"B"; if(a>=1e6) return s+(a/1e6).toFixed(0)+"M"; return s+a.toFixed(0); };
+  const bare=t=>String(t||"").trim().toUpperCase().split(":").pop();
+  const col=v=>v==null?"var(--text3)":v>0?"var(--green)":v<0?"var(--red)":"var(--text2)";
+  const heat=v=>{ if(v==null) return "transparent"; const k=Math.min(1,Math.abs(v)/60); return v>=0?"rgba(61,214,140,"+(0.06+0.3*k).toFixed(3)+")":"rgba(240,82,82,"+(0.06+0.3*k).toFixed(3)+")"; };
+  const lsGet=(k,d)=>{ try{ const v=localStorage.getItem(k); return v===null?d:v==="1"; }catch(e){ return d; } };
+
+  /* ---------- CSV ---------- */
+  function parseCSV(text){
+    const rows=[]; let i=0,field="",row=[],q=false; if(text.charCodeAt(0)===0xFEFF) text=text.slice(1);
+    while(i<text.length){ const c=text[i];
+      if(q){ if(c==='"'){ if(text[i+1]==='"'){field+='"';i++;} else q=false; } else field+=c; }
+      else{ if(c==='"') q=true; else if(c===','){row.push(field);field="";} else if(c==='\n'){row.push(field);rows.push(row);row=[];field="";} else if(c==='\r'){} else field+=c; }
+      i++; }
+    if(field!==""||row.length){ row.push(field); rows.push(row); }
+    return rows.filter(r=>r.length&&!(r.length===1&&r[0].trim()===""));
+  }
+  const FIELDS=[
+    ["t",[/^symbol$/i,/^ticker$/i]],["n",[/^description$/i,/^name$/i]],
+    ["earn",[/upcoming earnings/i,/next earnings/i]],["earnPrev",[/recent earnings/i,/last earnings/i]],
+    ["px",[/^price$/i]],["tgt",[/target price(?!.*currency)/i]],["rating",[/^analyst rating/i]],
+    ["p1w",[/perf.*1\s*week/i]],["p1m",[/perf.*1\s*month\b/i]],["p3m",[/perf.*3\s*month/i]],["p6m",[/perf.*6\s*month/i]],["p1y",[/perf.*1\s*year/i]],["p5y",[/perf.*5\s*year/i]],
+    ["vol",[/^volume,?\s*1\s*day/i,/^volume$/i]],["mcap",[/market cap(?!.*currency)/i]],
+    ["roic",[/return on invested capital/i]],["roe",[/return on equity/i]],["rg",[/revenue growth/i]],
+    ["nd",[/net debt(?!.*currency)/i]],["ebit",[/^ebitda(?!.*currency)/i]],["fcf",[/free cash flow(?!.*currency)/i]],
+    ["pe",[/price to earnings/i,/^p\/e/i]],["gm",[/gross margin.*(ttm|trailing)/i]],["gmfy",[/gross margin.*(annual|fiscal|\bfy\b)/i]],
+    ["bby",[/buyback yield/i]],["shg",[/shares.*outstanding.*(growth|change)/i]],["epsg",[/earnings per share.*growth/i,/eps.*growth/i]],
+    ["e5",[/exponential moving average,?\s*5\b/i]],["e10",[/exponential moving average,?\s*10\b/i]],["e20",[/exponential moving average,?\s*20\b/i]],["e50",[/exponential moving average,?\s*50\b/i]],["e200",[/exponential moving average,?\s*200\b/i]],
+    ["atr",[/average true range/i]],["rsi",[/relative strength index/i]],["volat",[/volatil/i]],
+    ["hi52",[/^high,?\s*52(?!.*currency)/i,/52.?week high/i]],["lo52",[/^low,?\s*52(?!.*currency)/i,/52.?week low/i]],
+    ["avol",[/average volume/i]],["rvol",[/relative volume/i]],
+    ["ex",[/^exchange$/i]],["sec",[/^sector$/i]],["ind",[/^industry$/i]],
+    ["trat",[/technical rating/i]],["eve",[/enterprise value to ebitda/i]],["beta",[/^beta/i]],
+    ["epsEst",[/earnings per share estimate(?!.*currency)/i,/eps estimate(?!.*currency)/i]],["epsRep",[/earnings per share reported(?!.*currency)/i,/eps reported(?!.*currency)/i]],
+    ["gap",[/^gap/i]]
+  ];
+  const TEXTF=new Set(["t","n","earn","earnPrev","rating","ex","sec","ind","trat"]);
+  const NICE={earn:"Upcoming earnings date",tgt:"Target price 1 year",rating:"Analyst rating",roic:"Return on invested capital",rg:"Revenue growth",nd:"Net debt",ebit:"EBITDA",fcf:"Free cash flow",pe:"Price to earnings",gm:"Gross margin TTM",gmfy:"Gross margin FY",bby:"Buyback yield",epsg:"EPS growth",e20:"EMA 20",atr:"ATR 14",rsi:"RSI 14",hi52:"52-week high",ex:"Exchange",sec:"Sector"};
+  function ingest(matrix){
+    const heads=matrix[0].map(h=>String(h).trim()); const m={}, used=new Set();
+    FIELDS.forEach(([k,rxs])=>{ for(const rx of rxs){ const hit=heads.findIndex((h,j)=>!used.has(j)&&rx.test(h)); if(hit>=0){ m[k]=hit; used.add(hit); return; } } });
+    if(m.t===undefined||m.px===undefined) throw new Error("This does not look like a TradingView screener export — it needs at least a Symbol and a Price column.");
+    const rows=[];
+    for(let r=1;r<matrix.length;r++){ const raw=matrix[r]; if(!raw||!raw.length) continue; const o={};
+      for(const k in m){ const v=raw[m[k]]; if(TEXTF.has(k)){ let s=String(v==null?"":v).trim(); if(k==="earn"||k==="earnPrev"){ s=/^\d{4}-\d{2}-\d{2}/.test(s)?s.slice(0,10):""; } o[k]=s||null; } else o[k]=num(v); }
+      if(!o.t) continue; o.t=bare(o.t); rows.push(o); }
+    const missing=Object.keys(NICE).filter(k=>m[k]===undefined).map(k=>NICE[k]);
+    return {rows,heads,missing};
   }
 
-  const pctOf=(r,n)=> n>1 ? (r-1)/(n-1) : 0;        // 0 = best, 1 = worst
+  /* ---------- the seven lights (same tests as the Momentum tab) ---------- */
+  const LIGHT_INFO=[
+    {name:"Return on capital",why:"Plant one dollar in this business — how many cents grow back every year? Green: more than 15 cents. Below 8 the business is quietly eating money. The single best test of whether a company is any good.",line:"ROIC (or ROE) above 15%"},
+    {name:"Growth",why:"Are sales getting bigger? Green: more than 10% a year. Nothing else can grow for long if this does not.",line:"Revenue growth above 10% (TTM YoY)"},
+    {name:"Debt",why:"If every dollar of operating profit went to the bank, how many years to be debt-free? Green: under 2 years. Over 4 and the bank, not you, decides what happens in a bad year. Switched off for banks — borrowing is what they sell.",line:"Net debt ÷ EBITDA below 2×"},
+    {name:"Cash conversion",why:"The company says it made a profit — did the money actually turn up? Green: more than 80 cents of every reported dollar. Below 60 for two years usually means the profit exists on paper only. A company spending heavily to build something new will look bad here on purpose. Switched off for banks.",line:"Free cash flow ÷ implied net income (market cap ÷ P/E) above 0.8×"},
+    {name:"Gross margin",why:"Out of every dollar a customer pays, how much is left after making the thing? The level barely matters — software keeps 80 cents, a grocer 25. Green: holding steady or rising versus last fiscal year. Falling means competitors are taking the pricing power away.",line:"TTM gross margin not more than 1 point below last FY"},
+    {name:"Share count",why:"You own a slice of a pizza. Is the pizza being cut into more slices? Green: the slices are flat or falling (buybacks). If management keeps cutting new slices your piece shrinks every year even while the company grows.",line:"Buyback yield at or above 0% (no dilution)"},
+    {name:"Price driver",why:"A stock goes up for two reasons: the business earned more, or people simply decided to pay more for the same earnings. Green: the earnings did the work. Red: the price outran the profits — you now pay more per dollar of earnings than a year ago; not automatically bad, but mood can reverse overnight.",line:"(1 + 1-year price return) ÷ (1 + EPS growth) at or below 1.0"}
+  ];
+  function lights(d){
+    if(!d) return [];
+    const bank=/financ|bank/i.test(d.sec||""), L=[];
+    const roic=d.roic!=null?d.roic:(d.roe!=null?d.roe:null), src=d.roic!=null?"ROIC":"ROE";
+    L.push({pass:roic==null?null:roic>15, val:roic==null?"no data":src+" "+roic.toFixed(1)+"%"});
+    L.push({pass:d.rg==null?null:d.rg>10, val:d.rg==null?"no data":"revenue "+sgn(d.rg)+"%"});
+    const ndeb=(d.nd!=null&&d.ebit!=null&&d.ebit>0)?d.nd/d.ebit:null;
+    L.push({pass:bank?null:(ndeb==null?null:ndeb<2), val:bank?"not judged for banks":(ndeb==null?(d.nd!=null&&d.nd<0?"net cash, but EBITDA ≤ 0 — not judged":"no data"):(d.nd<0?"net cash":"net debt "+ndeb.toFixed(2)+"× EBITDA"))});
+    const ni=(d.pe!=null&&d.pe>0&&d.mcap!=null&&d.mcap>0)?d.mcap/d.pe:null, conv=(ni&&d.fcf!=null)?d.fcf/ni:null;
+    L.push({pass:bank?null:(conv==null?null:conv>0.8), val:bank?"not judged for banks":(conv==null?(d.pe==null||d.pe<=0?"no positive P/E — not judged":"no data"):"FCF = "+conv.toFixed(2)+"× reported profit")});
+    L.push({pass:(d.gm!=null&&d.gmfy!=null)?(d.gm-d.gmfy)>=-1:null, val:(d.gm!=null&&d.gmfy!=null)?d.gm.toFixed(1)+"% now vs "+d.gmfy.toFixed(1)+"% last FY":"no data"});
+    L.push({pass:d.bby!=null?d.bby>=0:(d.shg!=null?d.shg<=0.5:null), val:d.bby!=null?"buyback yield "+sgn(d.bby,2)+"%":(d.shg!=null?"share count "+sgn(d.shg)+"%":"no data")});
+    const mult=(d.p1y!=null&&d.epsg!=null&&d.epsg>-90&&d.epsg<300)?(1+d.p1y/100)/(1+d.epsg/100):null;
+    L.push({pass:mult==null?null:mult<=1, val:mult==null?(d.epsg==null?"no data":"EPS growth off the scale ("+sgn(d.epsg,0)+"%) — not judged"):"multiple ×"+mult.toFixed(2)+(mult<=1?" — earnings did the work":" — mood did the work")});
+    L.forEach((l,i)=>{ l.name=LIGHT_INFO[i].name; l.title=(i+1)+" · "+LIGHT_INFO[i].name+" — "+(l.pass===true?"PASS":l.pass===false?"FAIL":"NOT JUDGED")+"\nThis stock: "+l.val+"\nLine: "+LIGHT_INFO[i].line+"\n\n"+LIGHT_INFO[i].why; });
+    return L;
+  }
+  const lscore=Ls=>Ls.filter(l=>l.pass===true).length, lmax=Ls=>Ls.filter(l=>l.pass!==null).length;
 
+  /* ---------- posture + street ---------- */
+  function posture(d){
+    const o={tags:[]}; if(!d||d.px==null) return o; const px=d.px;
+    o.above={e5:d.e5==null?null:px>d.e5, e10:d.e10==null?null:px>d.e10, e20:d.e20==null?null:px>d.e20, e50:d.e50==null?null:px>d.e50, e200:d.e200==null?null:px>d.e200};
+    o.stack=(d.e10!=null&&d.e20!=null&&d.e50!=null&&d.e200!=null)?(d.e10>d.e20&&d.e20>d.e50&&d.e50>d.e200):null;
+    o.atrDist=(d.e20!=null&&d.atr!=null&&d.atr>0)?(px-d.e20)/d.atr:null;
+    o.hiDist=(d.hi52!=null&&d.hi52>0)?(px/d.hi52-1)*100:null;
+    o.loDist=(d.lo52!=null&&d.lo52>0)?(px/d.lo52-1)*100:null;
+    o.stage=(d.e50!=null&&d.e200!=null)?(px>d.e50&&px>d.e200?"uptrend":(px<d.e50&&px<d.e200?"downtrend":"transition")):null;
+    const T=o.tags;
+    if(o.stack&&o.above.e20) T.push({t:"STACKED",c:"g",tip:"10 > 20 > 50 > 200 EMA and price above the 20 — the cleanest trend shape"});
+    if(o.atrDist!=null&&o.atrDist>=2) T.push({t:"EXTENDED",c:"o",tip:(o.atrDist).toFixed(1)+" ATR above the 20 EMA — stretched; chasing here is paying up"});
+    if(o.atrDist!=null&&o.atrDist<=-2) T.push({t:"WASHED",c:"b",tip:Math.abs(o.atrDist).toFixed(1)+" ATR below the 20 EMA — a flush, not a trend"});
+    if(d.e10!=null&&d.e50!=null&&px<d.e10&&px>d.e50&&o.stage==="uptrend") T.push({t:"PULLING IN",c:"b",tip:"Below the 10 EMA but still above the 50 in an uptrend — the pullback zone"});
+    if(o.stage==="downtrend") T.push({t:"BELOW 50/200",c:"r",tip:"Price under both the 50 and 200 EMA"});
+    if(o.hiDist!=null&&o.hiDist>=-5) T.push({t:o.hiDist>=-0.5?"AT HIGH":"NEAR HIGH",c:"g",tip:"Within "+Math.abs(o.hiDist).toFixed(1)+"% of the 52-week high"});
+    if(d.rsi!=null&&d.rsi>=70) T.push({t:"RSI "+Math.round(d.rsi),c:"o",tip:"RSI(14) at or above 70"});
+    if(d.rsi!=null&&d.rsi<=30) T.push({t:"RSI "+Math.round(d.rsi),c:"b",tip:"RSI(14) at or below 30"});
+    if(d.rvol!=null&&d.rvol>=1.5) T.push({t:"RVOL "+d.rvol.toFixed(1)+"×",c:"p",tip:"Relative volume — today is running "+d.rvol.toFixed(1)+"× its usual volume"});
+    if(d.gap!=null&&Math.abs(d.gap)>=2) T.push({t:"GAP "+sgn(d.gap)+"%",c:d.gap>0?"g":"r",tip:"Today opened "+sgn(d.gap)+"% away from yesterday's close"});
+    return o;
+  }
+  function rateClass(s){ if(!s) return null; const x=String(s).toLowerCase();
+    if(/strong buy/.test(x)) return {n:2,l:"Strong buy",c:"or-sb"}; if(/buy/.test(x)) return {n:1,l:"Buy",c:"or-b"};
+    if(/strong sell/.test(x)) return {n:-2,l:"Strong sell",c:"or-ss"}; if(/sell/.test(x)) return {n:-1,l:"Sell",c:"or-s"}; return {n:0,l:"Neutral",c:"or-n"}; }
+  function street(d){
+    if(!d) return {};
+    const up=(d.px&&d.tgt)?(d.tgt/d.px-1)*100:null, rc=rateClass(d.rating), tc=rateClass(d.trat);
+    let agree=null; if(rc&&tc){ agree=((rc.n>0&&tc.n<0)||(rc.n<0&&tc.n>0))?"diverge":((rc.n>0&&tc.n>0)||(rc.n<0&&tc.n<0))?"agree":"mixed"; }
+    const epsChg=(d.epsEst!=null&&d.epsRep!=null&&d.epsRep>0&&d.epsEst>0)?(d.epsEst/d.epsRep-1)*100:null;
+    return {up,rc,tc,agree,epsChg};
+  }
+
+  /* ---------- cross-references from the other tabs ---------- */
+  function xrefIndex(){
+    const X={rs:{},rsN:0,rsTab:"z",mo:{},ef:null,ib:null};
+    try{ const s3=(window.RS2&&RS2.getStep3)?RS2.getStep3():null; if(s3&&s3.rows&&s3.rows.length){ X.rsN=s3.rows.length; X.rsTab=s3.tab; s3.rows.forEach(r=>{ X.rs[bare(r.ticker)]={total:s3.tab==="p"?r.totP:r.totZ, rank:s3.tab==="p"?r.rankP:r.rankZ}; }); } }catch(e){}
+    try{ if(window.MO&&MO.runs&&MO.rankFor){ const byU={}; MO.runs().forEach(r=>{ if(!byU[r.uniId]||byU[r.uniId].as_of<r.as_of) byU[r.uniId]=r; });
+      Object.values(byU).forEach(run=>{ const rk=MO.rankFor(run.id); if(!rk) return; const n=rk.rows.filter(x=>x.rank).length; rk.rows.forEach(x=>{ if(x.rank&&!X.mo[x.t]) X.mo[x.t]={rank:x.rank,n,score:x.score,uni:run.uniName,as_of:run.as_of}; }); }); } }catch(e){}
+    X.ef=(window.EF&&EF.heldBy)?EF.heldBy:null; X.ib=(window.IB&&IB.symInfo)?IB.symInfo:null;
+    return X;
+  }
+
+  /* ---------- model ---------- */
   function build(){
-    if(!A||!B){ render(null); return; }
-    const mapA={}, mapB={};
-    A.forEach(r=>mapA[r.t]=r); B.forEach(r=>mapB[r.t]=r);
-    const keys = mode==="both"
-      ? A.filter(r=>mapB[r.t]).map(r=>r.t)
-      : [...new Set(A.map(r=>r.t).concat(B.map(r=>r.t)))];
-    const wm=wM/100, we=1-wm;
-    const rows=keys.map(t=>{
-      const a=mapA[t], b=mapB[t];
-      // a name present in only one list is treated as NEUTRAL in the other,
-      // never as worst: absence of ETF coverage is not evidence against a stock
-      const pa = a ? pctOf(a.rank,A.length) : 0.5;
-      const pb = b ? pctOf(b.rank,B.length) : 0.5;
-      return {
-        t:t, ex:(a&&a.ex)||(b&&b.ex)||"",
-        mr:a?a.rank:null, er:b?b.rank:null,
-        pa:pa, pb:pb,
-        comb: wm*pa + we*pb,
-        gap: (a&&b) ? Math.abs(pa-pb) : null,
-        src: (a&&b)?"both":(a?"mom":"etf")
-      };
+    const today=todayISO(), X=xrefIndex(); BY={};
+    MODEL=STOCKS.map(s=>{
+      const sym=s.symbol, d=ROWS[sym]||LAST[sym]||null, pv=PREV[sym]||null;
+      const m={sym,s,d,inLatest:!!ROWS[sym],active:s.active!==false,notes:s.notes||"",tags:Array.isArray(s.tags)?s.tags:[],x:{}};
+      BY[sym]=m; if(!d) return m;
+      m.L=lights(d); m.ls=lscore(m.L); m.lm=lmax(m.L); m.post=posture(d); m.st=street(d);
+      m.earnDays=d.earn?days(today,d.earn):null; m.sinceDays=d.earnPrev?days(d.earnPrev,today):null;
+      if(m.inLatest&&P){ if(pv){ const pL=lscore(lights(pv)); m.diff={px:(d.px&&pv.px)?(d.px/pv.px-1)*100:null, tgt:(d.tgt&&pv.tgt)?(d.tgt/pv.tgt-1)*100:null,
+          rating:(d.rating||"")!==(pv.rating||"")?{from:pv.rating,to:d.rating,dir:(rateClass(d.rating)||{n:0}).n-(rateClass(pv.rating)||{n:0}).n}:null,
+          earn:(d.earn||"")!==(pv.earn||"")?{from:pv.earn,to:d.earn}:null, lights:m.ls-pL, isNew:false}; } else m.diff={isNew:true}; }
+      m.x={rs:X.rs[sym]||null, rsN:X.rsN, rsTab:X.rsTab, mo:X.mo[sym]||null};
+      try{ m.x.etf=X.ef?X.ef(sym):null; }catch(e){ m.x.etf=null; }
+      try{ m.x.ib=X.ib?X.ib(sym):null; }catch(e){ m.x.ib=null; }
+      return m;
     });
-    rows.sort((x,y)=>x.comb-y.comb).forEach((r,i)=>r.rank=i+1);
-    render(rows);
   }
-
-  function render(rows){
-    const el=$("mxOut"), bar=$("mxBar");
-    if(!rows){ el.innerHTML='<div class="mo-empty">Drop both files above to combine them.</div>'; bar.style.display="none"; return; }
-    bar.style.display="flex";
-    if(!rows.length){ el.innerHTML='<div class="mo-empty">No overlap between the two lists. Switch to <b>All names</b> to see them side by side.</div>'; return; }
-    const both=rows.filter(r=>r.src==="both").length;
-    $("mxStat").innerHTML='<b>'+both+'</b> in both · <b>'+rows.filter(r=>r.src==="mom").length+'</b> momentum only · <b>'+rows.filter(r=>r.src==="etf").length+'</b> ETF only';
-    let out=rows.slice();
-    const s=sortBy;
-    out.sort((x,y)=>{
-      let a=x[s.c],b=y[s.c];
-      if(a===null)a=s.d==="asc"?Infinity:-Infinity;
-      if(b===null)b=s.d==="asc"?Infinity:-Infinity;
-      if(typeof a==="string")return s.d==="asc"?a.localeCompare(b):b.localeCompare(a);
-      return s.d==="asc"?a-b:b-a;
-    });
-    const H=[["rank","#"],["t","Ticker"],["mr","Mom rank"],["er","ETF rank"],["comb","Combined"],["gap","Disagree"],["src","In"]];
-    let h='<table class="mx-t"><thead><tr>'+H.map(([k,t])=>'<th onclick="MX.sort(\''+k+'\')">'+t+(s.c===k?'<span style="font-size:9px"> '+(s.d==="asc"?"▲":"▼")+'</span>':'')+'</th>').join("")+'</tr></thead><tbody>';
-    out.forEach(r=>{
-      const tag = r.src==="both"?'<span class="mx-tag mx-both">BOTH</span>'
-                : r.src==="mom" ?'<span class="mx-tag mx-m">MOM</span>'
-                                :'<span class="mx-tag mx-e">ETF</span>';
-      h+='<tr><td class="mx-rk">'+r.rank+'</td>'
-        +'<td style="font-weight:600">'+esc(r.t)+(r.gap!==null&&r.gap>0.5?' <span class="mx-tag mx-gap" title="The two lists rank this very differently — worth a look either way">SPLIT</span>':'')+'</td>'
-        +'<td>'+(r.mr||'<span class="mo-dim">—</span>')+'</td>'
-        +'<td>'+(r.er||'<span class="mo-dim">—</span>')+'</td>'
-        +'<td>'+(100-r.comb*100).toFixed(1)+'</td>'
-        +'<td>'+(r.gap===null?'<span class="mo-dim">—</span>':(r.gap*100).toFixed(0))+'</td>'
-        +'<td>'+tag+'</td></tr>';
-    });
-    el.innerHTML=h+'</tbody></table>';
-    window.__MXROWS=rows;
-  }
-
-  function bindDrop(el,which){
-    const take=f=>{
-      const rd=new FileReader();
-      rd.onload=e=>{
-        const list=parseList(e.target.result);
-        if(!list.length){ toast("No tickers found in that file","error"); return; }
-        if(which==="A")A=list; else B=list;
-        el.classList.add("has");
-        el.innerHTML='<b>'+(which==="A"?"Momentum list":"ETF list")+'</b>'+esc(f.name)
-          +'<div class="mx-meta">'+list.length+' tickers · click to replace</div>';
-        build();
-      };
-      rd.readAsText(f);
-    };
-    el.addEventListener("click",()=>{
-      const i=document.createElement("input"); i.type="file"; i.accept=".txt,.csv,text/plain";
-      i.onchange=e=>{ if(e.target.files[0])take(e.target.files[0]); };
-      i.click();
-    });
-    ["dragenter","dragover"].forEach(v=>el.addEventListener(v,e=>{e.preventDefault();e.stopPropagation();el.classList.add("over");}));
-    ["dragleave","drop"].forEach(v=>el.addEventListener(v,e=>{e.preventDefault();e.stopPropagation();el.classList.remove("over");}));
-    el.addEventListener("drop",e=>{ const f=e.dataTransfer.files[0]; if(f)take(f); });
-  }
-
-  function exportTop(){
-    const rows=(window.__MXROWS||[]).slice().sort((a,b)=>a.rank-b.rank).slice(0,topN);
-    if(!rows.length){ toast("Nothing to export","error"); return; }
-    const txt="###COMBINED_TOP"+rows.length+"\n"+rows.map(r=>(r.ex?r.ex+":":"")+r.t).join(",")+"\n";
-    const b=new Blob([txt],{type:"text/plain"});
-    const a=document.createElement("a"); a.href=URL.createObjectURL(b);
-    a.download="combined_top"+rows.length+".txt"; a.click();
-    toast("Exported "+rows.length+" tickers","success");
-  }
-
-  window.MX={
-    init:function(){
-      if(this._i)return; this._i=true;
-      bindDrop($("mxDropA"),"A"); bindDrop($("mxDropB"),"B");
-      $("mxExport").onclick=exportTop;
-      $("mxTopN").onchange=function(){ topN=parseInt(this.value)||100; };
-      $("mxW").oninput=function(){ wM=parseInt(this.value); $("mxWL").textContent=wM+" / "+(100-wM); build(); };
-      document.querySelectorAll("#mxMode button").forEach(b=>b.onclick=function(){
-        document.querySelectorAll("#mxMode button").forEach(x=>x.classList.remove("on"));
-        this.classList.add("on"); mode=this.dataset.m; build();
-      });
-      render(null);
-    },
-    sort:function(c){
-      if(sortBy.c===c)sortBy.d=sortBy.d==="asc"?"desc":"asc";
-      else sortBy={c:c,d:(c==="t"||c==="rank"||c==="mr"||c==="er")?"asc":"desc"};
-      build();
+  const vis=m=>m.d&&(showOff||m.active);
+  function passFilter(m){
+    const d=m.d; if(!d) return false;
+    switch(filt){
+      case "soon7": return m.earnDays!=null&&m.earnDays>=0&&m.earnDays<=7;
+      case "soon14": return m.earnDays!=null&&m.earnDays>=0&&m.earnDays<=14;
+      case "sb": return m.st.rc&&m.st.rc.n===2;
+      case "l5": return m.ls>=5;
+      case "above20": return m.post.above&&m.post.above.e20===true;
+      case "stacked": return m.post.tags.some(t=>t.t==="STACKED");
+      case "near": return m.post.hiDist!=null&&m.post.hiDist>=-5;
+      case "diverge": return m.st.agree==="diverge";
+      case "changed": return !!(m.diff&&(m.diff.isNew||m.diff.rating||m.diff.earn||(m.diff.tgt!=null&&Math.abs(m.diff.tgt)>=3)||(m.diff.lights&&m.diff.lights!==0)));
+      case "owned": return !!(m.x.ib&&m.x.ib.pos);
+      default: if(filt.startsWith("r:")){ const want=filt.slice(2); return (m.st.rc?m.st.rc.l:"—")===want; } return true;
     }
-  };
-})();
-</script>
-
-<script>
-/* ===== INTERSECT 2: RS Score (Step 3, at/above cutoff) x Momentum — automatic ===== */
-(function(){
-  const $=id=>document.getElementById(id);
-  const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  const MAXGAP=10*60*1000;                       // RS upload and momentum upload must be within 10 minutes
-  let inited=false, snapId=null, rsTab=null, cut=50, wRS=50, topN=30, sortBy={c:"rank",d:"asc"};
-  let BASE=null;                                  // {rs:[], mom:[], K, uni, snap, ...} — inputs of the last successful run
-  let ROWS=[];                                    // ranked common names (recomputed on slider change)
-  let busy=false, rerun=false;
-
-  const bare=t=>String(t||"").trim().toUpperCase().split(":").pop().replace(/[^A-Z0-9.\-&]/g,"");
-  const fmtT=d=>{ if(!d) return "unknown"; const x=new Date(d); return isNaN(x)?"unknown":x.toLocaleString([], {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}); };
-  const mins=ms=>{ const m=Math.round(ms/60000); if(m<60) return m+" min"; if(m<48*60) return (m/60).toFixed(1)+" h"; return Math.round(m/1440)+" days"; };
-  const pctOf=(r,n)=> n>1 ? (r-1)/(n-1) : 0;      // 0 = best, 1 = worst
-  const SB_URL="https://jpkniqmqoizscqdkaxag.supabase.co", SB_KEY="sb_publishable_SKiVUnE0b4BkDh9JPRT0Ng_pYgjLErJ";
-
-  async function rsStamp(){                       // Step 1 (stocks) upload time, read live so it is never stale
-    try{ const r=await fetch(SB_URL+"/rest/v1/rs_dataset?id=eq.1&select=uploaded_at,filename",{headers:{apikey:SB_KEY,Authorization:"Bearer "+SB_KEY}});
-      if(!r.ok) return {at:null,file:""}; const a=await r.json(); return a.length?{at:a[0].uploaded_at?new Date(a[0].uploaded_at):null,file:a[0].filename||""}:{at:null,file:""}; }
-    catch(e){ return {at:null,file:""}; }
   }
-  function setSync(html,cls){ const e=$("rxSync"); if(e){ e.innerHTML=html; e.className="rx-sync "+(cls||""); } }
-  function showBar(on){ const b=$("rxBar2"); if(b) b.style.display=on?"flex":"none"; }
-  function empty(msg){ ROWS=[]; BASE=null; showBar(false); const st=$("rxStat"); if(st) st.textContent=""; const o=$("rxOut"); if(o) o.innerHTML='<div class="mo-empty">'+msg+'</div>'; }
-
-  /* ---------- momentum run picker ---------- */
-  let known=null;                                 // snapshot ids seen so far — a brand-new upload is auto-selected
-  function refreshRuns(){
-    const sel=$("rxRun"); if(!sel||!window.MO||!MO.runs) return;
-    const runs=MO.runs();
-    let prev=snapId;
-    if(known&&known.size){ const fresh=runs.filter(r=>!known.has(r.id)); if(fresh.length) prev=fresh.sort((a,b)=>b.id-a.id)[0].id; }
-    known=new Set(runs.map(r=>r.id));
-    sel.innerHTML="";
-    if(!runs.length){ sel.innerHTML='<option value="">— no momentum snapshots yet —</option>'; snapId=null; return; }
-    const byU={}; runs.forEach(r=>{ const k=r.uniName||"Universe"; (byU[k]=byU[k]||[]).push(r); });
-    Object.keys(byU).forEach(k=>{
-      const og=document.createElement("optgroup"); og.label=k;
-      byU[k].slice().sort((a,b)=>a.as_of<b.as_of?1:-1).forEach(r=>{
-        const o=document.createElement("option"); o.value=r.id;
-        o.textContent=r.as_of+" · "+(r.n||0)+" rows · uploaded "+fmtT(r.uploaded_at);
-        og.appendChild(o);
-      });
-      sel.appendChild(og);
-    });
-    // keep the previous choice if it still exists; otherwise the newest snapshot of the universe open in the Momentum tab
-    if(prev&&runs.some(r=>r.id===prev)) snapId=prev;
-    else { const cur=MO.current&&MO.current(); const mine=runs.filter(r=>r.uniId===cur).sort((a,b)=>a.as_of<b.as_of?1:-1);
-           snapId=(mine[0]||runs.slice().sort((a,b)=>a.as_of<b.as_of?1:-1)[0]).id; }
-    sel.value=String(snapId);
+  function listRows(){
+    const qq=q.toUpperCase();
+    let rows=MODEL.filter(vis).filter(passFilter).filter(m=>!qq||m.sym.includes(qq)||String(m.d.n||"").toUpperCase().includes(qq)||String(m.d.sec||"").toUpperCase().includes(qq)||String(m.d.ind||"").toUpperCase().includes(qq));
+    const key=m=>{ const d=m.d, s=sortBy.c;
+      if(s==="sym") return m.sym; if(s==="earnDays") return m.earnDays==null?1e9:m.earnDays; if(s==="px") return d.px; if(s==="tgt") return d.tgt; if(s==="up") return m.st.up;
+      if(s==="rating") return m.st.rc?m.st.rc.n:-9; if(s==="trat") return m.st.tc?m.st.tc.n:-9; if(s==="ls") return m.ls; if(s==="atr") return m.post.atrDist; if(s==="rsi") return d.rsi;
+      if(s==="p1w") return d.p1w; if(s==="p1m") return d.p1m; if(s==="p6m") return d.p6m; if(s==="dpx") return m.diff?m.diff.px:null;
+      if(s==="rs") return m.x.rs?m.x.rs.rank:null; if(s==="mo") return m.x.mo?m.x.mo.rank:null; if(s==="etf") return m.x.etf?m.x.etf.filter(e=>e.held).length:0; if(s==="ib") return m.x.ib&&m.x.ib.pos?m.x.ib.pos.value:(m.x.ib?0:null);
+      if(s==="hi") return m.post.hiDist; return null; };
+    rows.sort((a,b)=>{ let x=key(a), y=key(b); const dir=sortBy.d==="asc"?1:-1;
+      if(typeof x==="string"||typeof y==="string") return String(x||"").localeCompare(String(y||""))*dir;
+      if(x==null&&y==null) return 0; if(x==null) return 1; if(y==null) return -1; return (x-y)*dir; });
+    return rows;
   }
 
-  /* ---------- the run ---------- */
-  async function run(){
-    if(!inited) return;
-    if(busy){ rerun=true; return; } busy=true;
-    try{ await runCore(); } finally{ busy=false; if(rerun){ rerun=false; run(); } }
+  /* ---------- supabase ---------- */
+  async function fetchAll(path){ let all=[],from=0; const page=1000;
+    while(true){ const res=await fetch(SB_URL+"/rest/v1/"+path,{headers:{...HDR,"Range-Unit":"items",Range:from+"-"+(from+page-1)}});
+      if(!res.ok) throw new Error(path.split("?")[0]+" "+res.status+": "+(await res.text())); const d=await res.json(); all=all.concat(d); if(d.length<page) break; from+=page; } return all; }
+  async function post(table,rows,conflict,ret){ const res=await fetch(SB_URL+"/rest/v1/"+table+(conflict?"?on_conflict="+conflict:""),{method:"POST",headers:{...HDRJ,Prefer:(conflict?"resolution=merge-duplicates,":"")+(ret?"return=representation":"return=minimal")},body:JSON.stringify(rows)});
+    if(!res.ok) throw new Error(table+" "+res.status+": "+(await res.text())); return ret?res.json():null; }
+  async function patch(table,filter,body){ const res=await fetch(SB_URL+"/rest/v1/"+table+"?"+filter,{method:"PATCH",headers:{...HDRJ,Prefer:"return=minimal"},body:JSON.stringify(body)}); if(!res.ok) throw new Error(table+" "+res.status+": "+(await res.text())); }
+  async function del(table,filter){ const res=await fetch(SB_URL+"/rest/v1/"+table+"?"+filter,{method:"DELETE",headers:{...HDR,Prefer:"return=minimal"}}); if(!res.ok) throw new Error(table+" "+res.status+": "+(await res.text())); }
+  const inList=arr=>"in.("+arr.map(s=>'"'+String(s).replace(/"/g,'')+'"').join(",")+")";
+  function setStatus(m,c){ const e=$("orStatus"); if(e){ e.innerHTML=m; e.className="or-status "+(c||""); } }
+
+  async function load(){
+    try{
+      UPS=await fetchAll(T_UP+"?select=*&order=as_of.asc"); STOCKS=await fetchAll(T_ST+"?select=*&order=symbol.asc");
+      L=UPS.length?UPS[UPS.length-1]:null; P=UPS.length>1?UPS[UPS.length-2]:null; ROWS={}; PREV={}; LAST={}; HIST={};
+      if(L){
+        const ids=[L.id].concat(P?[P.id]:[]);
+        (await fetchAll(T_ROW+"?select=*&upload_id=in.("+ids.join(",")+")")).forEach(r=>{ const d=r.data||{}; if(r.upload_id===L.id) ROWS[r.symbol]=d; else PREV[r.symbol]=d; });
+        const stale=STOCKS.filter(s=>!ROWS[s.symbol]).map(s=>s.symbol);
+        if(stale.length) (await fetchAll(T_ROW+"?select=upload_id,symbol,data&symbol="+inList(stale)+"&order=upload_id.desc")).forEach(r=>{ if(!LAST[r.symbol]) LAST[r.symbol]=r.data||{}; });
+        (await fetchAll(T_ROW+"?select=upload_id,symbol,price,target,rating,earn,lights&order=upload_id.asc")).forEach(r=>{ (HIST[r.symbol]=HIST[r.symbol]||[]).push(r); });
+      }
+      ready=true; $("orErr").textContent="";
+      const st=$("orStatus"); if(st&&!/\b(ok|err|warn)\b/.test(st.className)) setStatus(L?("Loaded "+Object.keys(ROWS).length+" names from "+dfmtY(L.as_of)+" · "+UPS.length+" upload"+(UPS.length!==1?"s":"")+" · "+STOCKS.filter(s=>s.active===false).length+" unticked"):"No list uploaded yet — drop your Orange List export above.");
+    }catch(err){ ready=false; $("orErr").textContent="Could not load the Orange list: "+err.message+" — has orange_setup.sql been run in Supabase?"; }
+    build(); render();
   }
-  async function runCore(){
-    const s3=(window.RS2&&RS2.getStep3)?RS2.getStep3():null;
-    if(rsTab===null&&s3) rsTab=s3.tab||"z";
-    if($("rxTab")&&rsTab) $("rxTab").value=rsTab;
-    if(!snapId){ setSync("No momentum snapshot to compare with — upload one in the Momentum tab first.","warn"); empty("Nothing to intersect yet."); return; }
-    if(!s3||!s3.rows||!s3.rows.length){
-      setSync("RS Step 3 table is empty"+(s3&&s3.reason?" — "+esc(s3.reason):"")+". Open the <b>RS Score</b> tab and make sure the Step 1 stock file and the Step 2 index file are both loaded.","warn");
-      empty("Waiting for the RS Score tab…"); return;
-    }
-    const run=MO.rankFor(snapId);
-    if(!run){ setSync("That momentum snapshot is gone — pick another.","warn"); refreshRuns(); empty("Pick a momentum run."); return; }
-    const st=await rsStamp();
-    const momAt=run.snap.uploaded_at?new Date(run.snap.uploaded_at):null;
-    const head='RS Step 1 uploaded <b>'+fmtT(st.at)+'</b>'+(st.file?' <span class="mo-dim">('+esc(st.file)+')</span>':'')
-              +' &nbsp;·&nbsp; Momentum <b>'+esc(run.uni?run.uni.name:"")+' '+esc(run.snap.as_of)+'</b> uploaded <b>'+fmtT(momAt)+'</b>';
-    if(!st.at){ setSync(head+'<br>⛔ The RS dataset has no upload time — re-upload the Step 1 file in the RS Score tab, then press Refresh.',"err"); empty("Blocked until both uploads are fresh."); return; }
-    if(!momAt){ setSync(head+'<br>⛔ This momentum snapshot has no upload time (it was saved before the time stamp existed'+(MO.stampMissing&&MO.stampMissing()?', or <b>momentum_uploaded_at.sql</b> has not been run in Supabase yet':'')+'). Re-upload the snapshot in the Momentum tab, then press Refresh.',"err"); empty("Blocked until both uploads are fresh."); return; }
-    const gap=Math.abs(st.at-momAt);
-    if(gap>MAXGAP){
-      setSync(head+'<br>⛔ These uploads are <b>'+mins(gap)+'</b> apart (limit 10 min). Export the screener again and upload it to <b>both</b> tabs within 10 minutes, then press Refresh.',"err");
-      empty("Blocked — the RS and momentum data do not describe the same moment."); return;
-    }
-    // ---- 1) RS names at/above the cutoff, in RS order
-    const tab=rsTab||"z";
-    const rs=s3.rows.map(r=>({key:bare(r.ticker),sym:r.exportSym||r.ticker,total:tab==="z"?r.totZ:r.totP}))
-                    .filter(r=>r.key&&r.total!==null&&r.total!==undefined&&r.total>=cut)
-                    .sort((a,b)=>b.total-a.total);
-    const seen=new Set(); const rsU=rs.filter(r=>{ if(seen.has(r.key)) return false; seen.add(r.key); return true; });
-    rsU.forEach((r,i)=>r.rank=i+1);
-    const K=rsU.length;
-    if(!K){ setSync(head+' &nbsp;·&nbsp; <span style="color:var(--green)">in sync ('+mins(gap)+' apart)</span>',"ok"); empty("No RS name scores "+cut+" or more on the "+(tab==="z"?"Z-Score":"Percentile")+" (combined) table — lower the cutoff or wait for a stronger tape."); return; }
-    // ---- 2) the same number of names from the top of the momentum ranking (Momentum-tab filters apply)
-    const momAll=run.rows.filter(run.pass).sort((a,b)=>a.rank-b.rank);
-    const mom=momAll.slice(0,K); mom.forEach((r,i)=>r.krank=i+1);
-    BASE={rs:rsU,mom,K,uni:run.uni,snap:run.snap,filters:run.filters,tab,gap,momTotal:momAll.length};
-    setSync(head+' &nbsp;·&nbsp; <span style="color:var(--green)">in sync ('+mins(gap)+' apart)</span>',"ok");
-    combine(); render();
+  function dateFromName(name){ const m=String(name).match(/(20\d{2})[-_]?(\d{2})[-_]?(\d{2})/); return m?m[1]+"-"+m[2]+"-"+m[3]:todayISO(); }
+  async function importFile(file){
+    if(!ready){ toast("Orange tables not ready — run orange_setup.sql first","error"); return; }
+    let parsed; try{ parsed=ingest(parseCSV(await file.text())); }catch(e){ setStatus(esc(e.message),"err"); toast("Import failed","error"); return; }
+    if(!parsed.rows.length){ setStatus("No data rows found in that file.","err"); return; }
+    const d=prompt("Date this export represents (YYYY-MM-DD):",dateFromName(file.name)); if(!d) return;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(d.trim())){ toast("Date must be YYYY-MM-DD","error"); return; } const asOf=d.trim();
+    try{
+      setStatus("Saving "+parsed.rows.length+" names…");
+      const up=(await post(T_UP,[{as_of:asOf,filename:file.name,uploaded_at:new Date().toISOString(),n_rows:parsed.rows.length,columns:parsed.heads}],"as_of",true))[0];
+      await del(T_ROW,"upload_id=eq."+up.id);
+      const newest=!UPS.some(u=>u.as_of>asOf), exist={}; STOCKS.forEach(s=>exist[s.symbol]=s);
+      const now=new Date().toISOString();
+      const srows=parsed.rows.map(r=>{ const e=exist[r.t]; const o={symbol:r.t,name:r.n||null,exchange:r.ex||null,sector:r.sec||null,industry:r.ind||null,
+        first_seen:(e&&e.first_seen&&e.first_seen<asOf)?e.first_seen:asOf, last_seen:(e&&e.last_seen&&e.last_seen>asOf)?e.last_seen:asOf, updated_at:now}; if(newest) o.active=true; return o; });
+      await post(T_ST,srows,"symbol");
+      await post(T_ROW,parsed.rows.map(r=>({upload_id:up.id,symbol:r.t,price:r.px,target:r.tgt,rating:r.rating||null,earn:r.earn||null,lights:lscore(lights(r)),data:r})),"upload_id,symbol");
+      let offN=0;
+      if(newest){ const inFile=new Set(parsed.rows.map(r=>r.t)); const off=STOCKS.filter(s=>!inFile.has(s.symbol)&&s.active!==false).map(s=>s.symbol); offN=off.length; if(off.length) await patch(T_ST,"symbol="+inList(off),{active:false,updated_at:now}); }
+      setStatus("Imported <b>"+esc(file.name)+"</b> · "+dfmtY(asOf)+" · "+parsed.rows.length+" names"+(offN?" · "+offN+" name"+(offN!==1?"s":"")+" no longer in the file → unticked":"")+(parsed.missing.length?'<br><span class="or-dim">Columns not found in this file: '+esc(parsed.missing.join(", "))+' — those readings show as “—”.</span>':""),parsed.missing.length?"warn":"ok");
+      toast("Orange list imported ✓","success"); await load();
+    }catch(err){ setStatus("Import failed: "+esc(err.message),"err"); toast("Import failed: "+err.message,"error"); }
   }
-  function combine(){
-    if(!BASE){ ROWS=[]; return; }
-    const w=wRS/100, mm={}; BASE.mom.forEach(m=>mm[bare(m.t)]=m);
-    ROWS=BASE.rs.filter(r=>mm[r.key]).map(r=>{
-      const m=mm[r.key], pa=pctOf(r.rank,BASE.K), pb=pctOf(m.krank,BASE.mom.length);
-      return {t:r.key, sym:r.sym||((m.ex?m.ex+":":"")+m.t), n:m.n||"", sec:m.sec||"", rsRank:r.rank, rsTotal:r.total, mRank:m.krank, mScore:m.score,
-              f:m.fscore, fmax:m.fmax, pa, pb, comb:w*pa+(1-w)*pb, gap:Math.abs(pa-pb)};
-    });
-    ROWS.sort((x,y)=>x.comb-y.comb || x.rsRank-y.rsRank).forEach((r,i)=>r.rank=i+1);
-  }
+  async function setActive(sym,on){ const s=STOCKS.find(x=>x.symbol===sym); if(!s) return; s.active=on; try{ await patch(T_ST,"symbol=eq."+encodeURIComponent(sym),{active:on,updated_at:new Date().toISOString()}); }catch(e){ toast("Save failed: "+e.message,"error"); } build(); render(); if(cardSym===sym) openCard(sym); }
+  async function delStock(sym){ if(!confirm("Delete "+sym+" from the Orange list?\n\nIts notes and all its history go too. If it turns up in a later upload it comes back as a new name.")) return;
+    try{ await del(T_ST,"symbol=eq."+encodeURIComponent(sym)); toast(sym+" deleted","success"); closeCard(); await load(); }catch(e){ toast("Delete failed: "+e.message,"error"); } }
+  async function saveNotes(sym){ const s=STOCKS.find(x=>x.symbol===sym); if(!s) return; const notes=($("orNotes").value||"").trim(); const tags=($("orTags").value||"").split(",").map(t=>t.trim()).filter(Boolean);
+    s.notes=notes; s.tags=tags; try{ await patch(T_ST,"symbol=eq."+encodeURIComponent(sym),{notes:notes||null,tags,updated_at:new Date().toISOString()}); toast("Saved ✓","success"); }catch(e){ toast("Save failed: "+e.message,"error"); } build(); render(); }
+  async function delUpload(id){ const u=UPS.find(x=>x.id===id); if(!u) return; if(!confirm("Delete the upload of "+dfmtY(u.as_of)+"? The names stay; only that day's readings go.")) return;
+    try{ await del(T_UP,"id=eq."+id); toast("Upload deleted","success"); await load(); }catch(e){ toast("Delete failed: "+e.message,"error"); } }
 
   /* ---------- render ---------- */
-  function render(){
-    const el=$("rxOut"); if(!el) return;
-    if(!BASE){ return; }
-    showBar(true);
-    const mm=new Set(BASE.mom.map(m=>bare(m.t))), rk=new Set(BASE.rs.map(r=>r.key));
-    const rsOnly=BASE.rs.filter(r=>!mm.has(r.key)).map(r=>r.key), momOnly=BASE.mom.filter(m=>!rk.has(bare(m.t))).map(m=>bare(m.t));
-    const f=BASE.filters, fl=[]; if(f.minF>0) fl.push("Min F "+f.minF); if(f.minTurn>0) fl.push("turnover ≥ $"+f.minTurn+"M"); if(f.use3M) fl.push("3M included");
-    $("rxStat").innerHTML='<b>'+BASE.K+'</b> RS names ≥ '+cut+' &nbsp;→&nbsp; top <b>'+BASE.mom.length+'</b> momentum'+(BASE.mom.length<BASE.K?' (only '+BASE.momTotal+' ranked)':'')+' &nbsp;→&nbsp; <b>'+ROWS.length+'</b> in both'
-      +(fl.length?' &nbsp;<span class="mo-dim">· momentum filters: '+esc(fl.join(", "))+'</span>':'');
-    const tn=$("rxTopN"); if(tn){ tn.max=Math.max(1,ROWS.length); if(parseInt(tn.value)>ROWS.length&&ROWS.length) tn.value=ROWS.length; topN=parseInt(tn.value)||ROWS.length; }
-    if(!ROWS.length){ el.innerHTML='<div class="mo-empty">No name is on both lists. The '+BASE.K+' RS names ≥ '+cut+' and the top '+BASE.mom.length+' momentum names do not overlap at all.</div>'+foot(rsOnly,momOnly); return; }
-    const s=sortBy, out=ROWS.slice();
-    out.sort((x,y)=>{ let a=x[s.c],b=y[s.c]; if(a==null)a=s.d==="asc"?Infinity:-Infinity; if(b==null)b=s.d==="asc"?Infinity:-Infinity;
-      if(typeof a==="string") return s.d==="asc"?a.localeCompare(b):b.localeCompare(a); return s.d==="asc"?a-b:b-a; });
-    const H=[["rank","#"],["t","Ticker"],["rsRank","RS rank /"+BASE.K],["rsTotal","RS total"],["mRank","Mom rank /"+BASE.mom.length],["mScore","Mom score"],["f","F"],["comb","Combined"],["gap","Disagree"]];
-    let h='<table class="mx-t"><thead><tr>'+H.map(([k,t])=>'<th onclick="RX.sort(\''+k+'\')">'+t+(s.c===k?'<span style="font-size:9px"> '+(s.d==="asc"?"▲":"▼")+'</span>':'')+'</th>').join("")+'</tr></thead><tbody>';
-    out.forEach(r=>{
-      h+='<tr><td class="mx-rk">'+r.rank+'</td>'
-        +'<td style="font-weight:600" title="'+esc(r.n)+(r.sec?' · '+esc(r.sec):'')+'">'+esc(r.t)+(r.gap>0.5?' <span class="mx-tag mx-gap" title="RS and momentum place this name very differently">SPLIT</span>':'')+'</td>'
-        +'<td>'+r.rsRank+'</td><td>'+(r.rsTotal==null?'—':r.rsTotal.toFixed(1))+'</td>'
-        +'<td>'+r.mRank+'</td><td>'+(r.mScore==null?'—':(r.mScore>=0?'+':'')+r.mScore.toFixed(2))+'</td>'
-        +'<td><span class="mo-dim">'+(r.fmax?r.f+'/'+r.fmax:'—')+'</span></td>'
-        +'<td style="font-weight:700;color:var(--accent)">'+(100-r.comb*100).toFixed(1)+'</td>'
-        +'<td>'+(r.gap*100).toFixed(0)+'</td></tr>';
-    });
-    el.innerHTML=h+'</tbody></table>'+foot(rsOnly,momOnly);
+  function render(){ if(!$("orTable")) return; renderMeta(); renderKpis(); renderChanges(); renderCalendar(); renderStreet(); renderTable(); renderUploads(); }
+  function renderMeta(){ const e=$("orMeta"); if(!e) return; e.textContent=L?("list as of "+dfmtY(L.as_of)+" · "+MODEL.filter(m=>m.active&&m.d).length+" ticked · "+MODEL.filter(m=>!m.active).length+" unticked"):""; }
+  function tile(l,v,sub,cls,f){ return '<div class="or-k '+(cls||"")+(f?' click" onclick="OR.filter(\''+f+'\')" title="Click to filter the watchlist':'"')+'">'+l+'<b>'+v+'</b>'+(sub?'<span class="or-dim">'+sub+'</span>':'')+'</div>'; }
+  function renderKpis(){
+    const k=$("orKpis"); const A=MODEL.filter(m=>m.active&&m.d); if(!A.length){ k.innerHTML=""; return; }
+    const soon7=A.filter(m=>m.earnDays!=null&&m.earnDays>=0&&m.earnDays<=7).length, soon14=A.filter(m=>m.earnDays!=null&&m.earnDays>=0&&m.earnDays<=14).length;
+    const ups=A.map(m=>m.st.up).filter(v=>v!=null), avgUp=ups.length?ups.reduce((a,b)=>a+b,0)/ups.length:null, above=A.filter(m=>m.st.up!=null&&m.st.up<0).length;
+    const sb=A.filter(m=>m.st.rc&&m.st.rc.n===2).length, buy=A.filter(m=>m.st.rc&&m.st.rc.n===1).length, l5=A.filter(m=>m.ls>=5).length;
+    const a20=A.filter(m=>m.post.above&&m.post.above.e20===true).length, stk=A.filter(m=>m.post.tags.some(t=>t.t==="STACKED")).length, near=A.filter(m=>m.post.hiDist!=null&&m.post.hiDist>=-5).length;
+    const div=A.filter(m=>m.st.agree==="diverge").length, owned=A.filter(m=>m.x.ib&&m.x.ib.pos).length;
+    k.innerHTML=tile("Ticked names",A.length)+tile("Reporting ≤ 7 days",soon7,"",soon7?"alert":"","soon7")+tile("≤ 14 days",soon14,"","","soon14")
+      +tile("Avg Street upside",avgUp==null?"—":sgn(avgUp)+"%",above+" already above target")+tile("Strong buy / Buy",sb+" / "+buy,Math.round((sb+buy)/A.length*100)+"% of list","","sb")
+      +tile("5+ lights",l5,"of "+A.length,"","l5")+tile("Above 20 EMA",a20,Math.round(a20/A.length*100)+"%","","above20")+tile("Stacked EMAs",stk,"","","stacked")+tile("Near 52w high",near,"within 5%","","near")
+      +tile("Street ≠ tape",div,"rating vs TV technical",div?"alert":"","diverge")+(owned?tile("In IBKR now",owned,"","","owned"):"");
   }
-  function foot(rsOnly,momOnly){
-    return '<details class="rx-foot"><summary>Names on only one list — '+rsOnly.length+' RS-only · '+momOnly.length+' momentum-only (not ranked)</summary>'
-      +'<div><b>RS ≥ '+cut+' but not in momentum top '+(BASE?BASE.mom.length:0)+':</b> '+(rsOnly.length?esc(rsOnly.join(", ")):"—")+'</div>'
-      +'<div><b>Momentum top '+(BASE?BASE.mom.length:0)+' but not RS ≥ '+cut+':</b> '+(momOnly.length?esc(momOnly.join(", ")):"—")+'</div></details>';
+  function renderChanges(){
+    const el=$("orChanges"), sub=$("orChangesSub"); if(!L){ el.innerHTML='<div class="or-empty">Nothing yet.</div>'; sub.textContent=""; return; }
+    if(!P){ el.innerHTML='<div class="or-empty">Only one upload so far — the next one will show what moved.</div>'; sub.textContent="first upload"; return; }
+    const cur=MODEL.filter(m=>m.inLatest), prevSyms=Object.keys(PREV);
+    const added=cur.filter(m=>m.diff&&m.diff.isNew), dropped=prevSyms.filter(s=>!ROWS[s]);
+    const rUp=cur.filter(m=>m.diff&&m.diff.rating&&m.diff.rating.dir>0), rDn=cur.filter(m=>m.diff&&m.diff.rating&&m.diff.rating.dir<0);
+    const tUp=cur.filter(m=>m.diff&&m.diff.tgt!=null&&m.diff.tgt>=3).sort((a,b)=>b.diff.tgt-a.diff.tgt), tDn=cur.filter(m=>m.diff&&m.diff.tgt!=null&&m.diff.tgt<=-3).sort((a,b)=>a.diff.tgt-b.diff.tgt);
+    const eMv=cur.filter(m=>m.diff&&m.diff.earn), lUp=cur.filter(m=>m.diff&&m.diff.lights>0), lDn=cur.filter(m=>m.diff&&m.diff.lights<0);
+    const pBig=cur.filter(m=>m.diff&&m.diff.px!=null&&Math.abs(m.diff.px)>=10).sort((a,b)=>Math.abs(b.diff.px)-Math.abs(a.diff.px));
+    const t=s=>'<span class="t" onclick="OR.card(\''+esc(s)+'\')">'+esc(s)+'</span>';
+    const box=(h,items,empty)=>'<div class="or-chgbox"><h5>'+h+'</h5>'+(items.length?items.join("<br>"):'<span class="or-dim">'+(empty||"none")+'</span>')+'</div>';
+    sub.textContent=dfmtY(P.as_of)+" → "+dfmtY(L.as_of);
+    el.innerHTML='<div class="or-chg">'
+      +box("New in the list ("+added.length+")",added.map(m=>t(m.sym)+' <span class="or-dim">'+esc((m.d.n||"").slice(0,28))+'</span>'))
+      +box("No longer in the file → unticked ("+dropped.length+")",dropped.map(s=>t(s)))
+      +box("Analyst rating changed ("+(rUp.length+rDn.length)+")",rUp.map(m=>t(m.sym)+' <span class="or-up">▲</span> '+esc(m.diff.rating.from)+' → '+esc(m.diff.rating.to)).concat(rDn.map(m=>t(m.sym)+' <span class="or-dn">▼</span> '+esc(m.diff.rating.from)+' → '+esc(m.diff.rating.to))))
+      +box("Target moved ≥ 3% ("+(tUp.length+tDn.length)+")",tUp.map(m=>t(m.sym)+' <span class="or-up">'+sgn(m.diff.tgt)+'%</span> → '+money(m.d.tgt)).concat(tDn.map(m=>t(m.sym)+' <span class="or-dn">'+sgn(m.diff.tgt)+'%</span> → '+money(m.d.tgt))))
+      +box("Earnings date moved ("+eMv.length+")",eMv.map(m=>t(m.sym)+' '+dfmt(m.diff.earn.from)+' → '+dfmt(m.diff.earn.to)))
+      +box("Lights changed ("+(lUp.length+lDn.length)+")",lUp.map(m=>t(m.sym)+' <span class="or-up">+'+m.diff.lights+'</span> → '+m.ls+'/'+m.lm).concat(lDn.map(m=>t(m.sym)+' <span class="or-dn">'+m.diff.lights+'</span> → '+m.ls+'/'+m.lm)))
+      +box("Price moved ≥ 10% ("+pBig.length+")",pBig.map(m=>t(m.sym)+' <span style="color:'+col(m.diff.px)+'">'+sgn(m.diff.px)+'%</span>'))
+      +'</div>';
   }
-  function exportTop(){
-    if(!ROWS.length){ toast("Nothing to export","error"); return; }
-    const n=Math.max(1,Math.min(parseInt($("rxTopN").value)||ROWS.length,ROWS.length));
-    const rows=ROWS.slice().sort((a,b)=>a.rank-b.rank).slice(0,n);
-    const code=((BASE.uni&&(BASE.uni.code||BASE.uni.name))||"UNIVERSE").toUpperCase().replace(/[^A-Z0-9]/g,"");
-    const txt="###RSxMOMO_"+code+"_TOP"+rows.length+"\n"+rows.map(r=>r.sym).join(",")+"\n";
-    const b=new Blob([txt],{type:"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b);
-    a.download="rs_x_momentum_"+code.toLowerCase()+"_top"+rows.length+".txt"; a.click();
-    toast("Exported "+rows.length+" tickers · RS "+wRS+" / momentum "+(100-wRS),"success");
+  function chip(m){ const c=m.st.rc?m.st.rc.c:"or-x";
+    return '<span class="or-chip '+c+(m.active?'':' off')+'" onclick="OR.card(\''+esc(m.sym)+'\')" title="'+esc((m.d.n||"")+' · '+money(m.d.px)+' · target '+money(m.d.tgt)+(m.st.up!=null?' ('+sgn(m.st.up)+'%)':'')+' · '+(m.st.rc?m.st.rc.l:'no rating')+' · lights '+m.ls+'/'+m.lm+(m.active?'':' · UNTICKED'))+'">'+esc(m.sym)+'<i>'+m.ls+'</i></span>'; }
+  function renderCalendar(){
+    const today=todayISO(); const src=MODEL.filter(m=>m.d&&m.d.earn&&(calOff||m.active));
+    const byD={}; src.forEach(m=>{ (byD[m.d.earn]=byD[m.d.earn]||[]).push(m); }); Object.values(byD).forEach(a=>a.sort((x,y)=>(y.ls-x.ls)||x.sym.localeCompare(y.sym)));
+    let h=""; for(let i=0;i<14;i++){ const d=addDays(today,i), dow=dOf(d).getDay(), wk=dow===0||dow===6, list=byD[d]||[];
+      h+='<div class="or-sd'+(wk?' wk':'')+(i===0?' today':'')+'"><div class="d">'+DN[dow]+' '+dfmt(d)+(list.length?' · '+list.length:'')+'</div>'+list.map(chip).join("")+'</div>'; }
+    $("orStrip").innerHTML=h;
+    if(!calYM) calYM=today.slice(0,7);
+    const y=+calYM.slice(0,4), mo=+calYM.slice(5,7); $("orCalTitle").textContent=MF[mo-1].toUpperCase()+" "+y;
+    const first=new Date(y,mo-1,1), start=new Date(first); start.setDate(1-first.getDay()); const cells=[];
+    for(let i=0;i<42;i++){ const x=new Date(start); x.setDate(start.getDate()+i); cells.push(x); }
+    const iso=x=>x.getFullYear()+"-"+pad(x.getMonth()+1)+"-"+pad(x.getDate());
+    let g=DN.map(d=>'<div class="h">'+d.toUpperCase()+'</div>').join("");
+    const last=cells[35], hideLast=last.getMonth()!==mo-1; const use=hideLast?cells.slice(0,35):cells;
+    use.forEach(x=>{ const d=iso(x), out=x.getMonth()!==mo-1, wk=x.getDay()===0||x.getDay()===6, list=byD[d]||[];
+      g+='<div class="or-cd'+(out?' out':'')+(wk?' wk':'')+(d===today?' today':'')+'"><div class="d">'+x.getDate()+'</div>'+list.map(chip).join("")+'</div>'; });
+    $("orCal").innerHTML=g;
+  }
+  const quadPlugin={id:"orQuad",afterDraw(c){ const {ctx,chartArea:a,scales:{x,y}}=c; if(!a) return; ctx.save(); ctx.font="10px Barlow, sans-serif"; ctx.fillStyle="rgba(154,163,184,.75)";
+    const zx=x.getPixelForValue(0), zy=y.getPixelForValue(0); const L=c.config.options.orLabels||{};
+    ctx.textAlign="left"; ctx.fillText(L.tl||"",a.left+6,a.top+12); ctx.fillText(L.bl||"",a.left+6,a.bottom-6); ctx.textAlign="right"; ctx.fillText(L.tr||"",a.right-6,a.top+12); ctx.fillText(L.br||"",a.right-6,a.bottom-6);
+    ctx.strokeStyle="rgba(232,184,75,.45)"; ctx.setLineDash([4,4]); ctx.beginPath(); if(zx>=a.left&&zx<=a.right){ ctx.moveTo(zx,a.top); ctx.lineTo(zx,a.bottom); } if(zy>=a.top&&zy<=a.bottom){ ctx.moveTo(a.left,zy); ctx.lineTo(a.right,zy); } ctx.stroke(); ctx.restore(); }};
+  function renderStreet(){
+    const A=MODEL.filter(m=>m.d&&m.active); renderBoard(A);
+    if(typeof Chart==="undefined"){ setTimeout(renderStreet,400); return; }
+    const cv=$("orScatter"); if(!cv) return;
+    const yv=m=>scY==="rs"?(m.x.rs?m.x.rs.total:null):scY==="mo"?(m.x.mo?m.x.mo.rank:null):m.d[scY];
+    const pts=A.filter(m=>m.st.up!=null&&yv(m)!=null).map(m=>({x:m.st.up,y:yv(m),sym:m.sym,m}));
+    const colour=m=>!m.st.rc?"rgba(154,163,184,.7)":m.st.rc.n===2?"rgba(61,214,140,.95)":m.st.rc.n===1?"rgba(61,214,140,.55)":m.st.rc.n===0?"rgba(154,163,184,.7)":"rgba(240,82,82,.85)";
+    if(chart){ try{chart.destroy();}catch(e){} chart=null; }
+    if(!pts.length) return;
+    const yl={p6m:"6-month performance %",p1y:"1-year performance %",p1m:"1-month performance %",rs:"RS Step 3 total",mo:"Momentum rank (1 = best)"}[scY];
+    const labels=scY==="mo"?{tl:"",tr:"",bl:"Street sees room · tape already strong",br:""}:{tl:"tape strong · Street says fully valued",tr:"tape strong · Street still sees room",bl:"tape weak · Street says fully valued",br:"tape weak · Street sees room"};
+    chart=new Chart(cv.getContext("2d"),{type:"scatter",data:{datasets:[{data:pts,backgroundColor:pts.map(p=>colour(p.m)),borderColor:"rgba(13,15,18,.8)",borderWidth:1,pointRadius:6,pointHoverRadius:8}]},
+      options:{responsive:true,maintainAspectRatio:false,animation:false,orLabels:labels,onClick:(e,els)=>{ if(els.length){ const p=pts[els[0].index]; if(p) openCard(p.sym); } },
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{ const p=pts[c.dataIndex]; return [p.sym+" · "+(p.m.d.n||"").slice(0,28),"Street upside "+sgn(p.x)+"% · "+(p.m.st.rc?p.m.st.rc.l:"—"),yl+": "+(scY==="mo"?"#"+p.y:f1(p.y)+(scY==="rs"?"":"%")),"lights "+p.m.ls+"/"+p.m.lm]; }}}},
+        scales:{x:{title:{display:true,text:"Street upside % (1-year target vs price)",color:"#9aa3b8"},ticks:{color:"#9aa3b8",callback:v=>v+"%"},grid:{color:"rgba(45,52,69,.5)"}},
+                y:{reverse:scY==="mo",title:{display:true,text:yl,color:"#9aa3b8"},ticks:{color:"#9aa3b8"},grid:{color:"rgba(45,52,69,.5)"}}}},
+      plugins:[quadPlugin]});
+  }
+  function renderBoard(A){
+    const el=$("orBoard"); if(!A.length){ el.innerHTML='<div class="or-empty">No names yet.</div>'; return; }
+    const cats=[["Strong buy","or-sb"],["Buy","or-b"],["Neutral","or-n"],["Sell","or-s"],["Strong sell","or-ss"]];
+    const cnt={}; A.forEach(m=>{ const l=m.st.rc?m.st.rc.l:"—"; cnt[l]=(cnt[l]||0)+1; });
+    let h='<h5>Analyst ratings · '+A.length+' names</h5><div class="or-stack">'+cats.filter(([l])=>cnt[l]).map(([l,c])=>'<div class="'+c+'" style="flex:'+cnt[l]+'" title="'+l+' · '+cnt[l]+'" onclick="OR.filter(\'r:'+l+'\')">'+cnt[l]+'</div>').join("")+'</div>';
+    h+=cats.filter(([l])=>cnt[l]).map(([l,c])=>'<div class="or-bl" onclick="OR.filter(\'r:'+l+'\')"><span class="or-tag '+c+'">'+l+'</span><span>'+cnt[l]+' · '+Math.round(cnt[l]/A.length*100)+'%</span></div>').join("");
+    const ups=A.filter(m=>m.st.up!=null).sort((a,b)=>b.st.up-a.st.up);
+    if(ups.length){ h+='<h5 style="margin-top:10px">Most room to target</h5>'+ups.slice(0,5).map(m=>'<div class="or-bl" onclick="OR.card(\''+esc(m.sym)+'\')"><span>'+esc(m.sym)+'</span><span class="or-up">'+sgn(m.st.up)+'%</span></div>').join("");
+      h+='<h5 style="margin-top:10px">Already past the target</h5>'+ups.filter(m=>m.st.up<0).slice(-5).reverse().map(m=>'<div class="or-bl" onclick="OR.card(\''+esc(m.sym)+'\')"><span>'+esc(m.sym)+'</span><span class="or-dn">'+sgn(m.st.up)+'%</span></div>').join("")||""; }
+    const div=A.filter(m=>m.st.agree==="diverge"); if(div.length) h+='<h5 style="margin-top:10px">Street ≠ TradingView technical ('+div.length+')</h5>'+div.slice(0,6).map(m=>'<div class="or-bl" onclick="OR.card(\''+esc(m.sym)+'\')"><span>'+esc(m.sym)+'</span><span class="or-dim">'+esc(m.st.rc.l)+' vs '+esc(m.st.tc.l)+'</span></div>').join("");
+    el.innerHTML=h;
+  }
+  function ladder(m){ return '<span class="or-ll" title="'+esc(m.L.map(l=>(l.pass===true?"✓":l.pass===false?"✗":"○")+" "+l.name+" — "+l.val).join("\n"))+'">'+m.L.map(l=>'<i class="'+(l.pass===true?"y":l.pass===false?"n":"u")+'"></i>').join("")+'</span>'; }
+  const FILTERS=[["all","All"],["soon7","Reporting ≤7d"],["soon14","≤14d"],["sb","Strong buy"],["l5","5+ lights"],["above20","Above 20 EMA"],["stacked","Stacked"],["near","Near 52w high"],["diverge","Street ≠ tape"],["changed","Changed"],["owned","In IBKR"]];
+  function renderTable(){
+    const el=$("orTable"); $("orChips").innerHTML=FILTERS.map(([k,l])=>'<span class="or-fc'+(filt===k?' on':'')+'" onclick="OR.filter(\''+k+'\')">'+l+'</span>').join("")+(filt.startsWith("r:")?'<span class="or-fc on" onclick="OR.filter(\'all\')">'+esc(filt.slice(2))+' ×</span>':'');
+    if(!L){ el.innerHTML='<div class="or-empty">Upload your Orange List export to begin.</div>'; $("orListSub").textContent=""; return; }
+    const rows=listRows(); $("orListSub").textContent=rows.length+" shown";
+    if(!rows.length){ el.innerHTML='<div class="or-empty">No name matches this filter.</div>'; return; }
+    const H=[["sym","Ticker","l"],["earnDays","Earnings","l"],["px","Price"],["tgt","Target"],["up","Upside"],["rating","Rating","l"],["trat","TV tech","l"],["ls","Lights","l"],["post","Posture","l"],["atr","→20 EMA"],["rsi","RSI"],["hi","52w hi"],["p1w","1W"],["p1m","1M"],["p6m","6M"],["dpx","Δ price"],["rs","RS"],["mo","Mom"],["etf","ETFs"],["ib","IBKR","l"],["nt","",""],["x","",""]];
+    const s=sortBy;
+    let h='<table class="or-t"><thead><tr><th title="ticked = in your latest file (or re-ticked by you)">✓</th>'+H.map(([k,t,a])=>'<th class="'+(a||"")+'" '+(k==="post"||k==="nt"||k==="x"?'':'onclick="OR.sort(\''+k+'\')"')+'>'+t+(s.c===k?'<span style="font-size:9px"> '+(s.d==="asc"?"▲":"▼")+'</span>':'')+'</th>').join("")+'</tr></thead><tbody>';
+    rows.forEach(m=>{ const d=m.d, st=m.st, po=m.post, x=m.x;
+      const ed=m.earnDays==null?'<span class="or-dim">—</span>':(m.earnDays<0?'<span class="or-dim">'+dfmt(d.earn)+' · done</span>':dfmt(d.earn)+' <span class="'+(m.earnDays<=7?'or-tag o':'or-dim')+'">'+(m.earnDays===0?'today':m.earnDays+'d')+'</span>');
+      const dif=m.diff?(m.diff.isNew?'<span class="or-tag b">NEW</span>':(m.diff.px==null?'—':'<span style="color:'+col(m.diff.px)+'">'+sgn(m.diff.px)+'%</span>')+(m.diff.rating?' <span class="or-tag '+(m.diff.rating.dir>0?'g':'r')+'">'+(m.diff.rating.dir>0?'▲':'▼')+' rating</span>':'')+(m.diff.tgt!=null&&Math.abs(m.diff.tgt)>=3?' <span class="or-tag '+(m.diff.tgt>0?'g':'r')+'" title="target '+sgn(m.diff.tgt)+'%">tgt '+sgn(m.diff.tgt,0)+'%</span>':'')+(m.diff.earn?' <span class="or-tag p">date</span>':'')):'<span class="or-dim">—</span>';
+      const etfs=x.etf?x.etf.filter(e=>e.held):[]; const etfTxt=etfs.length?'<span title="'+esc(etfs.map(e=>e.etf+" "+e.w.toFixed(2)+"%"+(e.pw!=null?" (was "+e.pw.toFixed(2)+"%)":"")).join("\n"))+'">'+etfs.length+(etfs.some(e=>e.pw!=null&&e.w>e.pw*1.05)?' <span class="or-up">▲</span>':etfs.some(e=>e.pw!=null&&e.w<e.pw*0.95)?' <span class="or-dn">▼</span>':'')+'</span>':'<span class="or-dim">—</span>';
+      const ib=x.ib?(x.ib.pos?'<span class="or-tag g" title="open position · unrealized P&L">'+x.ib.pos.qty+' sh · '+(x.ib.pos.unreal>=0?'+$':'-$')+Math.abs(x.ib.pos.unreal).toFixed(0)+'</span> ':'')+(x.ib.closed?'<span class="or-dim" title="closed trades · net P&L">'+x.ib.closed+' tr · <span style="color:'+col(x.ib.net)+'">'+(x.ib.net>=0?"+":"-")+"$"+Math.abs(x.ib.net).toFixed(0)+'</span></span>':'')+(x.ib.lt?' <span class="or-tag gr">LT</span>':''):'<span class="or-dim">—</span>';
+      h+='<tr class="'+(m.active?'':'off')+'">'
+        +'<td><span class="or-ck'+(m.active?'':' off')+'" onclick="OR.tick(\''+esc(m.sym)+'\','+(m.active?'false':'true')+')" title="'+(m.active?'ticked — click to untick':'unticked (not in the latest file) — click to tick')+'">'+(m.active?'✓':'○')+'</span></td>'
+        +'<td class="l"><span class="or-tk" onclick="OR.card(\''+esc(m.sym)+'\')">'+esc(m.sym)+'</span>'+(m.tags.length?' '+m.tags.map(t=>'<span class="or-tag gr">'+esc(t)+'</span>').join(''):'')+'<span class="or-nm">'+esc(d.n||"")+(d.sec?' · '+esc(d.sec):'')+'</span></td>'
+        +'<td class="l">'+ed+'</td><td>'+money(d.px)+'</td><td>'+money(d.tgt)+'</td><td style="color:'+col(st.up)+'">'+(st.up==null?'—':sgn(st.up)+'%')+'</td>'
+        +'<td class="l">'+(st.rc?'<span class="or-tag '+st.rc.c+'">'+st.rc.l+'</span>':'<span class="or-dim">—</span>')+'</td>'
+        +'<td class="l">'+(st.tc?'<span class="or-tag '+st.tc.c+'">'+st.tc.l+'</span>':'<span class="or-dim">—</span>')+(st.agree==="diverge"?' <span class="or-tag o" title="analyst rating and TradingView technical rating point opposite ways">≠</span>':'')+'</td>'
+        +'<td class="l">'+ladder(m)+'<span class="or-dim">'+m.ls+'/'+m.lm+'</span></td>'
+        +'<td class="l">'+(po.tags.length?po.tags.map(t=>'<span class="or-tag '+t.c+'" title="'+esc(t.tip)+'">'+esc(t.t)+'</span>').join(''):'<span class="or-dim">—</span>')+'</td>'
+        +'<td style="color:'+col(po.atrDist)+'">'+(po.atrDist==null?'—':sgn(po.atrDist)+' ATR')+'</td><td>'+(d.rsi==null?'—':Math.round(d.rsi))+'</td><td style="color:'+(po.hiDist!=null&&po.hiDist>=-5?'var(--green)':'var(--text2)')+'">'+(po.hiDist==null?'—':sgn(po.hiDist)+'%')+'</td>'
+        +'<td style="color:'+col(d.p1w)+'">'+sgn(d.p1w)+'%</td><td style="color:'+col(d.p1m)+'">'+sgn(d.p1m)+'%</td><td style="color:'+col(d.p6m)+'">'+sgn(d.p6m)+'%</td>'
+        +'<td>'+dif+'</td>'
+        +'<td>'+(x.rs?'<span title="RS Step 3 total '+f1(x.rs.total)+' · rank '+x.rs.rank+' of '+x.rsN+'">'+x.rs.rank+'<span class="or-dim">/'+x.rsN+'</span></span>':'<span class="or-dim">—</span>')+'</td>'
+        +'<td>'+(x.mo?'<span title="Momentum rank '+x.mo.rank+' of '+x.mo.n+' in '+esc(x.mo.uni)+' ('+x.mo.as_of+') · score '+f2(x.mo.score)+'">'+x.mo.rank+'<span class="or-dim">/'+x.mo.n+'</span></span>':'<span class="or-dim">—</span>')+'</td>'
+        +'<td>'+etfTxt+'</td><td class="l">'+ib+'</td>'
+        +'<td><span class="or-nt'+(m.notes?' has':'')+'" title="'+esc(m.notes||"add a note")+'" onclick="OR.card(\''+esc(m.sym)+'\')">✎</span></td>'
+        +'<td><span class="or-x" title="Delete this name" onclick="OR.del(\''+esc(m.sym)+'\')">✕</span></td></tr>'; });
+    el.innerHTML=h+'</tbody></table>';
+  }
+  function renderUploads(){
+    const el=$("orUploads"); if(!UPS.length){ el.innerHTML='<div class="or-empty">No uploads yet.</div>'; return; }
+    el.innerHTML='<table class="or-ut"><thead><tr><th>List date</th><th>File</th><th>Names</th><th>Uploaded</th><th></th></tr></thead><tbody>'+UPS.slice().reverse().map(u=>'<tr><td><b>'+dfmtY(u.as_of)+'</b>'+(L&&u.id===L.id?' <span class="or-tag g">latest</span>':'')+'</td><td class="or-dim">'+esc(u.filename||"")+'</td><td>'+(u.n_rows||0)+'</td><td class="or-dim">'+(u.uploaded_at?new Date(u.uploaded_at).toLocaleString():"")+'</td><td><span class="or-x" onclick="OR.delUpload('+u.id+')">✕</span></td></tr>').join("")+'</tbody></table>';
+  }
+
+  /* ---------- the stock card ---------- */
+  function openCard(sym){
+    const m=BY[sym]; if(!m||!m.d) return; cardSym=sym; const d=m.d, st=m.st, po=m.post, x=m.x;
+    const tv="https://www.tradingview.com/chart/?symbol="+encodeURIComponent((d.ex?d.ex+":":"")+sym), sa="https://stockanalysis.com/stocks/"+sym.toLowerCase().replace(/\./g,"-")+"/";
+    const kv=pairs=>'<div class="or-kv">'+pairs.map(([k,v])=>'<span>'+k+'</span><span>'+v+'</span>').join("")+'</div>';
+    let h='<div class="or-ch"><div><h3>'+esc(sym)+' <span style="font-size:14px;color:var(--text3);letter-spacing:0">'+esc(d.ex||"")+'</span></h3><div class="sub">'+esc(d.n||"")+(d.sec?' · '+esc(d.sec):'')+(d.ind?' · '+esc(d.ind):'')+'</div>'
+      +'<div class="or-links" style="margin-top:4px"><a href="'+tv+'" target="_blank" rel="noopener">TradingView chart ↗</a><a href="'+sa+'" target="_blank" rel="noopener">StockAnalysis ↗</a></div></div>'
+      +'<div style="margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap">'+(m.active?'<span class="or-tag g">TICKED</span>':'<span class="or-tag gr">UNTICKED · last seen '+esc(m.s.last_seen||"")+'</span>')
+      +'<button class="btn btn-ghost btn-sm" onclick="OR.tick(\''+esc(sym)+'\','+(m.active?'false':'true')+')">'+(m.active?'Untick':'Tick')+'</button><button class="btn btn-ghost btn-sm" onclick="OR.del(\''+esc(sym)+'\')" style="color:var(--red)">Delete</button><button class="btn btn-ghost btn-sm" onclick="OR.close()">✕</button></div></div>';
+    if(!m.inLatest) h+='<div class="or-status warn" style="margin-bottom:10px">Not in the latest file — these readings are from the last file that had it'+(m.s.last_seen?' ('+dfmtY(m.s.last_seen)+')':'')+'.</div>';
+    // row 1: street + earnings
+    const upW=st.up==null?0:Math.min(60,Math.abs(st.up)), upL=st.up==null?0:(st.up>=0?50:50-upW/60*50), upR=st.up==null?0:(st.up>=0?50+upW/60*50:50);
+    h+='<div class="or-grid"><div class="or-box"><h5>Street</h5><div style="display:flex;gap:16px;align-items:baseline;flex-wrap:wrap"><span class="or-big">'+money(d.px)+'</span><span>target <b>'+money(d.tgt)+'</b></span><span class="or-big" style="color:'+col(st.up)+'">'+(st.up==null?'—':sgn(st.up)+'%')+'</span></div>'
+      +'<div class="or-upb"><i style="left:'+upL+'%;right:'+(100-upR)+'%;background:'+(st.up>=0?'var(--green)':'var(--red)')+'"></i><i style="left:50%;width:1px;background:var(--text3)"></i></div><div class="or-dim" style="margin:2px 0 8px">'+(st.up==null?'no target':st.up>=0?'room to the 1-year target':'price is already above the 1-year target')+'</div>'
+      +kv([["Analyst rating",st.rc?'<span class="or-tag '+st.rc.c+'">'+st.rc.l+'</span>':'—'],["TradingView technical",st.tc?'<span class="or-tag '+st.tc.c+'">'+st.tc.l+'</span>'+(st.agree==="diverge"?' <span class="or-tag o">≠ Street</span>':st.agree==="agree"?' <span class="or-tag g">agrees</span>':''):'—'],
+        ["EPS last quarter",d.epsRep==null?'—':'$'+f2(d.epsRep)],["EPS est. next quarter",d.epsEst==null?'—':'$'+f2(d.epsEst)+(st.epsChg!=null?' <span style="color:'+col(st.epsChg)+'">('+sgn(st.epsChg,0)+'% vs last)</span>':'')],
+        ["Market cap",big(d.mcap)],["P/E · EV/EBITDA",f1(d.pe)+" · "+f1(d.eve)],["Beta 1y",f2(d.beta)]])+'</div>';
+    h+='<div class="or-box"><h5>Earnings</h5><div style="display:flex;gap:16px;align-items:baseline;flex-wrap:wrap"><span class="or-big">'+(d.earn?dfmtY(d.earn):"—")+'</span>'+(m.earnDays==null?'':m.earnDays<0?'<span class="or-dim">reported '+Math.abs(m.earnDays)+' days ago</span>':'<span class="or-tag '+(m.earnDays<=7?'o':'gr')+'" style="font-size:12px">'+(m.earnDays===0?'TODAY':'in '+m.earnDays+' days')+'</span>')+'</div>'
+      +kv([["Last report",d.earnPrev?dfmtY(d.earnPrev)+(m.sinceDays!=null?' <span class="or-dim">('+m.sinceDays+' days ago)</span>':''):'—'],["Volume today",big(d.vol)+(d.rvol!=null?' <span class="or-dim">('+d.rvol.toFixed(2)+'× relative)</span>':'')],["Avg volume 30d",big(d.avol)+(d.avol&&d.px?' <span class="or-dim">≈ $'+big(d.avol*d.px)+'/day</span>':'')],["Gap today",d.gap==null?'—':sgn(d.gap)+'%'],["Volatility 1M",d.volat==null?'—':f1(d.volat)+'%']])
+      +'<h5 style="margin-top:10px">Performance</h5><div class="or-perf">'+[["1W",d.p1w],["1M",d.p1m],["3M",d.p3m],["6M",d.p6m],["1Y",d.p1y],["5Y",d.p5y]].map(([k,v])=>'<div class="or-pc" style="background:'+heat(v)+';color:'+col(v)+'">'+sgn(v)+'%<small>'+k+'</small></div>').join("")+'</div></div>';
+    // row 2: lights + posture
+    h+='<div class="or-box"><h5>Seven lights · '+m.ls+' of '+m.lm+' judged'+(m.lm<7?' <span class="or-dim">('+(7-m.lm)+' not judged)</span>':'')+'</h5><div class="or-lights">'+m.L.map((l,i)=>'<div class="or-light '+(l.pass===true?'y':l.pass===false?'n':'u')+'" title="'+esc(l.title)+'"><span class="ln">'+(i+1)+' · '+l.name+'</span><span class="lv">'+esc(l.val)+'</span><span class="lr">'+(l.pass===true?'PASS':l.pass===false?'FAIL':'—')+'</span></div>').join("")+'</div><div class="or-dim" style="margin-top:6px">Hover a bar for what it means and where the line is. Same tests as the Momentum tab; light 7 is the snapshot version — IVA Pro on the chart runs the full one.</div></div>';
+    h+='<div class="or-box"><h5>Posture · '+(po.stage?po.stage:"—")+'</h5><div class="or-ema">'+[["5",d.e5],["10",d.e10],["20",d.e20],["50",d.e50],["200",d.e200]].map(([k,v])=>'<div class="or-ec '+(v==null?'':d.px>v?'a':'b')+'">'+(v==null?'—':v.toFixed(2))+'<small>EMA '+k+(v==null?'':d.px>v?' · above':' · below')+'</small></div>').join("")+'</div>'
+      +kv([["Price → 20 EMA",po.atrDist==null?'—':'<b style="color:'+col(po.atrDist)+'">'+sgn(po.atrDist,2)+' ATR</b> <span class="or-dim">(ATR '+f2(d.atr)+')</span>'],["EMA stack 10>20>50>200",po.stack==null?'—':po.stack?'<span class="or-up">aligned</span>':'<span class="or-dn">not aligned</span>'],["RSI 14",d.rsi==null?'—':Math.round(d.rsi)],["52-week high",d.hi52==null?'—':money(d.hi52)+' <span style="color:'+(po.hiDist>=-5?'var(--green)':'var(--text2)')+'">('+sgn(po.hiDist)+'%)</span>'],["52-week low",d.lo52==null?'—':money(d.lo52)+' <span class="or-dim">('+sgn(po.loDist)+'%)</span>']])
+      +'<div style="margin-top:8px">'+(po.tags.length?po.tags.map(t=>'<span class="or-tag '+t.c+'" title="'+esc(t.tip)+'">'+esc(t.t)+'</span>').join(''):'<span class="or-dim">no posture flags</span>')+'</div></div>';
+    // row 3: cross refs + history
+    const etfs=x.etf||[];
+    h+='<div class="or-box"><h5>From the other tabs</h5>'+kv([
+      ["RS Score (Step 3)",x.rs?'rank <b>'+x.rs.rank+'</b> of '+x.rsN+' · total '+f1(x.rs.total)+(x.rsTab==="p"?" (percentile)":" (z)"):'<span class="or-dim">not in the RS list</span>'],
+      ["Momentum",x.mo?'rank <b>'+x.mo.rank+'</b> of '+x.mo.n+' · score '+f2(x.mo.score)+' <span class="or-dim">('+esc(x.mo.uni)+' '+x.mo.as_of+')</span>':'<span class="or-dim">not in a momentum universe</span>'],
+      ["Tracked ETFs",etfs.length?etfs.map(e=>'<span title="'+esc(e.name)+'">'+esc(e.etf)+'</span> '+(e.held?e.w.toFixed(2)+'%':'<span class="or-dn">exited</span>')+(e.pw!=null&&e.held?' <span style="color:'+col(e.w-e.pw)+'">('+sgn(e.w-e.pw,2)+')</span>':e.pw==null&&e.held&&e.hasPrev?' <span class="or-up">(new)</span>':'')).join(" · "):'<span class="or-dim">not held by any tracked ETF</span>'],
+      ["IBKR",x.ib?((x.ib.pos?'<b>holding '+x.ib.pos.qty+' sh</b> · value '+money(x.ib.pos.value)+' · unrealized <span style="color:'+col(x.ib.pos.unreal)+'">'+(x.ib.pos.unreal>=0?'+$':'-$')+Math.abs(x.ib.pos.unreal).toFixed(2)+'</span>':'no open position')+(x.ib.closed?' · '+x.ib.closed+' closed trade'+(x.ib.closed!==1?'s':'')+', net <span style="color:'+col(x.ib.net)+'">'+(x.ib.net>=0?'+':'-')+'$'+Math.abs(x.ib.net).toFixed(2)+'</span> ('+x.ib.wins+' wins)'+(x.ib.last?' · last '+dfmtY(x.ib.last):''):'')+(x.ib.lt?' · <span class="or-tag gr">long-term</span>':'')):'<span class="or-dim">never traded</span>']])+'</div>';
+    const hist=(HIST[sym]||[]).map(r=>({u:UPS.find(u=>u.id===r.upload_id),r})).filter(o=>o.u).sort((a,b)=>a.u.as_of<b.u.as_of?-1:1);
+    h+='<div class="or-box"><h5>History · '+hist.length+' upload'+(hist.length!==1?'s':'')+'</h5>'+(hist.length>1?'<div style="height:150px;position:relative"><canvas id="orHist"></canvas></div>':'<div class="or-dim">A line of price vs target appears once there are two uploads.</div>')
+      +'<div class="or-hist" style="margin-top:6px">'+hist.slice(-6).reverse().map(o=>dfmt(o.u.as_of)+': '+money(o.r.price)+' · tgt '+money(o.r.target)+' · '+esc(o.r.rating||"—")+' · lights '+(o.r.lights==null?'—':o.r.lights)+(o.r.earn?' · earn '+dfmt(o.r.earn):'')).join("<br>")+'</div></div>';
+    // row 4: notes
+    h+='<div class="or-box" style="grid-column:1/-1"><h5>Notes &amp; tags</h5><textarea class="or-ta" id="orNotes" placeholder="Why it is on the list, levels, what you are waiting for…">'+esc(m.notes)+'</textarea>'
+      +'<div style="display:flex;gap:8px;align-items:center;margin-top:6px"><input class="or-in" id="orTags" placeholder="tags, comma separated (core, earnings play, waiting for flush)" value="'+esc(m.tags.join(", "))+'"><button class="btn btn-gold btn-sm" onclick="OR.saveNotes(\''+esc(sym)+'\')">Save</button></div></div></div>';
+    $("orCardBody").innerHTML=h; $("orCard").classList.add("show");
+    if(hist.length>1&&typeof Chart!=="undefined"){ if(hchart){ try{hchart.destroy();}catch(e){} hchart=null; }
+      hchart=new Chart($("orHist").getContext("2d"),{type:"line",data:{labels:hist.map(o=>dfmt(o.u.as_of)),datasets:[{label:"Price",data:hist.map(o=>o.r.price),borderColor:"#e8b84b",backgroundColor:"rgba(232,184,75,.1)",tension:.3,pointRadius:3},{label:"1y target",data:hist.map(o=>o.r.target),borderColor:"#7ba3f5",borderDash:[4,3],tension:.3,pointRadius:3}]},
+        options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{labels:{color:"#9aa3b8",boxWidth:10}}},scales:{x:{ticks:{color:"#9aa3b8"},grid:{color:"rgba(45,52,69,.5)"}},y:{ticks:{color:"#9aa3b8"},grid:{color:"rgba(45,52,69,.5)"}}}}}); }
+  }
+  function closeCard(){ $("orCard").classList.remove("show"); cardSym=null; }
+  function exportView(){
+    const rows=listRows(); if(!rows.length){ toast("Nothing to export","error"); return; }
+    const txt="###ORANGE_"+(filt==="all"?"ALL":filt.replace(/[^A-Za-z0-9]/g,"").toUpperCase())+"\n"+rows.map(m=>(m.d.ex?m.d.ex+":":"")+m.sym).join(",")+"\n";
+    const b=new Blob([txt],{type:"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="orange_"+(filt==="all"?"all":filt.replace(/[^A-Za-z0-9]/g,"_"))+"_"+rows.length+".txt"; a.click(); toast("Exported "+rows.length+" names","success");
   }
 
   /* ---------- wiring ---------- */
+  function bindDrop(el){
+    el.addEventListener("click",()=>{ const i=document.createElement("input"); i.type="file"; i.accept=".csv,text/csv"; i.onchange=e=>{ if(e.target.files[0]) importFile(e.target.files[0]); }; i.click(); });
+    ["dragenter","dragover"].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();el.classList.add("over");}));
+    ["dragleave","drop"].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();el.classList.remove("over");}));
+    el.addEventListener("drop",e=>{ const f=e.dataTransfer.files[0]; if(f) importFile(f); });
+  }
+  function rebuild(){ clearTimeout(xTimer); xTimer=setTimeout(()=>{ if(inited){ build(); render(); if(cardSym) openCard(cardSym); } },150); }
   function init(){
     if(inited) return; inited=true;
-    $("rxRun").onchange=function(){ snapId=parseInt(this.value)||null; run(); };
-    $("rxTab").onchange=function(){ rsTab=this.value; run(); };
-    $("rxCut").onchange=function(){ cut=parseFloat(this.value); if(isNaN(cut)) cut=50; this.value=cut; run(); };
-    $("rxRefresh").onclick=()=>{ if(window.RS) RS.ensureInit(); if(window.RS2) RS2.ensureInit(); refreshRuns(); run(); };
-    $("rxW").oninput=function(){ wRS=parseInt(this.value); $("rxWL").textContent=wRS+" / "+(100-wRS); combine(); render(); };
-    $("rxTopN").onchange=function(){ topN=parseInt(this.value)||topN; };
-    $("rxExport").onclick=exportTop;
-    if(window.RS) RS.ensureInit(); if(window.RS2) RS2.ensureInit();     // RS tables are needed even if the RS tab was never opened
-    refreshRuns(); run();
+    bindDrop($("orDrop"));
+    $("orRefresh").onclick=()=>{ load(); };
+    $("orSearch").addEventListener("input",e=>{ q=e.target.value.trim(); renderTable(); });
+    $("orShowOff").onchange=function(){ showOff=this.checked; renderTable(); };
+    $("orCalOff").onchange=function(){ calOff=this.checked; renderCalendar(); };
+    $("orCalPrev").onclick=()=>{ const y=+calYM.slice(0,4), m=+calYM.slice(5,7); const x=new Date(y,m-2,1); calYM=x.getFullYear()+"-"+pad(x.getMonth()+1); renderCalendar(); };
+    $("orCalNext").onclick=()=>{ const y=+calYM.slice(0,4), m=+calYM.slice(5,7); const x=new Date(y,m,1); calYM=x.getFullYear()+"-"+pad(x.getMonth()+1); renderCalendar(); };
+    $("orCalToday").onclick=()=>{ calYM=todayISO().slice(0,7); renderCalendar(); };
+    $("orScY").onchange=function(){ scY=this.value; renderStreet(); };
+    $("orExport").onclick=exportView;
+    $("orCard").addEventListener("click",e=>{ if(e.target.id==="orCard") closeCard(); });
+    ["orSecChanges","orSecCal","orSecStreet","orSecList","orSecUploads"].forEach(id=>{ const d=$(id); if(d) d.open=lsGet(id,id!=="orSecUploads"); });
+    // the other tabs feed the cross-references — make sure their data is loading
+    try{ if(window.RS) RS.ensureInit(); if(window.RS2) RS2.ensureInit(); if(window.MO) MO.ensureInit(); if(window.EF) EF.ensureInit(); }catch(e){}
+    load();
   }
-  window.RX={
-    init,
-    onRS:()=>{ if(inited) run(); },                       // RS Step 3 recomputed
-    onMO:()=>{ if(inited){ refreshRuns(); run(); } },    // momentum snapshots (re)loaded
-    sort:c=>{ if(sortBy.c===c) sortBy.d=sortBy.d==="asc"?"desc":"asc"; else sortBy={c:c,d:(c==="t"||c==="rank"||c==="rsRank"||c==="mRank")?"asc":"desc"}; render(); }
-  };
+  window.OR={ init, load, card:openCard, close:closeCard, tick:setActive, del:delStock, delUpload, saveNotes,
+    filter:f=>{ filt=f; renderTable(); const sec=$("orSecList"); if(sec&&!sec.open) sec.open=true; },
+    sort:c=>{ if(sortBy.c===c) sortBy.d=sortBy.d==="asc"?"desc":"asc"; else sortBy={c,d:(c==="sym"||c==="earnDays"||c==="rs"||c==="mo")?"asc":"desc"}; renderTable(); },
+    tog:el=>{ try{ localStorage.setItem(el.id,el.open?"1":"0"); }catch(e){} if(el.id==="orSecStreet"&&el.open) renderStreet(); },
+    onRS:rebuild, onMO:rebuild, onEF:rebuild, onIB:rebuild };
 })();
 
 </script>
@@ -6004,6 +6261,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       ready=true; const e=$('ibErr'); if(e) e.textContent='';
     }catch(err){ ready=false; const e=$('ibErr'); if(e) e.textContent='Could not load IBKR data: '+err.message+' — have the IBKR tables been created in Supabase?'; }
     compute(); publish(); render();
+    if(window.OR&&OR.onIB)OR.onIB();
     const st=$('ibStatus');
     if(st && !/\b(ok|warn|err)\b/.test(st.className)){
       if(!ready) setStatus('IBKR tables not found — run <b>ibkr_setup.sql</b> in Supabase first (see steps).','err');
@@ -6230,7 +6488,16 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     $('ibClear').addEventListener('click',clearAll);
     ['ibSecImport','ibSecAccount','ibSecChart','ibSecTrades','ibSecLT'].forEach(id=>{ const d=$(id); if(d){ d.open=lsGet(id,id!=='ibSecChart'); } });
   }
-  window.IB={init,load,render,equity,asOf:()=>AS_OF,edit:editTrade,saveTrade,risk:setRisk,inc:toggleInclude,lt:toggleLT,tog,cl:clToggle,clearAll};
+  function symInfo(sym){   // read by the Orange tab
+    if(!M) return null; sym=String(sym||'').toUpperCase();
+    const pos=POS.find(p=>String(p.symbol).toUpperCase()===sym)||null;
+    const closed=M.closed.filter(r=>r.sym===sym), active=M.active.filter(r=>r.sym===sym);
+    if(!pos&&!closed.length&&!active.length) return null;
+    return { pos:pos?{qty:+pos.qty,value:+pos.value||0,unreal:+pos.unrealized||0,cost:+pos.cost_price||0}:null, lt:LT.has(sym),
+             closed:closed.length, net:closed.reduce((a,r)=>a+r.net,0), wins:closed.filter(r=>r.net>0).length, active:active.length,
+             last:closed.length?closed.map(r=>r.closeDt).sort().slice(-1)[0]:null };
+  }
+  window.IB={init,load,render,equity,asOf:()=>AS_OF,edit:editTrade,saveTrade,risk:setRisk,inc:toggleInclude,lt:toggleLT,tog,cl:clToggle,clearAll,symInfo};
 })();
 
 </script>
