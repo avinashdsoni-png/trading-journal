@@ -1289,6 +1289,7 @@ tr.flt-row .flt2{display:flex;gap:3px}
       <button class="nav-btn" onclick="showPage(&#39;rs&#39;,this); if(window.RS) RS.ensureInit(); if(window.RS2) RS2.ensureInit();">📈 RS Score</button>
       <button class="nav-btn" onclick="showPage(&#39;mom&#39;,this); if(window.MO) MO.ensureInit();">🚀 Momentum</button>
       <button class="nav-btn" onclick="showPage(&#39;orange&#39;,this); if(window.OR) OR.init();">🟠 Orange</button>
+      <button class="nav-btn" onclick="showPage(&#39;dd&#39;,this); if(window.DD) DD.init();">🔬 Deep Dive</button>
       <button class="nav-btn" onclick="showPage(&#39;etf&#39;,this); if(window.EF) EF.ensureInit();">🧭 ETF Flow</button>
     </div>
     <div class="topbar-right">
@@ -2096,6 +2097,270 @@ tr.flt-row .flt2{display:flex;gap:3px}
       <summary><span class="or-st">UPLOADS</span><span class="or-dim">every file is kept &mdash; that is what makes the &ldquo;what changed&rdquo; panel and the history charts work</span></summary>
       <div id="orUploads"></div>
     </details>
+  </div>
+
+  <!-- ══ DEEP DIVE PAGE ══ -->
+  <div class="page" id="page-dd">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">DEEP <span>DIVE</span></div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="dd-inbox" id="ddInbox"></span>
+          <button class="btn btn-ghost btn-sm" id="ddRefresh" title="Re-read the deep-dive tables and the inbox">&#8635; Refresh</button>
+        </div>
+      </div>
+      <div class="dd-bar">
+        <div class="dd-drop" id="ddDrop">Drop a <b>deep-dive package</b> (deep_dive_&lt;run&gt;.json from the stock-deep-dive skill) here, or click to choose &middot; runs written straight to the cloud by the skill are folded in automatically when this tab opens</div>
+        <div class="dd-status" id="ddStatus">Open this tab to load the deep dives&hellip;</div>
+      </div>
+<div class="sd">
+  <header class="sd-head">
+    <h1 class="sd-title">Stock Deep Dive</h1>
+    <p class="sd-take" data-draw="takeaway" data-source="runs">—</p>
+    <nav class="sd-tabs" role="tablist" aria-label="Views">
+      <button type="button" role="tab" id="tab-screen" data-tab="screen" aria-selected="true">Screen</button>
+      <button type="button" role="tab" id="tab-stock" data-tab="stock" aria-selected="false">Stock</button>
+      <button type="button" role="tab" id="tab-market" data-tab="market" aria-selected="false">Market</button>
+      <button type="button" role="tab" id="tab-history" data-tab="history" aria-selected="false">History</button>
+      <button type="button" role="tab" id="tab-method" data-tab="method" aria-selected="false">How it reads</button>
+    </nav>
+  </header>
+
+  <!-- ═══ SCREEN ═══ -->
+  <section id="screen" class="sd-page" role="tabpanel" aria-labelledby="tab-screen">
+    <div class="sd-tools">
+      <input type="search" id="sd-q" placeholder="Search ticker, name, sector, archetype" aria-label="Search stocks">
+      <div class="sd-seg" role="group" aria-label="Which stocks">
+        <button type="button" class="sd-scope" data-scope="run" aria-pressed="true">Latest run</button>
+        <button type="button" class="sd-scope" data-scope="all" aria-pressed="false">Every stock</button>
+        <button type="button" class="sd-scope" data-scope="repeat" aria-pressed="false">Repeats</button>
+      </div>
+      <p class="sd-note" data-draw="screencount" data-source="stocks runs">—</p>
+    </div>
+    <div class="sd-scroll">
+      <table class="sd-tbl" id="screen-table" data-source="stocks" data-row-key="ticker">
+        <thead>
+          <tr>
+            <th data-field="ticker"><button type="button" data-sort="ticker">Stock</button></th>
+            <th data-field="price" class="r"><button type="button" data-sort="price">Price</button></th>
+            <th data-field="score"><button type="button" data-sort="score">Lights /7</button></th>
+            <th data-field="verdict"><button type="button" data-sort="verdict">Verdict</button></th>
+            <th data-field="btsp_rating" class="r"><button type="button" data-sort="btsp_rating" title="Beyond-the-stock-price scorecard, 32 checks, rated on the ones that could be measured">/100</button></th>
+            <th data-field="archetype" class="sd-hide-sm"><button type="button" data-sort="archetype">Story</button></th>
+            <th data-field="evc_c"><button type="button" data-sort="evc_c">1W</button></th>
+            <th data-field="evc_v"><button type="button" data-sort="evc_v">1D</button></th>
+            <th data-field="evc_e" class="sd-hide-sm"><button type="button" data-sort="evc_e">1H</button></th>
+            <th data-field="rs_3m" class="r"><button type="button" data-sort="rs_3m">RS 3M</button></th>
+            <th data-field="ivp_52w" class="r sd-hide-sm"><button type="button" data-sort="ivp_52w">IV pct</button></th>
+            <th data-field="pcr_today" class="r sd-hide-sm"><button type="button" data-sort="pcr_today">Put/call</button></th>
+            <th data-field="consensus" class="sd-hide-sm"><button type="button" data-sort="consensus">Analysts</button></th>
+            <th data-field="up_avg_pct" class="r"><button type="button" data-sort="up_avg_pct">To target</button></th>
+            <th data-field="days_to_earn" class="r sd-hide-sm"><button type="button" data-sort="days_to_earn">Earnings</button></th>
+            <th data-field="risk_tag" class="sd-hide-sm"><button type="button" data-sort="risk_tag">Risk</button></th>
+            <th data-field="sizing_tier" class="sd-hide-sm"><button type="button" data-sort="sizing_votes">Size</button></th>
+          </tr>
+        </thead>
+        <tbody data-draw="screen"></tbody>
+      </table>
+    </div>
+    <p class="sd-note">Click a row to open its deep dive. Lights are the seven Bible screener columns (ch.28) in order: ROIC · Growth · Debt · Cash · Margin · Shares · Value. 1W/1D/1H are your EVC context, validation and entry rows.</p>
+  </section>
+
+  <!-- ═══ STOCK ═══ -->
+  <section id="stock" class="sd-page" role="tabpanel" aria-labelledby="tab-stock" hidden>
+    <div class="sd-tools">
+      <label class="sd-lab" for="pick-stock">Stock</label>
+      <select id="pick-stock" class="sd-pick" data-draw="pick" data-source="stocks" aria-label="Choose a stock"></select>
+    </div>
+    <div class="sd-card" data-draw="head" data-source="stocks">—</div>
+    <div class="sd-grid">
+      <article class="sd-card" id="eli5-card">
+        <h2>Like you're five</h2>
+        <div data-draw="eli5" data-source="stocks">—</div>
+      </article>
+      <article class="sd-card" id="changes-card">
+        <h2>What changed since last time</h2>
+        <div data-draw="changes" data-source="stocks">—</div>
+      </article>
+    </div>
+
+    <article class="sd-card" id="lights-card">
+      <h2>The seven lights</h2>
+      <p class="sd-note">Bible ch.28, scored exactly like IVA Pro: 6–7 on = full-size candidate, 4–5 = half size, 0–3 = trade only, never a hold. Formula first, then the pass mark.</p>
+      <div class="sd-lights" data-draw="lights7" data-source="lights stocks">—</div>
+    </article>
+
+    <article class="sd-card" id="stripes-card">
+      <h2>Six more Bible tests</h2>
+      <p class="sd-note">The extra IVA Tape stripes: leverage, the amplifier, accruals, the discount test, three-year pricing power and the compounder test.</p>
+      <div class="sd-lights" data-draw="stripes6" data-source="lights stocks">—</div>
+    </article>
+
+    <article class="sd-card" id="btsp-card">
+      <h2>Beyond-the-stock-price scorecard</h2>
+      <p class="sd-note">The 32-point checklist from the Indian investor beyond.the.stockprice, scored out of 100 with the conclusion first, as the checklist asks. India-only items use their US equivalent on US names (promoter holding → insider ownership, pledge → insider selling, auditor qualifications → the 10-K opinion). A check that could not be measured is left out and the rating is re-based on the rest.</p>
+      <div data-draw="btsp" data-source="lights stocks">—</div>
+    </article>
+
+    <div class="sd-grid">
+      <article class="sd-card" id="story-card">
+        <h2>The story panel</h2>
+        <div data-draw="story" data-source="stocks">—</div>
+      </article>
+      <article class="sd-card" id="evc-card">
+        <h2>EVC posture</h2>
+        <p class="sd-note">Your checklist rows from daily, weekly and hourly bars. Grey rows are yours to judge on the chart.</p>
+        <div data-draw="evc" data-source="lights stocks">—</div>
+      </article>
+    </div>
+
+    <article class="sd-card" id="updown-card">
+      <h2>If it goes right, if it goes wrong</h2>
+      <p class="sd-note">Every price anchor on one scale: options ±1 standard deviation, analyst targets, the own-history P/E anchors and your 20 and 50 EMA exits.</p>
+      <div class="sd-chart" data-draw="ladder" data-source="ladder stocks" style="min-height:16rem"></div>
+      <div class="sd-ud" data-draw="updown" data-source="stocks">—</div>
+    </article>
+
+    <div class="sd-grid">
+      <article class="sd-card" id="options-card">
+        <h2>Options market</h2>
+        <div data-draw="options" data-source="stocks">—</div>
+        <h3 class="sd-sec">Live now</h3>
+        <div data-draw="livestock" data-source="live_stock live_pcr stocks">—</div>
+      </article>
+      <article class="sd-card" id="analysts-card">
+        <h2>Analysts</h2>
+        <div class="sd-chart" data-draw="ptbar" data-source="stocks" style="min-height:4.5rem"></div>
+        <div data-draw="analysts" data-source="stocks">—</div>
+      </article>
+    </div>
+
+    <div class="sd-grid">
+      <article class="sd-card" id="news-card">
+        <h2>News that can move it</h2>
+        <div data-draw="news" data-source="news stocks">—</div>
+      </article>
+      <article class="sd-card" id="bible-card">
+        <h2>Bible checks</h2>
+        <div data-draw="bible" data-source="stocks">—</div>
+      </article>
+    </div>
+
+    <article class="sd-card" id="thesis-card">
+      <h2>One-page thesis</h2>
+      <p class="sd-note">Bible ch.29: five questions before anything becomes a hold.</p>
+      <div data-draw="thesis" data-source="stocks">—</div>
+    </article>
+
+    <article class="sd-card" id="iva-card"><details>
+      <summary>Full IVA Pro table (two columns per row, coloured exactly like the indicator)</summary>
+      <div class="sd-scroll" style="max-height:none">
+        <table class="sd-tbl" id="iva-table" data-source="lights" data-row-key="ticker,key">
+          <thead>
+            <tr>
+              <th data-field="name">Row</th>
+              <th data-field="formula">What it measures</th>
+              <th data-field="shown" class="r">Column 2</th>
+              <th data-field="shown2" class="r">Column 3</th>
+              <th data-field="bible">Bible</th>
+            </tr>
+          </thead>
+          <tbody data-draw="iva"></tbody>
+        </table>
+      </div>
+    </details></article>
+
+    <article class="sd-card" id="sources-card">
+      <h2>Sources and data notes</h2>
+      <div data-draw="sources" data-source="stocks">—</div>
+    </article>
+  </section>
+
+  <!-- ═══ MARKET ═══ -->
+  <section id="market" class="sd-page" role="tabpanel" aria-labelledby="tab-market" hidden>
+    <article class="sd-card" id="mkt-live">
+      <h2>Market now</h2>
+      <p class="sd-note">Live from your IBKR connection each time you open this tab. Index data can be delayed.</p>
+      <div class="sd-stats" data-draw="mktlive" data-source="live_qqq live_vix live_vix3m live_nifty vix_ratio">—</div>
+    </article>
+    <div class="sd-grid">
+      <article class="sd-card" id="mkt-us">
+        <h2>United States</h2>
+        <div data-draw="mkt_us" data-source="runs">—</div>
+      </article>
+      <article class="sd-card" id="mkt-in">
+        <h2>India</h2>
+        <div data-draw="mkt_in" data-source="runs">—</div>
+      </article>
+    </div>
+    <div class="sd-grid">
+      <article class="sd-card" id="mkt-clock">
+        <h2>Where the cycle sits</h2>
+        <p class="sd-note">Bible ch.25–26: rates are gravity, and money rotates in a repeating order.</p>
+        <div class="sd-chart" data-draw="clock" data-source="runs" style="min-height:15rem"></div>
+        <div data-draw="regime" data-source="runs">—</div>
+      </article>
+      <article class="sd-card" id="mkt-cal">
+        <h2>Dates that move everything</h2>
+        <div data-draw="calendar" data-source="runs">—</div>
+      </article>
+    </div>
+    <article class="sd-card" id="mkt-news">
+      <h2>Market news</h2>
+      <div data-draw="mktnews" data-source="news">—</div>
+    </article>
+  </section>
+
+  <!-- ═══ HISTORY ═══ -->
+  <section id="history" class="sd-page" role="tabpanel" aria-labelledby="tab-history" hidden>
+    <div class="sd-tools">
+      <label class="sd-lab" for="pick-hist">Stock</label>
+      <select id="pick-hist" class="sd-pick" data-draw="pick" data-source="stocks" aria-label="Choose a stock"></select>
+    </div>
+    <article class="sd-card" id="hist-chart-card">
+      <h2>Price and lights at each deep dive</h2>
+      <p class="sd-note">Dots are the price on each run day; the dashed line is the average analyst target; bars underneath are the lights score out of 7.</p>
+      <div class="sd-chart" data-draw="histchart" data-source="history stocks" style="min-height:16rem"></div>
+    </article>
+    <div class="sd-scroll">
+      <table class="sd-tbl" id="hist-table" data-source="history" data-row-key="ticker,run_id">
+        <thead>
+          <tr>
+            <th data-field="as_of">Run day</th>
+            <th data-field="price" class="r">Price</th>
+            <th data-field="score">Lights /7</th>
+            <th data-field="verdict">Verdict</th>
+            <th data-field="btsp_rating" class="r">/100</th>
+            <th data-field="archetype" class="sd-hide-sm">Story</th>
+            <th data-field="evc_c">1W</th>
+            <th data-field="evc_v">1D</th>
+            <th data-field="rs_3m" class="r">RS 3M</th>
+            <th data-field="ivp_52w" class="r sd-hide-sm">IV pct</th>
+            <th data-field="consensus" class="sd-hide-sm">Analysts</th>
+            <th data-field="pt_avg" class="r">Avg target</th>
+            <th data-field="risk_tag" class="sd-hide-sm">Risk</th>
+          </tr>
+        </thead>
+        <tbody data-draw="histtable"></tbody>
+      </table>
+    </div>
+    <article class="sd-card" id="repeat-card">
+      <h2>Names that keep coming back</h2>
+      <p class="sd-note">Stocks your screen has surfaced more than once, with how their lights score moved.</p>
+      <div data-draw="repeats" data-source="stocks history">—</div>
+    </article>
+  </section>
+
+  <!-- ═══ METHOD ═══ -->
+  <section id="method" class="sd-page" role="tabpanel" aria-labelledby="tab-method" hidden>
+    <article class="sd-card">
+      <h2>How every number is worked out</h2>
+      <p class="sd-note">Formula first, then the pass mark and the Bible chapter. The same arithmetic runs in your IVA Pro, IVA Tape and EVC Checklist indicators, so the chart and this page agree.</p>
+      <div class="sd-method" data-draw="method" data-source="method">—</div>
+    </article>
+  </section>
+</div>
+    </div>
   </div>
 
 </div><!-- end app -->
@@ -6082,6 +6347,1160 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 })();
 
 </script>
+<style>
+#page-dd{--color-fg:var(--text);--color-fg-muted:var(--text3);--color-bg:var(--bg3);--color-panel:var(--bg2);--color-border-line:var(--border);--color-ok:var(--green);--color-warn:#f5a623;--color-bad:var(--red);--cds-chart-muted:var(--border2);
+  --cds-gap-lg:16px;--cds-gap-md:12px;--cds-gap-sm:8px;--cds-gap-xs:4px;--cds-pad-lg:14px;--cds-pad-md:10px;--cds-pad-sm:7px;--cds-pad-xs:4px;--cds-radius:8px;
+  --cds-font-size-body:13px;--cds-font-size-caption:11px;--cds-font-size-heading:14px;--cds-font-size-title:26px;--cds-font-weight-medium:600;--font-anthropic-sans:'Barlow',sans-serif;--font-anthropic-serif:'Barlow Condensed',sans-serif}
+#page-dd [hidden]{display:none !important}
+#page-dd table{min-width:0}
+#page-dd td,#page-dd th{white-space:normal;padding:.45em .6em;font-size:inherit;vertical-align:top}
+#page-dd .sd-tbl th,#page-dd .sd-tbl td{white-space:nowrap;vertical-align:middle;padding:.5em .65em}
+#page-dd .sd-method td,#page-dd .sd-method th{white-space:normal;padding:.45em .6em}
+#page-dd .sd{margin-top:12px}
+#page-dd .sd-title{display:none}
+#page-dd .dash-skeleton{opacity:.5}
+#page-dd .sd-tabs button{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.06em}
+#page-dd .sd-tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+#page-dd .sd-card h2{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.06em;color:var(--accent);font-weight:400}
+#page-dd .sd-tbl thead th{background:var(--surface);color:var(--accent);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em}
+#page-dd .sd-pill[data-tone="ok"]{color:var(--green);background:rgba(61,214,140,.14);border-color:rgba(61,214,140,.35)}
+#page-dd .sd-pill[data-tone="warn"]{color:#f5a623;background:rgba(245,166,35,.14);border-color:rgba(245,166,35,.35)}
+#page-dd .sd-pill[data-tone="bad"]{color:var(--red);background:rgba(240,82,82,.14);border-color:rgba(240,82,82,.35)}
+#page-dd .sd-light[data-c="green"]{background:rgba(61,214,140,.09);border-color:rgba(61,214,140,.4)}
+#page-dd .sd-light[data-c="red"]{background:rgba(240,82,82,.08);border-color:rgba(240,82,82,.4)}
+#page-dd .sd-light[data-c="grey"]{background:rgba(245,166,35,.06)}
+#page-dd .sd-tbl tbody tr:hover{background:var(--bg3)}
+#page-dd .dd-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+#page-dd .dd-drop{border:2px dashed var(--border2);border-radius:9px;padding:10px 14px;color:var(--text3);background:var(--bg3);font-size:12px;cursor:pointer;transition:.15s}
+#page-dd .dd-drop:hover,#page-dd .dd-drop.over{border-color:var(--accent);color:var(--accent);background:var(--surface)}
+#page-dd .dd-status{font-size:12px;color:var(--text2);min-height:16px}
+#page-dd .dd-status.ok{color:var(--green)} #page-dd .dd-status.err{color:var(--red)} #page-dd .dd-status.warn{color:#f5a623}
+#page-dd .dd-inbox{font-size:11.5px;color:var(--text3)}
+#page-dd .dd-x{color:var(--text3);font-size:14px;padding:0 3px;border:0;background:none;cursor:pointer;line-height:1} #page-dd .dd-x:hover{color:var(--red)}
+#page-dd .sd{font-family:var(--font-anthropic-sans);color:var(--color-fg);display:grid;gap:var(--cds-gap-lg);font-size:var(--cds-font-size-body)}
+#page-dd .sd *,#page-dd .sd *::before,#page-dd .sd *::after{box-sizing:border-box}
+#page-dd .sd-head{display:grid;gap:var(--cds-gap-sm)}
+#page-dd .sd-title{font-family:var(--font-anthropic-serif);font-weight:400;font-size:var(--cds-font-size-title);margin:0;text-wrap:balance}
+#page-dd .sd-take{margin:0;color:var(--color-fg-muted);max-width:75ch;line-height:1.5}
+#page-dd .sd-tabs{display:flex;flex-wrap:wrap;gap:var(--cds-gap-xs);border-bottom:1px solid var(--color-border-line)}
+#page-dd .sd-tabs button{appearance:none;background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;color:var(--color-fg-muted);font:inherit;padding:var(--cds-pad-sm) var(--cds-pad-md);cursor:pointer}
+#page-dd .sd-tabs button[aria-selected="true"]{color:var(--color-fg);border-bottom-color:var(--color-fg);font-weight:var(--cds-font-weight-medium)}
+#page-dd .sd-tabs button:focus-visible,#page-dd .sd button:focus-visible,#page-dd .sd select:focus-visible,#page-dd .sd input:focus-visible{outline:2px solid var(--color-fg);outline-offset:2px}
+#page-dd .sd-page{display:grid;gap:var(--cds-gap-lg);min-width:0}
+#page-dd .sd-row{display:flex;flex-wrap:wrap;gap:var(--cds-gap-sm);align-items:center}
+#page-dd .sd-grid{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr))}
+#page-dd .sd-grid3{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr))}
+#page-dd .sd-card{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg);display:grid;gap:var(--cds-gap-sm);align-content:start;min-width:0}
+#page-dd .sd-card h2,#page-dd .sd-card h3{margin:0;font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);text-wrap:balance}
+#page-dd .sd-sec{margin:0;font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium)}
+#page-dd .sd-note{margin:0;color:var(--color-fg-muted);font-size:var(--cds-font-size-caption);line-height:1.45}
+#page-dd .sd-lab{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);letter-spacing:.02em}
+#page-dd .sd-big{font-family:var(--font-anthropic-serif);font-size:var(--cds-font-size-title);font-weight:400;font-variant-numeric:tabular-nums;line-height:1.1}
+#page-dd .sd-num{font-variant-numeric:tabular-nums}
+#page-dd .sd-muted{color:var(--color-fg-muted)}
+#page-dd .sd-ok{color:var(--color-ok)}
+#page-dd .sd-warn{color:var(--color-warn)}
+#page-dd .sd-bad{color:var(--color-bad)}
+#page-dd .sd-pill{display:inline-flex;align-items:center;gap:.35em;border-radius:999px;padding:.1em .65em;font-size:var(--cds-font-size-caption);font-weight:var(--cds-font-weight-medium);border:1px solid var(--color-border-line);white-space:nowrap}
+#page-dd .sd-pill[data-tone="ok"]{color:var(--color-ok);background:color-mix(in srgb,var(--color-ok) 12%,transparent);border-color:color-mix(in srgb,var(--color-ok) 35%,transparent)}
+#page-dd .sd-pill[data-tone="warn"]{color:var(--color-warn);background:color-mix(in srgb,var(--color-warn) 12%,transparent);border-color:color-mix(in srgb,var(--color-warn) 35%,transparent)}
+#page-dd .sd-pill[data-tone="bad"]{color:var(--color-bad);background:color-mix(in srgb,var(--color-bad) 12%,transparent);border-color:color-mix(in srgb,var(--color-bad) 35%,transparent)}
+#page-dd .sd-pill[data-tone="muted"]{color:var(--color-fg-muted)}
+#page-dd .sd-text{margin:0;line-height:1.55;white-space:pre-line;max-width:80ch}
+#page-dd .sd-eli5{font-size:calc(var(--cds-font-size-body) * 1.12);line-height:1.6;margin:0;white-space:pre-line;max-width:72ch}
+#page-dd .sd-list{margin:0;padding-left:1.1em;display:grid;gap:.3em;line-height:1.45}
+#page-dd .sd-kv{display:grid;grid-template-columns:minmax(7rem,max-content) 1fr;gap:.25em var(--cds-gap-md);align-items:baseline;margin:0}
+#page-dd .sd-kv dt{color:var(--color-fg-muted);font-size:var(--cds-font-size-caption)}
+#page-dd .sd-kv dd{margin:0;font-variant-numeric:tabular-nums;min-width:0}
+#page-dd .sd-tools{display:flex;flex-wrap:wrap;gap:var(--cds-gap-sm);align-items:center}
+#page-dd .sd-tools input[type="search"],#page-dd .sd select{font:inherit;color:var(--color-fg);background:var(--color-bg);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-xs) var(--cds-pad-sm);min-width:0}
+#page-dd .sd-seg{display:inline-flex;border:1px solid var(--color-border-line);border-radius:var(--cds-radius);overflow:hidden}
+#page-dd .sd-seg button{appearance:none;border:0;background:none;font:inherit;font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);padding:var(--cds-pad-xs) var(--cds-pad-sm);cursor:pointer}
+#page-dd .sd-seg button[aria-pressed="true"]{background:var(--color-bg);color:var(--color-fg);font-weight:var(--cds-font-weight-medium)}
+#page-dd .sd-scroll{overflow-x:auto;max-height:70vh;overflow-y:auto;border:1px solid var(--color-border-line);border-radius:var(--cds-radius)}
+#page-dd .sd-tbl{border-collapse:collapse;width:100%;font-size:var(--cds-font-size-caption);font-variant-numeric:tabular-nums}
+#page-dd .sd-tbl th,#page-dd .sd-tbl td{padding:.5em .65em;text-align:left;border-bottom:1px solid var(--color-border-line);white-space:nowrap;vertical-align:middle}
+#page-dd .sd-tbl thead th{position:sticky;top:0;background:var(--color-panel);z-index:1;font-weight:var(--cds-font-weight-medium);color:var(--color-fg-muted)}
+#page-dd .sd-tbl thead th button{appearance:none;border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:0}
+#page-dd .sd-tbl thead th[aria-sort="ascending"] button::after{content:" ↑"}
+#page-dd .sd-tbl thead th[aria-sort="descending"] button::after{content:" ↓"}
+#page-dd .sd-tbl td.r,#page-dd .sd-tbl th.r{text-align:right}
+#page-dd .sd-tbl tbody tr{cursor:pointer}
+#page-dd .sd-tbl tbody tr:hover{background:color-mix(in srgb,var(--color-fg) 5%,transparent)}
+#page-dd .sd-tk{font-weight:var(--cds-font-weight-medium);font-size:var(--cds-font-size-body)}
+#page-dd .sd-sub{display:block;color:var(--color-fg-muted);font-size:var(--cds-font-size-caption);max-width:16rem;overflow:hidden;text-overflow:ellipsis}
+#page-dd .sd-dots{display:inline-flex;gap:3px;vertical-align:middle;margin-left:.45em}
+#page-dd .sd-dots i{width:8px;height:8px;border-radius:50%;background:var(--cds-chart-muted);display:inline-block}
+#page-dd .sd-dots i[data-c="green"]{background:var(--color-ok)}
+#page-dd .sd-dots i[data-c="red"]{background:var(--color-bad)}
+#page-dd .sd-dots i[data-c="grey"]{background:var(--color-fg-muted)}
+#page-dd .sd-dots i[data-c="na"]{background:transparent;box-shadow:inset 0 0 0 1px var(--color-fg-muted)}
+#page-dd .sd-lights{display:grid;gap:var(--cds-gap-sm);grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr))}
+#page-dd .sd-light{border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-md);display:grid;gap:.3em;align-content:start;min-width:0;background:var(--color-bg)}
+#page-dd .sd-light[data-c="green"]{background:color-mix(in srgb,var(--color-ok) 9%,var(--color-bg));border-color:color-mix(in srgb,var(--color-ok) 40%,var(--color-border-line))}
+#page-dd .sd-light[data-c="red"]{background:color-mix(in srgb,var(--color-bad) 8%,var(--color-bg));border-color:color-mix(in srgb,var(--color-bad) 40%,var(--color-border-line))}
+#page-dd .sd-light[data-c="grey"]{background:color-mix(in srgb,var(--color-warn) 6%,var(--color-bg))}
+#page-dd .sd-light .nm{display:flex;justify-content:space-between;gap:.5em;align-items:baseline;font-weight:var(--cds-font-weight-medium)}
+#page-dd .sd-light .val{font-family:var(--font-anthropic-serif);font-size:calc(var(--cds-font-size-heading) * 1.25);font-variant-numeric:tabular-nums}
+#page-dd .sd-light[data-c="green"] .val{color:var(--color-ok)}
+#page-dd .sd-light[data-c="red"] .val{color:var(--color-bad)}
+#page-dd .sd-light .fx{font-size:var(--cds-font-size-caption);color:var(--color-fg);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;line-height:1.4;overflow-wrap:anywhere}
+#page-dd .sd-light .rule,#page-dd .sd-light .why{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);line-height:1.4}
+#page-dd .sd-story{display:grid;grid-template-columns:5.5rem 1fr;gap:var(--cds-gap-sm) var(--cds-gap-md);margin:0}
+#page-dd .sd-story dt{font-size:var(--cds-font-size-caption);font-weight:var(--cds-font-weight-medium);letter-spacing:.06em;padding-top:.15em}
+#page-dd .sd-story dd{margin:0;min-width:0}
+#page-dd .sd-evc{display:grid;gap:.35em}
+#page-dd .sd-evc .ln{display:grid;grid-template-columns:2.6rem 1.4rem 1fr;gap:.6em;align-items:start;line-height:1.4}
+#page-dd .sd-evc .tf{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);padding-top:.1em}
+#page-dd .sd-mark{width:1.2rem;height:1.2rem;border-radius:4px;display:inline-grid;place-items:center;font-size:.75em;font-weight:var(--cds-font-weight-medium);border:1px solid var(--color-border-line)}
+#page-dd .sd-mark[data-c="green"]{background:var(--color-ok);color:var(--color-bg);border-color:transparent}
+#page-dd .sd-mark[data-c="red"]{background:var(--color-bad);color:var(--color-bg);border-color:transparent}
+#page-dd .sd-mark[data-c="grey"]{background:transparent;color:var(--color-fg-muted)}
+#page-dd .sd-stats{display:grid;gap:var(--cds-gap-sm);grid-template-columns:repeat(auto-fit,minmax(min(100%,8.5rem),1fr))}
+#page-dd .sd-stat{display:grid;gap:.15em;min-width:0}
+#page-dd .sd-stat .v{font-family:var(--font-anthropic-serif);font-size:calc(var(--cds-font-size-heading) * 1.3);font-variant-numeric:tabular-nums}
+#page-dd .sd-chart{width:100%;min-height:2rem;position:relative}
+#page-dd .sd-chart svg{display:block;width:100%;height:auto;overflow:visible}
+#page-dd .sd-chart text{fill:var(--color-fg-muted);font-size:11px;font-family:var(--font-anthropic-sans)}
+#page-dd .sd-tip{position:absolute;pointer-events:none;background:var(--cds-surface-popover);border:1px solid var(--cds-border);border-radius:var(--cds-radius);box-shadow:var(--cds-shadow-popover);padding:var(--cds-pad-xs) var(--cds-pad-sm);font-size:var(--cds-font-size-caption);white-space:nowrap}
+#page-dd .sd-ud{display:grid;gap:var(--cds-gap-md);grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr))}
+#page-dd .sd-side{display:grid;gap:var(--cds-gap-sm);align-content:start;min-width:0}
+#page-dd .sd-side h3{margin:0;font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium)}
+#page-dd .sd-news{list-style:none;margin:0;padding:0;display:grid;gap:var(--cds-gap-sm)}
+#page-dd .sd-news li{display:grid;grid-template-columns:1.6rem 1fr;gap:.6em;align-items:start}
+#page-dd .sd-imp{width:1.5rem;height:1.5rem;border-radius:50%;display:inline-grid;place-items:center;font-weight:var(--cds-font-weight-medium);border:1px solid var(--color-border-line)}
+#page-dd .sd-imp[data-i="+"]{color:var(--color-ok);border-color:color-mix(in srgb,var(--color-ok) 45%,transparent)}
+#page-dd .sd-imp[data-i="-"]{color:var(--color-bad);border-color:color-mix(in srgb,var(--color-bad) 45%,transparent)}
+#page-dd .sd-news a{color:var(--color-fg);text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--color-fg) 35%,transparent);text-underline-offset:2px}
+#page-dd .sd-q{display:grid;gap:.15em}
+#page-dd .sd-q b{font-weight:var(--cds-font-weight-medium)}
+#page-dd .sd details summary{cursor:pointer;color:var(--color-fg-muted);font-size:var(--cds-font-size-caption)}
+#page-dd .sd-empty{color:var(--color-fg-muted);font-size:var(--cds-font-size-caption);margin:0}
+#page-dd .sd-fail{display:flex;align-items:center;justify-content:center;gap:.5em;color:var(--color-fg-muted);font-size:var(--cds-font-size-caption);min-height:3rem}
+#page-dd .sd-fail::before{content:"";width:.375rem;height:.375rem;border-radius:50%;background:var(--color-bad)}
+#page-dd .sd [data-dash-source-state=empty]{color:transparent}
+#page-dd .sd [data-dash-source-state=refreshing]{opacity:.5;transition:opacity var(--cds-dur-slow)}
+#page-dd .sd-method{display:grid;gap:var(--cds-gap-md)}
+#page-dd .sd-method table{border-collapse:collapse;width:100%;font-size:var(--cds-font-size-caption)}
+#page-dd .sd-method td,#page-dd .sd-method th{padding:.45em .6em;border-bottom:1px solid var(--color-border-line);text-align:left;vertical-align:top}
+#page-dd .sd-method td.fx{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:normal;min-width:14rem}
+@media (max-width:640px){#page-dd .sd-hide-sm{display:none}
+#page-dd .sd-story{grid-template-columns:1fr}
+#page-dd .sd-kv{grid-template-columns:1fr}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+/* ═══════════ DEEP DIVE TAB — the Stock Deep Dive dashboard page, fed by Supabase (isolated module) ═══════════
+   Tables (dd_setup.sql): dd_runs · dd_stocks · dd_lights · dd_ladder · dd_history · dd_news · dd_inbox.
+   The skill writes one "run package" per run (dd_inbox, or a .json dropped here); fold() replays the dashboard's
+   merge rules (what changed, times seen, quick cards never overwrite a deep dive, 12 headlines per ticker). */
+(function(){
+  const T={runs:"dd_runs",stocks:"dd_stocks",lights:"dd_lights",ladder:"dd_ladder",history:"dd_history",news:"dd_news",inbox:"dd_inbox"};
+  const HDR={apikey:SB_KEY,Authorization:"Bearer "+SB_KEY}, HDRJ={...HDR,"Content-Type":"application/json"};
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  let inited=false, loaded=false, busy=false;
+  const METHOD=[{"id": "m01", "group": "Seven lights (the screener columns)", "name": "ROIC", "formula": "EBIT × (1 − tax rate) ÷ average(equity + debt − cash); tax rate = income tax ÷ (EBIT − interest)", "rule": "ON above 15%", "chapter": "ch.7", "meaning": "Cents of profit every year for each dollar ever put into the business."}, {"id": "m02", "group": "Seven lights (the screener columns)", "name": "Growth", "formula": "Revenue CAGR = (revenue now ÷ revenue 3 years ago)^(1/3) − 1; TTM year-on-year when 3 years are missing", "rule": "ON above 10% a year", "chapter": "ch.4", "meaning": "Is the top line growing fast enough to compound?"}, {"id": "m03", "group": "Seven lights (the screener columns)", "name": "Debt", "formula": "Net debt ÷ EBITDA = (total debt − cash) ÷ EBITDA", "rule": "ON under 2x; net cash passes; n/a for banks", "chapter": "ch.11", "meaning": "Years of raw profit needed to clear the debt: the survival bar."}, {"id": "m04", "group": "Seven lights (the screener columns)", "name": "Cash", "formula": "FCF conversion = free cash flow ÷ net income", "rule": "ON above 80%; n/a for banks", "chapter": "ch.10", "meaning": "How much reported profit turns into real cash."}, {"id": "m05", "group": "Seven lights (the screener columns)", "name": "Margin", "formula": "Gross margin now − gross margin 3 years ago, in points", "rule": "ON if better than −1 pt", "chapter": "ch.5", "meaning": "Pricing power: does it keep its slice of every sale?"}, {"id": "m06", "group": "Seven lights (the screener columns)", "name": "Shares", "formula": "Diluted shares: per-year change over 3 years = (now ÷ 3y ago)^(1/3) − 1; 1-year change if 3 years are missing", "rule": "ON at or under +0.5% a year", "chapter": "ch.12", "meaning": "Is your slice of the pizza growing or shrinking?"}, {"id": "m07", "group": "Seven lights (the screener columns)", "name": "Value", "formula": "Trailing P/E ÷ its own 3-year average P/E − 1", "rule": "ON when below its own average", "chapter": "ch.19", "meaning": "Is it cheaper than it usually is?"}, {"id": "m08", "group": "Seven lights (the screener columns)", "name": "Score and verdict", "formula": "Count of lights ON", "rule": "6–7 FULL SIZE · 4–5 HALF SIZE · 0–3 TRADE ONLY (never a hold)", "chapter": "ch.28, 22", "meaning": "Quality and price vote; your chart casts the timing vote."}, {"id": "m09", "group": "Six more Bible tests (IVA Tape stripes)", "name": "Leverage", "formula": "Total assets ÷ equity (DuPont engine three)", "rule": "pass ≤ 2x · red towards 4x · n/a for banks", "chapter": "ch.9", "meaning": "Is debt doing the lifting behind the return on equity?"}, {"id": "m10", "group": "Six more Bible tests (IVA Tape stripes)", "name": "DOL (the amplifier)", "formula": "Gross profit ÷ EBIT; colour = EBIT growth against revenue growth this year", "rule": "green when EBIT grows faster than revenue · red when it falls faster", "chapter": "ch.6", "meaning": "Fixed costs make profit move faster than sales, both ways."}, {"id": "m11", "group": "Six more Bible tests (IVA Tape stripes)", "name": "Accruals", "formula": "(Net income − operating cash flow) ÷ total assets", "rule": "pass ≤ +2% · red towards +10%", "chapter": "ch.3, 10", "meaning": "Profit running ahead of cash: earnings wearing makeup."}, {"id": "m12", "group": "Six more Bible tests (IVA Tape stripes)", "name": "Discount test", "formula": "Gross-margin change (points, year on year) while revenue grows", "rule": "pass: revenue up and margin held (≥ −1 pt) · fail: revenue up while margin falls · grey: revenue not growing", "chapter": "ch.4 + 5", "meaning": "Real growth does not need price cuts."}, {"id": "m13", "group": "Six more Bible tests (IVA Tape stripes)", "name": "Pricing power 3y", "formula": "Gross margin now − 3 years ago (points), with revenue higher than 3 years ago", "rule": "pass ≥ −1 pt · red towards −5 pt · grey when revenue shrank", "chapter": "ch.5", "meaning": "Margin held while growing, not by shrinking."}, {"id": "m14", "group": "Six more Bible tests (IVA Tape stripes)", "name": "Compounder", "formula": "Incremental ROIC = (NOPAT now − NOPAT 3y ago) ÷ (invested capital now − 3y ago), shown as the lower of that and ROIC", "rule": "pass ≥ 15% · red below 5% · grey when nothing was reinvested", "chapter": "ch.7, 8", "meaning": "Does each new dollar invested earn as much as the old ones?"}, {"id": "m15", "group": "Story panel (IVA Pro)", "name": "Archetype order", "formula": "DATA-SPARSE → STORY STOCK → COMPOUNDER ON SALE → COMPOUNDER → QUALITY, FULLY PRICED → CHEAP FOR A REASON → LEVERAGED GROWER → CASH COW → SERIAL DILUTER → UNDER PRESSURE → MIXED PICTURE → WEAK HAND", "rule": "the first that fits wins", "chapter": "ch.28-30", "meaning": "One line naming what kind of stock this is right now."}, {"id": "m16", "group": "Story panel (IVA Pro)", "name": "Risk families", "formula": "leverage (net debt > 2x, cover < 3x or leverage > 4x) · earnings quality (conversion < 60%, margin −3 pt, ROIC < 8% or negative FCF) · valuation (P/E > 1.2 × own average, P/FCF > 35x or PEG > 2) · dilution (> 3% a year) · growth (shrinking or decelerating)", "rule": "0 LOW · 1 MEDIUM · 2 ELEVATED · 3+ HIGH", "chapter": "ch.9-19", "meaning": "Counts the structural ways this stock can hurt you."}, {"id": "m17", "group": "Story panel (IVA Pro)", "name": "BEST anchor", "formula": "Re-rating to own 3-year P/E = own average ÷ P/E − 1, plus EPS growth: the double engine", "rule": "only when the P/E sits more than 5% below its own average", "chapter": "ch.19", "meaning": "What happens if the mood returns to normal and the business keeps growing."}, {"id": "m18", "group": "Story panel (IVA Pro)", "name": "WORST anchor", "formula": "Reversion alone = own average ÷ P/E − 1 when the P/E sits above its own average", "rule": "plus leverage, one-miss and margin-erosion paths when they apply", "chapter": "ch.11, 17-20", "meaning": "What happens if the mood returns to normal from a stretched level."}, {"id": "m19", "group": "EVC checklist (your rows)", "name": "C1 / V1 unidirectional", "formula": "Efficiency ratio = |close − close 20 bars ago| ÷ Σ|close − previous close| over 20 bars, or the 20 EMA pointing one way", "rule": "green if ER ≥ 0.30 or the 20 EMA points one way on ≥ 85% of 20 bars", "chapter": "EVC", "meaning": "Is price walking in a straight line rather than wandering?"}, {"id": "m20", "group": "EVC checklist (your rows)", "name": "C2 not a pocket", "formula": "20 EMA move over 10 bars ÷ ATR, and crosses of the 20 EMA in 20 bars", "rule": "red only when the 20 EMA moved < 0.5 × ATR and price crossed it 3+ times", "chapter": "EVC", "meaning": "Flat average with price chopping across it = stage-1 pocket."}, {"id": "m21", "group": "EVC checklist (your rows)", "name": "C3 / V2 trend", "formula": "10 EMA > 20 EMA, both higher than one bar ago, MMB count in this cycle", "rule": "green when 10 > 20, both rising and no more than MMB 3", "chapter": "EVC", "meaning": "Clean trend, not overextended."}, {"id": "m22", "group": "EVC checklist (your rows)", "name": "V4 distance", "formula": "|close − 10 EMA| ÷ ATR(14, 1D) and |close − 5 EMA| ÷ ATR, close vs 50 EMA", "rule": "close ≥ 50 EMA · < 2 ATR from the 10 EMA · ≤ 1 ATR from the 5 EMA", "chapter": "EVC", "meaning": "Not chasing a stretched move."}, {"id": "m23", "group": "EVC checklist (your rows)", "name": "V3 do-not-enter", "formula": "Distance in ATRs, % below the 20-day high, biggest up-day in 5 days (in ATRs), days to earnings", "rule": "red on earnings day; otherwise you judge it", "chapter": "EVC", "meaning": "Too far, at the peak, after huge sudden demand, or on earnings day."}, {"id": "m24", "group": "EVC checklist (your rows)", "name": "E: ACCMB or MMB", "formula": "ACCMB: price at/after the high of the 10/20 cross candle or a 20 EMA DTC, still in the first leg · MMB: flushed (a close) below the 10 EMA since the last high", "rule": "either door open = 1; never after MMB 3", "chapter": "EVC", "meaning": "The entry doors on the hourly chart."}, {"id": "m25", "group": "EVC checklist (your rows)", "name": "MMB count", "formula": "New cycle at a 10/20 cross up; each new cycle high followed by a close below the 10 EMA adds one", "rule": "MMB 1-3 pass; 4+ fails", "chapter": "EVC", "meaning": "How many pauses this trend has already taken."}, {"id": "m26", "group": "EVC checklist (your rows)", "name": "Steadiness", "formula": "(Σ up-closes − Σ down-closes) ÷ Σ|changes| since the last 5 EMA turn", "rule": "−1 to +1; near +1 = steady demand", "chapter": "EVC SLS", "meaning": "How smooth the current leg is."}, {"id": "m27", "group": "EVC checklist (your rows)", "name": "RS vs index", "formula": "(1 + stock return) ÷ (1 + index return) − 1 over 21, 63 and 126 trading days; QQQ for US, NIFTY 50 for India", "rule": "leading when the RS line is above its 20-day average", "chapter": "ch.26", "meaning": "Is it beating the market it trades in?"}, {"id": "m28", "group": "Exits and size", "name": "Exit levels", "formula": "1D 20 EMA and 50 EMA; distance = level ÷ price − 1", "rule": "out on a close under the 20 or 50 EMA (1D)", "chapter": "EVC", "meaning": "Where the trade is wrong."}, {"id": "m29", "group": "Exits and size", "name": "10-20 gap rule", "formula": "gap now ÷ peak gap of this cycle (cycle starts at the last 10/20 cross)", "rule": "second 50% when both EMAs slope down and the gap is ≤ ¼ of the peak", "chapter": "EVC", "meaning": "The trend is running out of steam."}, {"id": "m30", "group": "Exits and size", "name": "Size tier", "formula": "Votes: quality (≥ 5 of lights 1-6) + valuation (light 7, or reverse-DCF bar ≤ 8%) + timing (all EVC computer rows green and RS leading)", "rule": "3 votes FULL (1R = 1%) · 2 HALF · 1 or 0 watchlist only", "chapter": "ch.22", "meaning": "Size follows the count of votes, not excitement."}, {"id": "m31", "group": "Valuation and Bible checks", "name": "Reverse DCF", "formula": "Solve g: market cap = Σ FCF×(1+g)^t ÷ (1+WACC)^t for 10 years + terminal value at 3% (5% India)", "rule": "≤ 5% low bar · 5-12% fair · > 12% high bar", "chapter": "ch.18", "meaning": "What growth the price already assumes."}, {"id": "m32", "group": "Valuation and Bible checks", "name": "FCF yield", "formula": "Free cash flow ÷ market cap, against the 10-year government bond", "rule": "green at or above the bond · grey half to full · red below half", "chapter": "ch.15", "meaning": "The rent the business pays you."}, {"id": "m33", "group": "Valuation and Bible checks", "name": "PEG · P/FCF", "formula": "P/E ÷ (EPS growth × 100) · market cap ÷ free cash flow", "rule": "PEG < 1.5 green, > 2 red · P/FCF < 20x green, > 35x red", "chapter": "ch.13, 17-18", "meaning": "Paying for growth, or for hope?"}, {"id": "m34", "group": "Valuation and Bible checks", "name": "Survivor test", "formula": "ROIC > WACC · net debt < 2x EBITDA · FCF conversion > 80% · a moat you can name", "rule": "4 of 4 = survives distribution into the next accumulation", "chapter": "ch.30", "meaning": "The company you want to hold when the index falls."}, {"id": "m35", "group": "Valuation and Bible checks", "name": "Moat (numbers test)", "formula": "Gross margin flat or rising over 3 years AND ROIC above 15%", "rule": "pass / fail, plus the named source", "chapter": "ch.20", "meaning": "Moats show up in numbers, not stories."}, {"id": "m36", "group": "Valuation and Bible checks", "name": "WACC and bond bar", "formula": "Default WACC 8% for mega caps, 10% large caps, 12% small caps and India; bond = current 10-year yield", "rule": "inputs, set per run", "chapter": "ch.8, 15", "meaning": "The cost of money every return is judged against."}, {"id": "m37", "group": "Options market", "name": "Implied volatility (IV)", "formula": "The yearly move options are priced for (IBKR underlying IV)", "rule": "compare with its own history", "chapter": "ch.27", "meaning": "How big a move the market is paying for."}, {"id": "m38", "group": "Options market", "name": "IV percentile", "formula": "Where today’s IV sits in its own 52-week range (IBKR)", "rule": "< 20 calm · 20-80 normal · > 80 nervous", "chapter": "ch.27", "meaning": "Are options cheap or expensive for this stock?"}, {"id": "m39", "group": "Options market", "name": "IV vs realised", "formula": "Implied vol ÷ 30-day historical vol", "rule": "> 1.25: an event is priced in · < 0.8: storm passing", "chapter": "ch.27", "meaning": "Are traders expecting more movement than lately?"}, {"id": "m40", "group": "Options market", "name": "Put/call ratio", "formula": "Put volume ÷ call volume today, against its own average", "rule": "> 1.3 × usual: hedging · < 0.7 × usual: call chasing", "chapter": "—", "meaning": "Who is buying insurance and who is betting on a rise."}, {"id": "m41", "group": "Options market", "name": "Expected move", "formula": "Price × IV × √(days ÷ 365); at earnings, the ATM straddle ÷ price when available", "rule": "1 standard deviation (about 2 in 3 outcomes inside)", "chapter": "ch.27", "meaning": "How far price can move without surprising anyone."}, {"id": "m42", "group": "Analysts and news", "name": "Analyst targets", "formula": "Average, low and high 12-month targets ÷ price − 1; spread = (high − low) ÷ average", "rule": "a crowd bar, not gospel; check it against the reverse DCF", "chapter": "ch.18", "meaning": "What the professionals say, and how much they disagree."}, {"id": "m43", "group": "Analysts and news", "name": "Estimate revisions", "formula": "Direction of EPS estimate changes over the last 30-90 days", "rule": "rising estimates support the price; falling ones drag it", "chapter": "ch.27", "meaning": "The forecast moving is what moves stocks."}, {"id": "m44", "group": "Analysts and news", "name": "News impact", "formula": "+ could push the price up · − could push it down · ± either way", "rule": "reliable outlets and company filings only", "chapter": "—", "meaning": "What could change the story this month."}, {"id": "m45", "group": "Valuation and Bible checks", "name": "Owner earnings", "formula": "Operating cash flow − maintenance capex (≈ D&A, never more than total capex); yield = owner earnings ÷ market cap", "rule": "compare the yield with the bond", "chapter": "ch.10", "meaning": "The cash an owner could take out without shrinking the business."}, {"id": "m46", "group": "Valuation and Bible checks", "name": "GAAP vs adjusted EPS", "formula": "Reported (adjusted) EPS ÷ GAAP EPS − 1, last four quarters", "rule": "a gap of 20% or more: check what is excluded", "chapter": "ch.1", "meaning": "Where the accounting opinions live."}, {"id": "m47", "group": "Valuation and Bible checks", "name": "ROIC 5-year average", "formula": "Average of the yearly ROIC over five years, when the source shows it", "rule": "above 15% for five years is elite", "chapter": "ch.7", "meaning": "Quality that lasts a cycle, not a peak year."}, {"id": "m48", "group": "Analysts and news", "name": "Positioning", "formula": "Short % of float and days to cover; insiders’ open-market trades; India: promoter, FII and DII holdings and their 1-year change, pledged %", "rule": "clustered insider or promoter buying is strong; 10b5-1 sales say little; rising pledges are a warning", "chapter": "ch.12", "meaning": "Who is betting on it, and who is betting against it."}, {"id": "m49", "group": "Exits and size", "name": "One bet, many tickers", "formula": "Deep-dived names per industry in one run", "rule": "3 or more in one industry: cap that driver near two full risk units", "chapter": "ch.23", "meaning": "Count drivers, not tickers."}, {"id": "m50", "group": "Options market", "name": "Options-implied odds", "formula": "P(price ends beyond K in 3 months) = N(d2), d2 = [ln(S ÷ K) − ½σ²T] ÷ (σ√T), σ = implied vol, T = 0.25", "rule": "risk-neutral odds, not a forecast", "chapter": "ch.27", "meaning": "How likely the options market thinks each price anchor is."}, {"id": "m51", "group": "Exits and size", "name": "Reward to risk", "formula": "(up target − price) ÷ (price − down target)", "rule": "above 2 : 1 pays for being wrong half the time", "chapter": "ch.21", "meaning": "How much you stand to make for each unit you stand to lose."}, {"id": "m52", "group": "Quick cards (CSV only)", "name": "Screen order", "formula": "1) EMA alignment: 1W and 1D 10 EMA above the 20 and price above the 50 · 2) 3-month RS = (1 + stock 3M performance) ÷ (1 + QQQ or NIFTY 50 3M performance) − 1 · 3) lights from the CSV", "rule": "Top eight get a deep dive; the next 30 get a quick card", "chapter": "weekly pipeline", "meaning": "The same order as his Sunday screen: trend first, then leadership, then quality."}, {"id": "m53", "group": "Quick cards (CSV only)", "name": "Margin light, CSV proxy", "formula": "Gross margin TTM − gross margin last fiscal year (points); else from gross-profit growth vs revenue growth", "rule": "ON if better than −1 pt", "chapter": "ch.5", "meaning": "One-year stand-in for the 3-year margin change until the deep dive."}, {"id": "m54", "group": "Quick cards (CSV only)", "name": "Shares light, CSV proxy", "formula": "(1 + net income growth TTM) ÷ (1 + diluted EPS growth TTM) − 1; else − buyback ratio", "rule": "ON at or under +0.5% a year", "chapter": "ch.12", "meaning": "Diluted shares = net income ÷ EPS, so the two growth rates give the share-count change."}, {"id": "m55", "group": "Quick cards (CSV only)", "name": "Value light, CSV proxy", "formula": "P/E a year ago = P/E now × (1 + EPS growth TTM) ÷ (1 + 1-year price performance)", "rule": "ON when today’s P/E is below last year’s", "chapter": "ch.19", "meaning": "Is it cheaper than a year ago? The deep dive replaces this with its own 3-year average P/E."}, {"id": "m56", "group": "Quick cards (CSV only)", "name": "Trend from the CSV", "formula": "Per timeframe: up = 10 EMA above the 20 and price above the 50; down = both fail; mixed = one of the two. Stretch = (price − 1D 10 EMA) ÷ ATR(14)", "rule": "V4 wants the stretch under 2 ATR", "chapter": "EVC", "meaning": "A first look at the trend before the bars-based EVC rows exist."}, {"id": "b00", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Rating", "formula": "points earned ÷ points available × 100, over the checks that could be measured", "rule": "≥ 70 green · 50–69 amber · < 50 red; the number of rated checks is shown next to it", "chapter": "beyond.the.stockprice", "meaning": "A 32-point checklist from an Indian value investor: returns and growth 25 pts, balance sheet and cash 20, valuation 20, ownership and governance 20, business 15. Full, half or no points per check. India-only items use their US equivalent on US names."}, {"id": "b01", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "ROCE", "formula": "EBIT ÷ (equity + total debt)", "rule": "≥ 20% full · ≥ 12% half · 5 pts", "chapter": "Returns & growth", "meaning": "Cents of operating profit a year on every dollar the business has tied up (equity plus borrowings). The Indian screeners’ favourite quality number."}, {"id": "b25", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Incremental ROCE", "formula": "(EBIT now − EBIT 3y ago) ÷ (capital employed now − 3y ago)", "rule": "≥ 15% full · > 0 half · more profit on less capital = full · 4 pts", "chapter": "Returns & growth", "meaning": "Did the NEW money put in over three years earn as much as the old? A business that grows profit faster than its capital base is getting better, not just bigger."}, {"id": "b20", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Return on equity", "formula": "net income ÷ shareholders’ equity", "rule": "≥ 15% full · ≥ 10% half · 4 pts", "chapter": "Returns & growth", "meaning": "Profit per dollar of the owners’ money. Read it with debt to equity: leverage can fake it."}, {"id": "b03", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "3-year profit growth / 3 Years Growth in Profit", "formula": "diluted EPS CAGR, 3 years", "rule": "≥ 15%/yr full · ≥ 8% half · loss → profit = full · 4 pts", "chapter": "Returns & growth", "meaning": "How fast profit per share has compounded over three years."}, {"id": "b05", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "3-year sales growth / 3 Years Growth in Annual Sales", "formula": "revenue CAGR, 3 years", "rule": "≥ 10%/yr full · ≥ 5% half · 4 pts", "chapter": "Returns & growth", "meaning": "How fast sales have compounded over three years — profit cannot outgrow sales for long."}, {"id": "b07", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Operating profit margin / Operating Profit Margin", "formula": "EBIT ÷ revenue", "rule": "≥ 20% full · ≥ 10% half · 4 pts", "chapter": "Returns & growth", "meaning": "Cents kept from every dollar of sales after running the business, before interest and tax."}, {"id": "b21", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Debt to equity / Debt to Equity", "formula": "total debt ÷ equity", "rule": "≤ 0.5 full · ≤ 1.0 half (banks not judged) · 4 pts", "chapter": "Balance sheet & cash", "meaning": "Borrowings against the owners’ money. Under 0.5 the bank is a bystander; above 1 the bank has a say."}, {"id": "b22", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Current ratio / Current Ratio", "formula": "current assets ÷ current liabilities", "rule": "≥ 1.5 full · ≥ 1.0 half (banks not judged) · 3 pts", "chapter": "Balance sheet & cash", "meaning": "Can it pay this year’s bills from this year’s assets? Under 1 means it depends on refinancing."}, {"id": "b10", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Free cash flow, 3 years / Free Cash Flow 3 Years", "formula": "FCF TTM and the 3-year sum", "rule": "both positive full · TTM positive half · 4 pts", "chapter": "Balance sheet & cash", "meaning": "Cash left after capex, this year and over three years. Profit is an opinion; free cash flow is a fact."}, {"id": "b24", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Cash flow ÷ profit before tax / Cash Flow / Profits Before Tax", "formula": "operating cash flow ÷ (net income + income tax)", "rule": "≥ 0.8 full · ≥ 0.5 half · 4 pts", "chapter": "Balance sheet & cash", "meaning": "How much of pre-tax profit turned into operating cash. Below 0.5 for long means profit on paper only."}, {"id": "b26", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Working capital trend / Working Capital Trend", "formula": "cash-conversion days (inventory + debtor − payable days) now vs 3 years ago", "rule": "shorter by ≥ 5 days full · within 5 days half · longer none · 3 pts", "chapter": "Balance sheet & cash", "meaning": "Days between paying suppliers and collecting from customers, now vs three years ago. Shorter = less cash trapped in the business."}, {"id": "b12", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Inventory days / Inventory Days", "formula": "365 × inventory ÷ cost of goods sold", "rule": "≤ 60 full · ≤ 120 half (no inventory → not judged) · 1 pt", "chapter": "Balance sheet & cash", "meaning": "Days of sales sitting in stock. Rising inventory days often precede a margin problem."}, {"id": "b13", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Debtor days / Debtor Days", "formula": "365 × receivables ÷ revenue", "rule": "≤ 45 full · ≤ 90 half · 1 pt", "chapter": "Balance sheet & cash", "meaning": "Days customers take to pay. Rising debtor days can mean channel stuffing or weak customers."}, {"id": "b11", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "P/E vs its 3-year median / 3 Years Median PE", "formula": "trailing P/E ÷ median weekly P/E of the last 3 years", "rule": "≤ 1.0 full · ≤ 1.2 half · 5 pts", "chapter": "Valuation", "meaning": "Is the market paying more or less per dollar of profit than it usually has for this company? The anchor the checklist calls “Median PE”."}, {"id": "b02", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "PEG", "formula": "P/E ÷ EPS growth % (3-year CAGR, else 1-year)", "rule": "≤ 1 full · ≤ 2 half · 4 pts", "chapter": "Valuation", "meaning": "Price for each point of growth. Under 1 is cheap for the growth on offer; over 2 is paying for hope."}, {"id": "b06", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "P/B × P/E / Price to Book Value × Price to Earnings", "formula": "price-to-book × trailing P/E (Graham’s 22.5)", "rule": "≤ 22.5 full · ≤ 45 half · 2 pts", "chapter": "Valuation", "meaning": "Graham’s quick value test: book multiple times earnings multiple. Asset-light compounders fail it by design — read it with ROCE."}, {"id": "b04", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Price to book / Price to Book Value", "formula": "market cap ÷ equity", "rule": "≤ 3 full · ≤ 6 half (banks: ≤ 1.5 · ≤ 3) · 2 pts", "chapter": "Valuation", "meaning": "Price against the accounting net worth. Matters most for banks and asset-heavy businesses."}, {"id": "b08", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Price to earnings / Price Earnings Ratio", "formula": "price ÷ diluted EPS TTM", "rule": "≤ 20 full · ≤ 35 half (no earnings none) · 1 pt", "chapter": "Valuation", "meaning": "Years of today’s profit you pay for the share. Context, not a verdict."}, {"id": "b31", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Valuation vs mid-cycle multiples / Valuation Against Mid-Cycle Multiples", "formula": "today’s EV/EBITDA (or P/E) against its own multi-year average, judged at mid-cycle margins", "rule": "≤ 1.0× full · ≤ 1.2× half · dearer none · 2 pts", "chapter": "Valuation", "meaning": "Is the business priced above or below what the market usually paid for it, judged at normal (mid-cycle) margins rather than peak or trough? The checklist’s guard against buying a cyclical at the top."}, {"id": "b14", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Dividend yield / Dividend Yield", "formula": "dividends per share ÷ price", "rule": "≥ 2% full · > 0 half · 2 pts", "chapter": "Valuation", "meaning": "Cash paid out to holders as a share of the price. Zero is normal for fast growers."}, {"id": "b17", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "3-year high / low / 3 Year High / Low", "formula": "where the price sits in its 3-year range, 0% = low, 100% = high", "rule": "30–85% of the range full · outside half · 2 pts", "chapter": "Valuation", "meaning": "Where today’s price sits between the lowest and highest price of the last three years."}, {"id": "b09", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Current market price / Current Market Price", "formula": "last price; P/E at this price and the 3-year high and low for context", "rule": "shown, not scored", "chapter": "Valuation", "meaning": "The price everything above is measured at, with the P/E and the 3-year range for context."}, {"id": "b19", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Insider ownership (US ≈ promoter holding) / Promoter Holding", "formula": "US: officers + directors % · IN: promoter %", "rule": "US ≥ 5% full · ≥ 1% half · IN ≥ 50% full · ≥ 35% half · 4 pts", "chapter": "Ownership & governance", "meaning": "How much the people running it own. India: the promoter family; US: officers and directors."}, {"id": "b15", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Insider ownership change (US ≈ promoter change) / Change in Promoter Holding 5 Years", "formula": "percentage-point change over 5 years (1 year when that is all the source shows)", "rule": "rising > +0.5 pt full · flat half · falling none · 4 pts", "chapter": "Ownership & governance", "meaning": "Are the people running it buying or selling their own shares over time?"}, {"id": "b18", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Insider selling (US ≈ pledge) / Pledged Percentage", "formula": "IN: pledged promoter shares % · US: open-market insider sales, 12 months, % of insider holdings", "rule": "IN 0% full · < 10% half · US ≤ 5% full · ≤ 15% half · 4 pts", "chapter": "Ownership & governance", "meaning": "India: promoter shares pledged for loans (a forced-selling risk). US: the share of insider holdings sold in the last year."}, {"id": "b29", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Related-party transactions / Related Party Transactions", "formula": "proxy / annual report related-party note (helper’s reading)", "rule": "none material full · minor half · material none · 3 pts", "chapter": "Ownership & governance", "meaning": "Deals between the company and its own directors, promoters or their other companies — where value quietly leaks."}, {"id": "b30", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Auditor opinion / Auditor Qualifications", "formula": "US: 10-K opinion, material weakness, auditor change · IN: audit qualifications, CARO remarks", "rule": "clean full · emphasis of matter half · qualified none · 3 pts", "chapter": "Ownership & governance", "meaning": "Did the auditor sign off cleanly? Qualifications, going-concern notes, material weaknesses or an auditor change are red."}, {"id": "b32", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Other red flags / Any Other Red Flags", "formula": "accruals, GAAP gap, dilution, litigation, customer concentration — anything the filings flag", "rule": "none full · one watch item half · a real flag none · 2 pts", "chapter": "Ownership & governance", "meaning": "Anything else the filings flag: accruals, GAAP vs adjusted gaps, dilution, litigation, customer concentration."}, {"id": "b23", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Industry prospects / Prospects for the Industry", "formula": "demand growth, pricing, regulation, cycle position (helper’s reading)", "rule": "improving full · mixed half · deteriorating none · 5 pts", "chapter": "Business", "meaning": "Is the industry’s demand growing, flat or shrinking, and is pricing power with the sellers or the buyers?"}, {"id": "b28", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Market share trend / Market Share Trend", "formula": "share gaining or losing vs peers (helper’s reading from filings and calls)", "rule": "gaining full · holding half · losing none · 4 pts", "chapter": "Business", "meaning": "Is the company taking customers from rivals or losing them?"}, {"id": "b27", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Capacity utilisation / Capacity Utilisation", "formula": "utilisation or its proxy (asset turnover trend) where disclosed", "rule": "high and rising full · steady half · falling none · not disclosed → not judged · 3 pts", "chapter": "Business", "meaning": "How hard the plants or seats are working. Rising utilisation lifts margins; falling utilisation precedes cuts."}, {"id": "b16", "group": "Beyond-the-stock-price scorecard (32 checks, rating /100)", "name": "Peter Lynch bucket / Peter Lynch Bucket", "formula": "fast grower · stalwart · slow grower · cyclical · turnaround · asset play, with the bucket’s own test", "rule": "bucket named and its test met full · named only half · 3 pts", "chapter": "Business", "meaning": "Peter Lynch’s six kinds of stock, each judged by its own test: fast growers by PEG, stalwarts by P/E, slow growers by yield, cyclicals by mid-cycle valuation, turnarounds by recovering margins, asset plays by price to book."}];
+
+  /* ---------- the dashboard runtime, replaced by a small shim ---------- */
+  const DATA={}, DRAW={}, ON=[], PAR={t:null,cid:null};
+  const dash={
+    colors:["#e8b84b","#4da3ff","#3dd68c","#f05252","#c084fc"],
+    loader(){}, calc(){}, setLink(){},
+    data:id=>DATA[id]||{status:(loaded?"missing":"loading"),data:null},
+    params:()=>PAR,
+    setParams(p){ Object.assign(PAR,p); dash.redrawAll(); },
+    draw(name,fn){ if(typeof fn==="function") DRAW[name]=fn; const f=DRAW[name]; if(!f) return;
+      document.querySelectorAll('#page-dd [data-draw="'+name+'"]').forEach(el=>{ try{ f(el); }catch(e){ console.warn("deep dive draw "+name,e); } }); },
+    onData(fn){ ON.push(fn); },
+    redrawAll(){ Object.keys(DRAW).forEach(n=>dash.draw(n)); ON.forEach(f=>{ try{ f(); }catch(e){} }); },
+    set(id,rows){ DATA[id]={status:"ok",data:rows}; }
+  };
+  dash.set("method",METHOD);
+
+  /* d3 draws the ladder, the clock and the history chart; the tag above loads it from cdnjs, these are the fallbacks */
+  function ensureD3(cb){
+    if(typeof d3!=="undefined") return cb();
+    const cdns=["https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js","https://unpkg.com/d3@7.9.0/dist/d3.min.js","https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"];
+    (function tryNext(i){ if(i>=cdns.length){ setStatus("The chart library (d3) could not be loaded from any CDN — check the connection and press Refresh.","err"); return; }
+      const sc=document.createElement("script"); sc.src=cdns[i]; sc.onload=()=>cb(); sc.onerror=()=>tryNext(i+1); document.head.appendChild(sc); })(0);
+  }
+  let pageStarted=false;
+  function startPage(){
+    if(pageStarted) return; pageStarted=true;
+(function () {
+  /* ── state kept by the page (not data) ── */
+  var view = { q: '', scope: 'run', sort: 'score', dir: -1, tab: 'screen' };
+  var TABS = ['screen', 'stock', 'market', 'history', 'method'];
+
+  /* ── small helpers ── */
+  function D(id) { return dash.data(id); }
+  function rows(id) { var d = D(id); return d.status === 'ok' && Array.isArray(d.data) ? d.data : []; }
+  function n(v) { if (v === null || v === undefined || v === '') return null; var x = Number(v); return isFinite(x) ? x : null; }
+  function enc(v) { return encodeURIComponent(String(v)); }
+  function where(t) { return 'ticker=' + enc(t); }
+  function make(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined && text !== null) e.textContent = text; return e; }
+  function mark(e, src, field, w) { e.setAttribute('data-source', src); if (field) e.setAttribute('data-field', field); if (w) e.setAttribute('data-where', w); return e; }
+  var F0 = d3.format(',.0f'), F1 = d3.format(',.1f'), F2 = d3.format(',.2f');
+  function cur(row) { return row && row.currency === 'INR' ? '₹' : (row && row.currency && row.currency !== 'USD' ? row.currency + ' ' : '$'); }
+  function money(v, row) { v = n(v); if (v === null) return '—'; return cur(row) + (Math.abs(v) >= 1000 ? F0(v) : F2(v)); }
+  function pctTxt(v, d) { v = n(v); if (v === null) return '—'; var s = (d === 0 ? F0(v) : F1(v)); return (v > 0 ? '+' : '') + s + '%'; }
+  function plainPct(v) { v = n(v); return v === null ? '—' : F0(v) + '%'; }
+  function lines(s) { return String(s || '').split('\n').map(function (x) { return x.trim(); }).filter(Boolean); }
+  function tone(verdict) { return /FULL/.test(verdict || '') ? 'ok' : /HALF/.test(verdict || '') ? 'warn' : verdict ? 'bad' : 'muted'; }
+  function riskTone(r) { return r === 'LOW' ? 'ok' : r === 'HIGH' ? 'bad' : r ? 'warn' : 'muted'; }
+  function ratingTone(v) { v = n(v); return v === null ? 'muted' : v >= 70 ? 'ok' : v >= 50 ? 'warn' : 'bad'; }
+  function pill(text, t, src, field, w) { var p = make('span', 'sd-pill', text); p.setAttribute('data-tone', t || 'muted'); if (src) mark(p, src, field, w); return p; }
+  function failLine() { return make('div', 'sd-fail', 'Failed to load'); }
+  function state(el, ids) {
+    var st = ids.map(function (i) { return D(i).status; });
+    if (st.every(function (s) { return s === 'ok'; })) { el.classList.remove('dash-skeleton'); return true; }
+    el.replaceChildren();
+    if (st.some(function (s) { return s === 'error' || s === 'missing' || s === 'declined' || s === 'connect'; })) { el.classList.remove('dash-skeleton'); el.append(failLine()); }
+    else { el.textContent = '—'; el.classList.add('dash-skeleton'); }
+    return false;
+  }
+  function stocks() { return rows('stocks'); }
+  function latestRun() { var r = rows('runs').slice().sort(function (a, b) { return String(b.date || '').localeCompare(String(a.date || '')); }); return r[0] || null; }
+  function current() {
+    var t = dash.params().t, all = stocks();
+    var hit = all.filter(function (s) { return s.ticker === t; })[0];
+    return hit || all[0] || null;
+  }
+  function selectTicker(t) {
+    var s = stocks().filter(function (x) { return x.ticker === t; })[0];
+    var p = { t: t };
+    if (s && n(s.cid) !== null) p.cid = n(s.cid);
+    dash.setParams(p);
+  }
+  function textBlock(row, field, cls) { var p = make('p', cls || 'sd-text', row[field] || '—'); return mark(p, 'stocks', field, where(row.ticker)); }
+  function listBlock(row, field) {
+    var ls = lines(row[field]);
+    if (!ls.length) return mark(make('p', 'sd-empty', '—'), 'stocks', field, where(row.ticker));
+    var ul = mark(make('ul', 'sd-list'), 'stocks', field, where(row.ticker));
+    ls.forEach(function (x) { ul.append(make('li', null, x), document.createTextNode('\n')); });
+    return ul;
+  }
+  function stat(label, value, row, field, cls) {
+    var b = make('div', 'sd-stat');
+    b.append(make('span', 'sd-lab', label));
+    var v = make('span', 'v' + (cls ? ' ' + cls : ''), value);
+    if (field) mark(v, 'stocks', field, where(row.ticker));
+    b.append(v);
+    return b;
+  }
+  function markRow0(e, src, field) { e.setAttribute('data-source', src); e.setAttribute('data-field', field); e.setAttribute('data-row', '0'); return e; }
+  function kv(dl, label, value, row, field) {
+    dl.append(make('dt', null, label));
+    var dd = make('dd', null, value);
+    if (field) mark(dd, 'stocks', field, where(row.ticker));
+    dl.append(dd);
+  }
+
+  /* ── tabs ── */
+  function showTab(name) {
+    if (TABS.indexOf(name) < 0) name = 'screen';
+    view.tab = name;
+    document.querySelectorAll('.sd-tabs [data-tab]').forEach(function (b) { b.setAttribute('aria-selected', b.getAttribute('data-tab') === name ? 'true' : 'false'); });
+    TABS.forEach(function (t) { document.querySelectorAll('section#' + t).forEach(function (s) { s.hidden = t !== name; }); });
+    dash.setLink(name);
+  }
+  document.querySelectorAll('.sd-tabs [data-tab]').forEach(function (b) { b.addEventListener('click', function () { showTab(b.getAttribute('data-tab')); }); });
+  var hash = (location.hash || '').slice(1);
+  if (TABS.indexOf(hash) >= 0) showTab(hash);
+
+  /* ── screen controls ── */
+  document.querySelectorAll('#sd-q').forEach(function (q) { q.addEventListener('input', function () { view.q = q.value.trim().toLowerCase(); dash.draw('screen'); dash.draw('screencount'); }); });
+  document.querySelectorAll('.sd-scope').forEach(function (b) {
+    b.addEventListener('click', function () {
+      view.scope = b.getAttribute('data-scope');
+      document.querySelectorAll('.sd-scope').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      dash.draw('screen'); dash.draw('screencount');
+    });
+  });
+  document.querySelectorAll('#screen-table thead [data-sort]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var k = b.getAttribute('data-sort');
+      view.dir = view.sort === k ? -view.dir : (k === 'ticker' || k === 'days_to_earn' ? 1 : -1);
+      view.sort = k;
+      document.querySelectorAll('#screen-table thead th').forEach(function (th) { th.removeAttribute('aria-sort'); });
+      b.parentElement.setAttribute('aria-sort', view.dir > 0 ? 'ascending' : 'descending');
+      dash.draw('screen');
+    });
+  });
+  document.querySelectorAll('#screen-table tbody').forEach(function (tb) {
+    tb.addEventListener('click', function (ev) {
+      var tr = ev.target.closest('tr[data-key]');
+      if (!tr) return;
+      selectTicker(tr.getAttribute('data-key'));
+      showTab('stock');
+    });
+  });
+
+  function screenRows() {
+    var all = stocks(), run = latestRun(), q = view.q;
+    var out = all.filter(function (s) {
+      if (view.scope === 'run' && run && s.run_id !== run.run_id) return false;
+      if (view.scope === 'repeat' && !(n(s.times_seen) > 1)) return false;
+      if (!q) return true;
+      return [s.ticker, s.name, s.sector, s.industry, s.archetype, s.verdict].join(' ').toLowerCase().indexOf(q) >= 0;
+    });
+    var verdictRank = { 'FULL SIZE': 3, 'HALF SIZE': 2, 'TRADE ONLY': 1 };
+    var k = view.sort, dir = view.dir;
+    out.sort(function (a, b) {
+      var va = k === 'verdict' ? verdictRank[a.verdict] : a[k], vb = k === 'verdict' ? verdictRank[b.verdict] : b[k];
+      var na = n(va), nb = n(vb);
+      if (na !== null || nb !== null) { if (na === null) return 1; if (nb === null) return -1; return (na - nb) * dir; }
+      return String(va || '').localeCompare(String(vb || '')) * dir;
+    });
+    return out;
+  }
+
+  dash.onData(function () {
+    var h = (location.hash || '').slice(1);
+    if (TABS.indexOf(h) >= 0 && h !== view.tab) showTab(h);
+  });
+
+  /* ═══ header takeaway ═══ */
+  dash.draw('takeaway', function (el) {
+    if (!state(el, ['runs'])) return;
+    var r = latestRun();
+    el.replaceChildren();
+    if (!r) { el.textContent = '—'; return; }
+    el.textContent = r.takeaway || '—';
+    mark(el, 'runs', 'takeaway', 'run_id=' + enc(r.run_id));
+  });
+
+  /* ═══ SCREEN ═══ */
+  dash.draw('screencount', function (el) {
+    if (!state(el, ['stocks', 'runs'])) return;
+    var r = latestRun(), shown = screenRows().length;
+    el.textContent = shown + ' shown' + (r ? ' · latest run ' + (r.label || r.date || '') : '');
+  });
+
+  dash.draw('screen', function (tb) {
+    tb.replaceChildren();
+    var s1 = D('stocks').status, s2 = D('lights').status;
+    if (s1 !== 'ok') { var tr0 = make('tr'), td0 = make('td', null, s1 === 'error' ? 'Failed to load' : '—'); td0.colSpan = 17; tr0.append(td0); tb.append(tr0); return; }
+    var lightsBy = {};
+    if (s2 === 'ok') rows('lights').forEach(function (l) { if (l.group === 'light') { (lightsBy[l.ticker] = lightsBy[l.ticker] || []).push(l); } });
+    var list = screenRows();
+    if (!list.length) { var tr1 = make('tr'), td1 = make('td', 'sd-empty', 'No stocks match. Change the search or pick Every stock.'); td1.colSpan = 17; tr1.append(td1); tb.append(tr1); return; }
+    list.forEach(function (s) {
+      var tr = make('tr'); tr.setAttribute('data-key', s.ticker); tr.tabIndex = 0;
+      tr.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { selectTicker(s.ticker); showTab('stock'); } });
+      var c0 = make('td'); var tk = make('span', 'sd-tk', s.ticker); c0.append(tk);
+      if (s.is_new === true || s.is_new === 'true') c0.append(document.createTextNode(' '), pill('new', 'ok'));
+      else if (n(s.times_seen) > 1) c0.append(document.createTextNode(' '), pill('seen ' + s.times_seen + '×', 'muted'));
+      if (s.depth === 'quick') c0.append(document.createTextNode(' '), pill('quick card', 'muted'));
+      c0.append(make('span', 'sd-sub', s.name || ''));
+      var c1 = make('td', 'r', money(s.price, s));
+      var c2 = make('td'); c2.append(document.createTextNode(s.score === null || s.score === undefined ? '—' : String(s.score)));
+      var dots = make('span', 'sd-dots'); dots.setAttribute('aria-hidden', 'true'); dots.setAttribute('data-source', 'lights');
+      (lightsBy[s.ticker] || []).slice().sort(function (a, b) { return String(a.key).localeCompare(String(b.key)); }).forEach(function (l) { var i = make('i'); i.setAttribute('data-c', l.color || 'na'); i.title = l.name + ': ' + (l.shown || '—'); dots.append(i); });
+      c2.append(dots);
+      var c3 = make('td'); c3.append(pill(s.verdict || '—', tone(s.verdict)));
+      var c3b = make('td', 'r'); c3b.append(pill(n(s.btsp_rating) === null ? '—' : String(s.btsp_rating), ratingTone(s.btsp_rating), 'stocks', 'btsp_rating', where(s.ticker)));
+      if (n(s.btsp_rated_n) !== null) c3b.title = 'rated on ' + s.btsp_rated_n + ' of 32 checks';
+      var c4 = make('td', 'sd-hide-sm', s.archetype || '—');
+      var c5 = make('td', null, s.evc_c || '—'), c6 = make('td', null, s.evc_v || '—'), c7 = make('td', 'sd-hide-sm', s.evc_e || '—');
+      var c8 = make('td', 'r', pctTxt(s.rs_3m)); if (n(s.rs_3m) !== null) c8.className = 'r ' + (n(s.rs_3m) >= 0 ? 'sd-ok' : 'sd-bad');
+      var c9 = make('td', 'r sd-hide-sm', s.ivp_52w === null || s.ivp_52w === undefined ? '—' : String(s.ivp_52w));
+      var c10 = make('td', 'r sd-hide-sm', s.pcr_today === null || s.pcr_today === undefined ? '—' : F2(s.pcr_today));
+      var c11 = make('td', 'sd-hide-sm', s.consensus || '—');
+      var c12 = make('td', 'r', pctTxt(s.up_avg_pct, 0));
+      var c13 = make('td', 'r sd-hide-sm', s.days_to_earn === null || s.days_to_earn === undefined ? '—' : String(s.days_to_earn));
+      if (n(s.days_to_earn) !== null && n(s.days_to_earn) <= 10) c13.className = 'r sd-hide-sm sd-warn';
+      var c14 = make('td', 'sd-hide-sm'); c14.append(pill(s.risk_tag || '—', riskTone(s.risk_tag)));
+      var c15 = make('td', 'sd-hide-sm', s.sizing_tier || '—');
+      tr.append(c0, c1, c2, c3, c3b, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15);
+      tb.append(tr);
+    });
+  });
+
+  /* ═══ STOCK ═══ */
+  dash.draw('pick', function (sel) {
+    var all = stocks().slice().sort(function (a, b) { return String(a.ticker).localeCompare(String(b.ticker)); });
+    var cur0 = current();
+    sel.replaceChildren();
+    all.forEach(function (s) { var o = new Option(s.ticker + (s.name ? ' · ' + s.name : ''), s.ticker); sel.append(o); });
+    sel.value = cur0 ? cur0.ticker : '';
+    sel.onchange = function () { selectTicker(sel.value); };
+  });
+
+  dash.draw('head', function (el) {
+    if (!state(el, ['stocks'])) return;
+    var s = current(); el.replaceChildren();
+    if (!s) { el.append(make('p', 'sd-empty', 'No deep dives yet. Upload a TradingView screener CSV and ask Claude to run the deep dive.')); return; }
+    var top = make('div', 'sd-row');
+    var name = make('div'); name.style.minWidth = '0';
+    name.append(mark(make('div', 'sd-big', s.ticker), 'stocks', 'ticker', where(s.ticker)));
+    name.append(mark(make('div', 'sd-muted', [s.name, s.exchange, s.sector, s.industry].filter(Boolean).join(' · ')), 'stocks', 'name', where(s.ticker)));
+    var px = make('div'); px.style.marginLeft = 'auto'; px.style.textAlign = 'right';
+    px.append(mark(make('div', 'sd-big', money(s.price, s)), 'stocks', 'price', where(s.ticker)));
+    var ch = mark(make('div', 'sd-num ' + (n(s.chg_1d_pct) >= 0 ? 'sd-ok' : 'sd-bad'), pctTxt(s.chg_1d_pct) + ' today'), 'stocks', 'chg_1d_pct', where(s.ticker));
+    px.append(ch);
+    top.append(name, px);
+    var chips = make('div', 'sd-row');
+    if (s.depth === 'quick') chips.append(pill('Quick card · CSV only', 'warn'));
+    chips.append(pill(s.verdict || '—', tone(s.verdict), 'stocks', 'verdict', where(s.ticker)));
+    chips.append(pill((s.score === null || s.score === undefined ? '—' : s.score) + '/7 lights', tone(s.verdict), 'stocks', 'score', where(s.ticker)));
+    chips.append(pill(s.archetype || '—', 'muted', 'stocks', 'archetype', where(s.ticker)));
+    chips.append(pill('Risk ' + (s.risk_tag || '—'), riskTone(s.risk_tag), 'stocks', 'risk_tag', where(s.ticker)));
+    chips.append(pill(s.sizing_tier || '—', s.sizing_votes >= 3 ? 'ok' : s.sizing_votes === 2 ? 'warn' : 'muted', 'stocks', 'sizing_tier', where(s.ticker)));
+    if (n(s.btsp_rating) !== null) chips.append(pill('Scorecard ' + s.btsp_rating + '/100', ratingTone(s.btsp_rating), 'stocks', 'btsp_rating', where(s.ticker)));
+    var seen = make('p', 'sd-note');
+    seen.append(mark(make('span', null, (s.depth === 'quick' ? 'Quick card on ' : 'Deep dive on ') + (s.as_of || '—')), 'stocks', 'as_of', where(s.ticker)));
+    seen.append(document.createTextNode(' · '));
+    seen.append(mark(make('span', null, 'seen ' + (s.times_seen || 1) + '× since ' + (s.first_seen || s.as_of || '—')), 'stocks', 'times_seen', where(s.ticker)));
+    if (s.archetype_note) { seen.append(document.createTextNode(' · ')); seen.append(mark(make('span', null, s.archetype_note), 'stocks', 'archetype_note', where(s.ticker))); }
+    el.append(top, chips, seen);
+    if (s.verdict_line) el.append(textBlock(s, 'verdict_line'));
+  });
+
+  dash.draw('eli5', function (el) {
+    if (!state(el, ['stocks'])) return;
+    var s = current(); el.replaceChildren();
+    if (!s) { el.textContent = '—'; return; }
+    el.append(textBlock(s, 'eli5', 'sd-eli5'));
+  });
+
+  dash.draw('changes', function (el) {
+    if (!state(el, ['stocks'])) return;
+    var s = current(); el.replaceChildren();
+    if (!s) { el.textContent = '—'; return; }
+    el.append(listBlock(s, 'changes'));
+    if (n(s.prev_score) !== null) el.append(mark(make('p', 'sd-note', 'Last deep dive: ' + (s.prev_run || '') + ' · lights ' + s.prev_score + '/7 · price ' + money(s.prev_price, s)), 'stocks', 'prev_run', where(s.ticker)));
+  });
+
+  function lightTile(l) {
+    var w = 'ticker=' + enc(l.ticker) + '&key=' + enc(l.key);
+    var t = make('div', 'sd-light'); t.setAttribute('data-c', l.color || 'na');
+    var nm = make('div', 'nm'); nm.append(make('span', null, l.name)); nm.append(make('span', 'sd-lab', l.bible || '')); t.append(nm);
+    t.append(mark(make('div', 'fx', l.formula || ''), 'lights', 'formula', w));
+    t.append(mark(make('div', 'val', l.shown || '—'), 'lights', 'shown', w));
+    if (l.rule) t.append(mark(make('div', 'rule', l.rule), 'lights', 'rule', w));
+    if (l.why) t.append(mark(make('div', 'why', l.why), 'lights', 'why', w));
+    return t;
+  }
+  function drawGroup(el, group) {
+    if (!state(el, ['lights'])) return;
+    var s = current(); el.replaceChildren();
+    if (!s) { el.textContent = '—'; return; }
+    var ls = rows('lights').filter(function (l) { return l.ticker === s.ticker && l.group === group; }).sort(function (a, b) { return String(a.key).localeCompare(String(b.key)); });
+    if (!ls.length) { el.append(make('p', 'sd-empty', 'No data for this stock yet.')); return; }
+    ls.forEach(function (l) { el.append(lightTile(l)); });
+  }
+  dash.draw('btsp', function (el) {
+    if (!state(el, ['lights', 'stocks'])) return;
+    var s = current(); el.replaceChildren();
+    if (!s) { el.textContent = '—'; return; }
+    var ls = rows('lights').filter(function (l) { return l.ticker === s.ticker && l.group === 'btsp'; });
+    if (!ls.length) { el.append(make('p', 'sd-empty', 'No scorecard for this stock yet (deep dives from before Nov 2026, or a quick card).')); return; }
+    var top = make('div', 'sd-row');
+    var big = make('div', 'sd-big', n(s.btsp_rating) === null ? '—' : s.btsp_rating + ' / 100'); big.className += ' ' + (ratingTone(s.btsp_rating) === 'ok' ? 'sd-ok' : ratingTone(s.btsp_rating) === 'bad' ? 'sd-bad' : 'sd-warn');
+    top.append(mark(big, 'stocks', 'btsp_rating', where(s.ticker)));
+    var meta = make('div'); meta.style.minWidth = '0';
+    meta.append(mark(make('div', 'sd-lab', 'rated on ' + (s.btsp_rated_n === null || s.btsp_rated_n === undefined ? '—' : s.btsp_rated_n) + ' of 32 checks' + (s.btsp_bucket ? ' · Peter Lynch bucket: ' + s.btsp_bucket : '')), 'stocks', 'btsp_rated_n', where(s.ticker)));
+    if (s.btsp_groups) meta.append(mark(make('div', 'sd-note', s.btsp_groups), 'stocks', 'btsp_groups', where(s.ticker)));
+    top.append(meta); el.append(top);
+    if (s.btsp_conclusion) el.append(textBlock(s, 'btsp_conclusion', 'sd-eli5'));
+    var groups = [];
+    ls.forEach(function (l) { var gname = String(l.bible || '').split(' · ')[0]; if (groups.indexOf(gname) < 0) groups.push(gname); });
+    groups.forEach(function (gname) {
+      var pts = ls.filter(function (l) { return String(l.bible || '').split(' · ')[0] === gname; });
+      var got = 0, avail = 0; pts.forEach(function (l) { if (n(l.points) && n(l.got) !== null) { got += n(l.got); avail += n(l.points); } });
+      el.append(make('h3', 'sd-sec', gname + (avail ? ' · ' + F1(got).replace(/\.0$/, '') + ' of ' + avail : '')));
+      var grid = make('div', 'sd-lights');
+      pts.forEach(function (l) { var t = lightTile(l); if (n(l.points)) { var sc = make('div', 'sd-lab', (n(l.got) === null ? 'not measured' : F1(n(l.got)).replace(/\.0$/, '') + ' of ' + l.points + ' pts')); t.append(sc); } grid.append(t); });
+      el.append(grid);
+    });
+    if (s.btsp_unknown) el.append(make('p', 'sd-note', 'Not measured: ' + s.btsp_unknown + '. Add the source and the rating re-bases itself.'));
+  });
+  dash.draw('lights7', function (el) { drawGroup(el, 'light'); });
+  dash.draw('stripes6', function (el) { drawGroup(el, 'stripe'); });
+
+  dash.draw('story', function (el) {
+    if (!state(el, ['stocks'])) return;
+    var s = current(); el.replaceChildren();
+    if (!s) { el.textContent = '—'; return; }
+    var dl = make('dl', 'sd-story');
+    function row(label, cls, node) { var dt = make('dt', cls, label); var dd = make('dd'); dd.append(node); dl.append(dt, dd); }
+    var read = make('div');
+    read.append(mark(make('div', null, (s.archetype || '—') + (s.archetype_note ? ' - ' + s.archetype_note : '')), 'stocks', 'archetype', where(s.ticker)));
+    read.append(mark(make('div', 'sd-note', 'Score ' + (s.score === undefined ? '—' : s.score) + '/7 · ' + (s.verdict || '—') + ' · on: ' + (s.on_lights || '-') + ' · off: ' + (s.off_lights || '-')), 'stocks', 'on_lights', where(s.ticker)));
+    row('READ', null, read);
+    row('GOOD', 'sd-ok', listBlock(s, 'good'));
+    row('BAD', 'sd-bad', listBlock(s, 'bad'));
+    row('WATCH', 'sd-warn', listBlock(s, 'watch'));
+    row('BEST', 'sd-ok', listBlock(s, 'best'));
+    row('WORST', 'sd-bad', listBlock(s, 'worst'));
+    var risk = make('div'); risk.append(pill(s.risk_tag || '—', riskTone(s.risk_tag), 'stocks', 'risk_tag', where(s.ticker)));
+    risk.append(document.createTextNode(' '));
+    risk.append(mark(make('span', 'sd-muted', s.risk_dom && s.risk_dom !== 'none' ? 'dominant risk: ' + s.risk_dom : 'no structural risk family flagged'), 'stocks', 'risk_dom', where(s.ticker)));
+    row('RISK', null, risk);
+    row('EVC', null, make('p', 'sd-note', 'This panel picks the LIST; your 1W-1D-60m-2m picks the MOMENT. Re-underwrite each earnings and act only if 2+ lights fail together (ch.30).'));
+    el.append(dl);
+  });
+
+  dash.draw('evc', function (el) {
+    if (!state(el, ['lights', 'stocks'])) return;
+    var s = current(); el.replaceChildren();
+    if (!s) { el.textContent = '—'; return; }
+    var ls = rows('lights').filter(function (l) { return l.ticker === s.ticker && l.group === 'evc'; });
+    var order = ['E_C1', 'E_C2', 'E_C3', 'E_V1', 'E_V2', 'E_V3', 'E_V4', 'E_V5', 'E_Ea', 'E_Em'];
+    ls.sort(function (a, b) { return order.indexOf(a.key) - order.indexOf(b.key); });
+    var box = make('div', 'sd-evc');
+    if (!ls.length) box.append(make('p', 'sd-empty', 'No price bars stored for this stock.'));
+    ls.forEach(function (l) {
+      var w = 'ticker=' + enc(l.ticker) + '&key=' + enc(l.key);
+      var ln = make('div', 'ln');
+      ln.append(make('span', 'tf', l.name));
+      var m = make('span', 'sd-mark', l.color === 'green' ? '1' : l.color === 'red' ? '0' : '?'); m.setAttribute('data-c', l.color || 'grey');
+      ln.append(mark(m, 'lights', 'shown', w));
+      ln.append(mark(make('span', null, l.formula || ''), 'lights', 'formula', w));
+      box.append(ln);
+    });
+    el.append(box);
+    var dl = make('dl', 'sd-kv');
+    kv(dl, 'Stage 1W · 1D · 1H', [s.stage_w, s.stage_d, s.stage_h].map(function (x) { return x || '—'; }).join(' · '), s, 'stage_d');
+    kv(dl, 'Distance from 10 MA', s.dist10_atr === null || s.dist10_atr === undefined ? '—' : F2(s.dist10_atr) + ' × ATR (1D)', s, 'dist10_atr');
+    kv(dl, 'Distance from 5 MA', s.dist5_atr === null || s.dist5_atr === undefined ? '—' : F2(s.dist5_atr) + ' × ATR (1D)', s, 'dist5_atr');
+    kv(dl, 'ATR (1D)', s.atr_pct === null || s.atr_pct === undefined ? '—' : F2(s.atr_pct) + '% of price', s, 'atr_pct');
+    kv(dl, 'RS vs ' + (s.rs_index || 'index'), [pctTxt(s.rs_1m) + ' 1M', pctTxt(s.rs_3m) + ' 3M', pctTxt(s.rs_6m) + ' 6M'].join(' · ') + (s.rs_trend ? ' · ' + s.rs_trend : ''), s, 'rs_3m');
+    kv(dl, 'Steadiness 1W · 1D · 1H', [s.steady_w, s.steady_d, s.steady_h].map(function (x) { return x === null || x === undefined ? '—' : F2(x); }).join(' · '), s, 'steady_d');
+    kv(dl, 'Exit: 20 EMA (1D)', money(s.ema20_d, s) + ' (' + pctTxt(s.to20_pct) + ')', s, 'ema20_d');
+    kv(dl, 'Exit: 50 EMA (1D)', money(s.ema50_d, s) + ' (' + pctTxt(s.to50_pct) + ')', s, 'ema50_d');
+    kv(dl, '10-20 gap rule', (s.gap_rule || '—') + (s.gap_ratio === null || s.gap_ratio === undefined ? '' : ' · gap at ' + F0(s.gap_ratio * 100) + '% of this cycle’s peak'), s, 'gap_rule');
+    el.append(dl);
+    if (s.v3_caution) el.append(mark(make('p', 'sd-note sd-warn', 'V3 caution: ' + s.v3_caution), 'stocks', 'v3_caution', where(s.ticker)));
+  });
+
+  /* ── the price ladder ── */
+  dash.draw('ladder', function (el) {
+    el.replaceChildren();
+    var st = D('ladder').status;
+    if (st !== 'ok') { if (st === 'error' || st === 'missing') el.append(failLine()); else el.classList.add('dash-skeleton'); return; }
+    el.classList.remove('dash-skeleton');
+    var s = current(); if (!s) return;
+    var pts = rows('ladder').filter(function (r) { return r.ticker === s.ticker && n(r.price) !== null; });
+    var price = n(s.price);
+    if (!pts.length || price === null) { el.append(make('p', 'sd-empty', 'No price anchors stored for this stock.')); return; }
+    var W = Math.max(300, el.clientWidth || 600), rowH = 20;
+    var ups = pts.filter(function (p) { return p.side === 'up'; });
+    var dns = pts.filter(function (p) { return p.side === 'down'; });
+    var H = Math.max(220, (Math.max(ups.length, dns.length) * 2 + 4) * rowH);
+    var all = pts.map(function (p) { return n(p.price); }).concat([price]);
+    var lo = d3.min(all), hi = d3.max(all), pad = (hi - lo) * 0.06 || price * 0.05;
+    var y = d3.scaleLinear([lo - pad, hi + pad], [H - 12, 24]);
+    var mid = W / 2, py = y(price);
+    var svg = d3.select(el).append('svg').attr('viewBox', '0 0 ' + W + ' ' + H).attr('width', '100%').attr('role', 'img').attr('aria-label', 'Price anchors above and below today');
+    svg.append('line').attr('x1', mid).attr('x2', mid).attr('y1', 8).attr('y2', H - 6).attr('stroke', 'var(--cds-chart-axis)').attr('stroke-width', 1);
+    svg.append('line').attr('x1', 0).attr('x2', W).attr('y1', py).attr('y2', py).attr('stroke', 'var(--color-fg)').attr('stroke-dasharray', '4 4').attr('stroke-width', 1);
+    var today = svg.append('text').attr('x', 0).attr('y', py - 6).style('fill', 'var(--color-fg)');
+    today.append('tspan').text('today ');
+    today.append('tspan').attr('data-source', 'stocks').attr('data-field', 'price').attr('data-where', where(s.ticker)).text(money(price, s));
+    function layout(ys, avoid) {
+      var order = ys.map(function (v, i) { return i; }).sort(function (a, b) { return ys[a] - ys[b]; });
+      var lab = ys.slice(), prev = -1e9;
+      order.forEach(function (i) {
+        var v = Math.max(lab[i], prev + rowH);
+        avoid.forEach(function (f) { if (Math.abs(v - f) < rowH) v = f + rowH; });
+        lab[i] = v; prev = v;
+      });
+      var over = order.length ? lab[order[order.length - 1]] - (H - 6) : 0;
+      if (over > 0) order.forEach(function (i) { lab[i] -= over; });
+      return lab;
+    }
+    function place(list, sideUp) {
+      var ys = list.map(function (p) { return y(n(p.price)); });
+      var lab = layout(ys, sideUp ? [] : [py - 6]);
+      var col = sideUp ? 'var(--color-ok)' : 'var(--color-bad)';
+      var room = mid - 26;
+      list.forEach(function (p, i) {
+        var g = svg.append('g');
+        g.append('circle').attr('cx', mid).attr('cy', ys[i]).attr('r', 4).attr('fill', col);
+        var x2 = sideUp ? mid + 16 : mid - 16;
+        g.append('line').attr('x1', mid).attr('y1', ys[i]).attr('x2', x2).attr('y2', lab[i]).attr('stroke', col).attr('stroke-width', 1);
+        var t = g.append('text').attr('x', sideUp ? x2 + 4 : x2 - 4).attr('y', lab[i]).attr('dy', '0.35em').attr('text-anchor', sideUp ? 'start' : 'end').style('fill', 'var(--color-fg)');
+        t.append('tspan').attr('data-source', 'ladder').attr('data-field', 'price').attr('data-where', 'ticker=' + enc(p.ticker) + '&side=' + enc(p.side) + '&label=' + enc(p.label)).text(money(p.price, s));
+        t.append('tspan').style('fill', 'var(--color-fg-muted)').text('  ' + pctTxt(p.pct) + (n(p.odds_pct) === null ? '' : ' · ' + F0(p.odds_pct) + '% odds') + '  ');
+        var lt = t.append('tspan').text(p.label || '');
+        var node = t.node(), txt = String(p.label || '');
+        while (txt.length > 6 && node.getComputedTextLength && node.getComputedTextLength() > room) { txt = txt.slice(0, -2); lt.text(txt + '…'); }
+      });
+    }
+    place(ups, true); place(dns, false);
+  });
+
+  dash.draw('updown', function (el) {
+    if (!state(el, ['stocks'])) return;
+    var s = current(); el.replaceChildren();
+    if (!s) { el.textContent = '—'; return; }
+    var up = make('div', 'sd-side'), dn = make('div', 'sd-side');
+    up.append(make('h3', 'sd-ok', 'If it goes right'));
+    up.append(mark(make('div', 'sd-stat'), 'stocks', 'bull_target', where(s.ticker)));
+    up.lastChild.append(make('span', 'sd-lab', 'Up target'), make('span', 'v sd-ok', money(s.bull_target, s) + '  ' + pctTxt(s.bull_target_pct)));
+    up.append(textBlock(s, 'bull_story'));
+    if (s.bull_triggers) { up.append(make('span', 'sd-lab', 'What has to go right')); up.append(listBlock(s, 'bull_triggers')); }
+    dn.append(make('h3', 'sd-bad', 'If it goes wrong'));
+    dn.append(mark(make('div', 'sd-stat'), 'stocks', 'bear_target', where(s.ticker)));
+    dn.lastChild.append(make('span', 'sd-lab', 'Down target'), make('span', 'v sd-bad', money(s.bear_target, s) + '  ' + pctTxt(s.bear_target_pct)));
+    dn.append(textBlock(s, 'bear_story'));
+    if (s.bear_triggers) { dn.append(make('span', 'sd-lab', 'What could go wrong')); dn.append(listBlock(s, 'bear_triggers')); }
+    if (n(s.bull_odds_pct) !== null) up.append(mark(make('p', 'sd-note', 'Options price about a ' + F0(s.bull_odds_pct) + '% chance of ending the next 3 months above this target.'), 'stocks', 'bull_odds_pct', where(s.ticker)));
+    if (n(s.bear_odds_pct) !== null) dn.append(mark(make('p', 'sd-note', 'Options price about a ' + F0(s.bear_odds_pct) + '% chance of ending the next 3 months below this level.'), 'stocks', 'bear_odds_pct', where(s.ticker)));
+    el.append(up, dn);
+    if (n(s.reward_risk) !== null) {
+      var rr = make('div', 'sd-side');
+      rr.append(make('h3', null, 'Reward to risk'));
+      rr.append(mark(make('div', 'sd-big', F1(s.reward_risk) + ' : 1'), 'stocks', 'reward_risk', where(s.ticker)));
+      rr.append(make('p', 'sd-note', '(up target − price) ÷ (price − down target), the way Morgan Stanley quotes its risk-reward. Odds come from options and assume nothing about the business.'));
+      el.append(rr);
+    }
+    if (s.base_story) { var b = make('div', 'sd-side'); b.append(make('h3', null, 'Most likely')); b.append(textBlock(s, 'base_story')); el.append(b); }
+  });
+
+  /* ── options ── */
+  dash.draw('options', function (el) {
+    if (!state(el, ['stocks'])) return;
+    var s = current(); el.replaceChildren();
+    if (!s) { el.textContent = '—'; return; }
+    var g = make('div', 'sd-stats');
+    g.append(stat('Implied vol', s.iv_pct === null || s.iv_pct === undefined ? '—' : F0(s.iv_pct) + '%', s, 'iv_pct'));
+    g.append(stat('IV percentile (1y)', s.ivp_52w === null || s.ivp_52w === undefined ? '—' : F0(s.ivp_52w), s, 'ivp_52w', n(s.ivp_52w) > 80 ? 'sd-warn' : ''));
+    g.append(stat('30-day realised', s.hv_pct === null || s.hv_pct === undefined ? '—' : F0(s.hv_pct) + '%', s, 'hv_pct'));
+    g.append(stat('Put/call today', s.pcr_today === null || s.pcr_today === undefined ? '—' : F2(s.pcr_today), s, 'pcr_today'));
+    g.append(stat('Usual put/call', s.pcr_avg === null || s.pcr_avg === undefined ? '—' : F2(s.pcr_avg), s, 'pcr_avg'));
+    g.append(stat('±1 SD, 30 days', s.em_30d_pct === null || s.em_30d_pct === undefined ? '—' : '±' + F1(s.em_30d_pct) + '%', s, 'em_30d_pct'));
+    if (s.em_earn_pct !== null && s.em_earn_pct !== undefined) g.append(stat('Into earnings', '±' + F1(s.em_earn_pct) + '%', s, 'em_earn_pct'));
+    el.append(g);
+    var gauge = make('div', 'sd-chart'); gauge.setAttribute('data-source', 'stocks'); gauge.setAttribute('data-field', 'ivp_52w'); gauge.setAttribute('data-where', where(s.ticker));
+    el.append(gauge);
+    var v = n(s.ivp_52w);
+    if (v !== null) {
+      var W = Math.max(240, el.clientWidth || 400), H = 34;
+      var x = d3.scaleLinear([0, 100], [2, W - 2]);
+      var svg = d3.select(gauge).append('svg').attr('viewBox', '0 0 ' + W + ' ' + H).attr('width', '100%').attr('role', 'img').attr('aria-label', 'IV percentile gauge');
+      [[0, 20, 'calm'], [20, 80, 'normal'], [80, 100, 'nervous']].forEach(function (z, i) {
+        svg.append('rect').attr('x', x(z[0])).attr('y', 6).attr('width', x(z[1]) - x(z[0])).attr('height', 8).attr('rx', 2)
+          .attr('fill', i === 0 ? 'var(--color-ok)' : i === 2 ? 'var(--color-bad)' : 'var(--cds-chart-muted)').attr('fill-opacity', 0.35);
+        svg.append('text').attr('x', (x(z[0]) + x(z[1])) / 2).attr('y', 30).attr('text-anchor', 'middle').text(z[2]);
+      });
+      svg.append('rect').attr('x', x(v) - 1.5).attr('y', 1).attr('width', 3).attr('height', 18).attr('rx', 1).attr('fill', 'var(--color-fg)');
+    }
+    el.append(textBlock(s, 'options_read'));
+  });
+
+  dash.draw('livestock', function (el) {
+    var s = current(); el.replaceChildren();
+    var st = D('live_stock').status;
+    if (!s) { el.textContent = '—'; return; }
+    if (n(s.cid) === null) { el.append(make('p', 'sd-note', 'No IBKR contract stored for this stock, so there is no live reading.')); return; }
+    if (n(dash.params().cid) !== n(s.cid)) { el.textContent = '—'; el.classList.add('dash-skeleton'); return; }
+    if (st === 'connect' || st === 'declined') { el.append(make('p', 'sd-note', 'Connect Interactive Brokers (IBKR) to see live options data here.')); return; }
+    if (st === 'error' || st === 'missing') { el.append(failLine()); return; }
+    if (st !== 'ok') { el.textContent = '—'; el.classList.add('dash-skeleton'); return; }
+    el.classList.remove('dash-skeleton');
+    var r = rows('live_stock')[0] || {};
+    var c = rows('live_pcr')[0] || {};
+    var g = make('div', 'sd-stats');
+    function lv(label, val, src, field) { var b = make('div', 'sd-stat'); b.append(make('span', 'sd-lab', label)); b.append(markRow0(make('span', 'v', val), src, field)); return b; }
+    g.append(lv('Price', n(r.price) === null ? '—' : money(r.price, s), 'live_stock', 'price'));
+    g.append(lv('Change', pctTxt(r.chg_pct), 'live_stock', 'chg_pct'));
+    g.append(lv('Implied vol', n(r.iv) === null ? '—' : d3.format('.0%')(r.iv), 'live_stock', 'iv'));
+    g.append(lv('IV percentile', n(r.ivp52) === null ? '—' : F0(r.ivp52 * 100), 'live_stock', 'ivp52'));
+    g.append(lv('Put/call now', n(c.pcr) === null ? '—' : F2(c.pcr), 'live_pcr', 'pcr'));
+    g.append(lv('Usual put/call', n(c.pcr_avg) === null ? '—' : F2(c.pcr_avg), 'live_pcr', 'pcr_avg'));
+    el.append(g);
+    el.append(markRow0(make('p', 'sd-note', 'IBKR data: ' + String(r.status || 'unknown').toLowerCase().replace('_', ' ')), 'live_stock', 'status'));
+  });
+
+  /* ── analysts ── */
+  dash.draw('ptbar', function (el) {
+    el.replaceChildren();
+    if (D('stocks').status !== 'ok') { el.classList.add('dash-skeleton'); return; }
+    el.classList.remove('dash-skeleton');
+    var s = current(); if (!s) return;
+    var lo = n(s.pt_low), av = n(s.pt_avg), hi = n(s.pt_high), px = n(s.price);
+    if (lo === null || hi === null || px === null) { el.append(make('p', 'sd-empty', 'No analyst target range stored.')); return; }
+    var W = Math.max(260, el.clientWidth || 420), H = 58;
+    var mn = Math.min(lo, px), mx = Math.max(hi, px);
+    var x = d3.scaleLinear([mn, mx], [10, W - 10]);
+    var svg = d3.select(el).append('svg').attr('viewBox', '0 0 ' + W + ' ' + H).attr('width', '100%').attr('role', 'img').attr('aria-label', 'Analyst target range and today’s price');
+    var g = svg.append('g').attr('data-source', 'stocks').attr('data-where', where(s.ticker));
+    g.append('rect').attr('x', x(lo)).attr('y', 22).attr('width', Math.max(1, x(hi) - x(lo))).attr('height', 8).attr('rx', 4).attr('fill', dash.colors[0]).attr('fill-opacity', 0.3);
+    if (av !== null) g.append('rect').attr('x', x(av) - 1).attr('y', 17).attr('width', 2).attr('height', 18).attr('fill', dash.colors[0]);
+    g.append('circle').attr('cx', x(px)).attr('cy', 26).attr('r', 5).attr('fill', 'var(--color-fg)');
+    var pxAnchor = x(px) > W - 70 ? 'end' : x(px) < 70 ? 'start' : 'middle';
+    var labs = [[lo, 'low ' + money(lo, s), 'start', 50], [hi, 'high ' + money(hi, s), 'end', 50], [px, 'today ' + money(px, s), pxAnchor, 12]];
+    if (av !== null) labs.push([av, 'avg ' + money(av, s), x(av) > W - 70 ? 'end' : x(av) < 70 ? 'start' : 'middle', 50]);
+    labs.forEach(function (l) {
+      var anchor = l[2];
+      var xx = anchor === 'start' ? x(l[0]) : anchor === 'end' ? x(l[0]) : x(l[0]);
+      g.append('text').attr('x', xx).attr('y', l[3]).attr('text-anchor', anchor).text(l[1]);
+    });
+    var texts = svg.selectAll('text').nodes();
+    var avgT = texts[3];
+    if (avgT && avgT.getBBox) {
+      var b0 = texts[0].getBBox(), b3 = avgT.getBBox(), b1 = texts[1].getBBox();
+      if (b3.x < b0.x + b0.width + 6 || b3.x + b3.width > b1.x - 6) avgT.setAttribute('y', 12);
+      var bt = texts[2].getBBox();
+      if (avgT.getAttribute('y') === '12' && !(b3.x > bt.x + bt.width + 6 || b3.x + b3.width < bt.x - 6)) avgT.setAttribute('display', 'none');
+    }
+  });
+
+  dash.draw('analysts', function (el) {
+    if (!state(el, ['stocks'])) return;
+    var s = current(); el.replaceChildren();
+    if (!s) { el.textContent = '—'; return; }
+    var g = make('div', 'sd-stats');
+    g.append(stat('Consensus', s.consensus || '—', s, 'consensus'));
+    g.append(stat('Analysts', s.n_analysts === null || s.n_analysts === undefined ? '—' : F0(s.n_analysts), s, 'n_analysts'));
+    g.append(stat('To average target', pctTxt(s.up_avg_pct), s, 'up_avg_pct', n(s.up_avg_pct) >= 0 ? 'sd-ok' : 'sd-bad'));
+    g.append(stat('Target spread', s.pt_dispersion_pct === null || s.pt_dispersion_pct === undefined ? '—' : F0(s.pt_dispersion_pct) + '%', s, 'pt_dispersion_pct'));
+    el.append(g);
+    if (n(s.eps_est_next_fy) !== null) {
+      var g2 = make('div', 'sd-stats');
+      g2.append(stat('Next-year EPS estimate', F2(s.eps_est_next_fy), s, 'eps_est_next_fy'));
+      if (n(s.eps_rev_30d_pct) !== null) g2.append(stat('Estimate, last 30 days', pctTxt(s.eps_rev_30d_pct), s, 'eps_rev_30d_pct', n(s.eps_rev_30d_pct) >= 0 ? 'sd-ok' : 'sd-bad'));
+      if (n(s.eps_rev_90d_pct) !== null) g2.append(stat('Estimate, last 90 days', pctTxt(s.eps_rev_90d_pct), s, 'eps_rev_90d_pct', n(s.eps_rev_90d_pct) >= 0 ? 'sd-ok' : 'sd-bad'));
+      if (n(s.eps_rev_since_last_pct) !== null) g2.append(stat('Since last deep dive', pctTxt(s.eps_rev_since_last_pct), s, 'eps_rev_since_last_pct', n(s.eps_rev_since_last_pct) >= 0 ? 'sd-ok' : 'sd-bad'));
+      el.append(g2);
+      el.append(make('p', 'sd-note', 'Rising estimates are the best-documented push behind a price over weeks; falling ones drag it.'));
+    }
+    if (s.analyst_read) el.append(textBlock(s, 'analyst_read'));
+    if (s.analyst_changes) { el.append(make('span', 'sd-lab', 'Recent rating and target changes')); el.append(listBlock(s, 'analyst_changes')); }
+    if (s.positioning_read) { el.append(make('span', 'sd-lab', 'Who owns it, who bets against it')); el.append(listBlock(s, 'positioning_read')); }
+  });
+
+  /* ── news ── */
+  function newsList(el, filter, emptyText) {
+    if (!state(el, ['news'])) return;
+    el.replaceChildren();
+    var items = rows('news').filter(filter).sort(function (a, b) { return String(b.date || '').localeCompare(String(a.date || '')); });
+    if (!items.length) { el.append(make('p', 'sd-empty', emptyText)); return; }
+    var ul = make('ul', 'sd-news');
+    items.slice(0, 12).forEach(function (it) {
+      var w = 'id=' + enc(it.id);
+      var li = make('li');
+      var imp = make('span', 'sd-imp', it.impact === '+' ? '+' : it.impact === '-' || it.impact === '−' ? '−' : '±');
+      imp.setAttribute('data-i', it.impact === '+' ? '+' : (it.impact === '-' || it.impact === '−') ? '-' : '0');
+      imp.setAttribute('aria-label', it.impact === '+' ? 'could push the price up' : (it.impact === '-' || it.impact === '−') ? 'could push the price down' : 'could go either way');
+      li.append(mark(imp, 'news', 'impact', w));
+      var body = make('div', 'sd-q');
+      var head = it.url && /^https?:\/\//.test(it.url) ? make('a', null, it.headline || 'Untitled') : make('b', null, it.headline || 'Untitled');
+      if (head.tagName === 'A') { head.href = it.url; head.target = '_blank'; head.rel = 'noopener'; }
+      body.append(mark(head, 'news', 'headline', w));
+      body.append(mark(make('span', 'sd-note', [it.source, it.date].filter(Boolean).join(' · ')), 'news', 'source', w));
+      if (it.why) body.append(mark(make('span', null, it.why), 'news', 'why', w));
+      li.append(body);
+      ul.append(li);
+    });
+    el.append(ul);
+  }
+  dash.draw('news', function (el) {
+    var s = current();
+    if (!s) { el.textContent = '—'; return; }
+    newsList(el, function (x) { return x.ticker === s.ticker; }, 'No stock-specific news stored on the last run.');
+  });
+  dash.draw('mktnews', function (el) {
+    newsList(el, function (x) { return String(x.ticker || '').indexOf('MARKET') === 0; }, 'No market news stored yet.');
+  });
+
+  /* ── Bible checks + thesis ── */
+  dash.draw('bible', function (el) {
+    if (!state(el, ['stocks'])) return;
+    var s = current(); el.replaceChildren();
+    if (!s) { el.textContent = '—'; return; }
+    var dl = make('dl', 'sd-kv');
+    kv(dl, 'Survivor test (ch.30)', (s.survivor_n === null || s.survivor_n === undefined ? '—' : s.survivor_n + '/4 · ') + (s.survivor_text || ''), s, 'survivor_text');
+    kv(dl, 'Moat (ch.20)', (s.moat_source || 'not named') + ' · numbers test: ' + (s.moat_test || 'n/a'), s, 'moat_source');
+    kv(dl, 'Reverse DCF (ch.18)', s.rdcf_read || '—', s, 'rdcf_read');
+    kv(dl, 'P/E vs own 3Y (ch.19)', (s.pe === null || s.pe === undefined ? '—' : F1(s.pe) + 'x') + ' vs ' + (s.pe_avg3 === null || s.pe_avg3 === undefined ? '—' : F1(s.pe_avg3) + 'x') + (s.pe_vs_avg_pct === null || s.pe_vs_avg_pct === undefined ? '' : ' (' + pctTxt(s.pe_vs_avg_pct, 0) + ')'), s, 'pe');
+    kv(dl, 'Forward P/E · PEG', (s.fwd_pe === null || s.fwd_pe === undefined ? '—' : F1(s.fwd_pe) + 'x') + ' · ' + (s.peg === null || s.peg === undefined ? '—' : F2(s.peg)), s, 'fwd_pe');
+    kv(dl, 'FCF yield vs bond (ch.15)', (s.fcf_yield_pct === null || s.fcf_yield_pct === undefined ? '—' : F1(s.fcf_yield_pct) + '%') + ' vs ' + (s.bond_pct === null || s.bond_pct === undefined ? '—' : F2(s.bond_pct) + '%'), s, 'fcf_yield_pct');
+    kv(dl, 'Size (ch.22)', (s.sizing_tier || '—') + (s.sizing_text ? ' · ' + s.sizing_text : ''), s, 'sizing_tier');
+    kv(dl, 'Double confirmation (ch.19)', s.entry_double === 'yes' ? 'yes: discount to itself + EVC turn' : 'not yet', s, 'entry_double');
+    kv(dl, 'Earnings (ch.27)', s.earnings_protocol || '—', s, 'earnings_protocol');
+    kv(dl, 'Driver (ch.23)', s.driver || '—', s, 'driver');
+    el.append(dl);
+    if (s.accounting_read) { el.append(make('span', 'sd-lab', 'Accounting checks')); el.append(listBlock(s, 'accounting_read')); }
+  });
+
+  dash.draw('thesis', function (el) {
+    if (!state(el, ['stocks'])) return;
+    var s = current(); el.replaceChildren();
+    if (!s) { el.textContent = '—'; return; }
+    var qs = [['q1_sells', '1. What does it sell, and to whom?'], ['q2_moat', '2. Why can’t customers leave? Which of the five moats?'], ['q3_roic', '3. What is ROIC, and its five-year direction?'], ['q4_must_be_true', '4. What must be true to justify today’s price?'], ['q5_kills', '5. What kills it?']];
+    var box = make('div', 'sd-grid3');
+    qs.forEach(function (q) { var b = make('div', 'sd-q'); b.append(make('b', null, q[1])); b.append(textBlock(s, q[0])); box.append(b); });
+    el.append(box);
+  });
+
+  dash.draw('iva', function (tb) {
+    tb.replaceChildren();
+    if (D('lights').status !== 'ok') return;
+    var s = current(); if (!s) return;
+    rows('lights').filter(function (l) { return l.ticker === s.ticker && l.group === 'iva'; }).sort(function (a, b) { return String(a.key).localeCompare(String(b.key)); }).forEach(function (l) {
+      var tr = make('tr'); tr.setAttribute('data-key', enc(l.ticker) + ',' + enc(l.key));
+      var c2 = make('td', 'r', l.shown || '—'), c3 = make('td', 'r', l.shown2 || '');
+      c2.className = 'r ' + (l.color === 'green' ? 'sd-ok' : l.color === 'red' ? 'sd-bad' : '');
+      c3.className = 'r ' + (l.color2 === 'green' ? 'sd-ok' : l.color2 === 'red' ? 'sd-bad' : '');
+      tr.append(make('td', null, l.name), make('td', null, l.formula || ''), c2, c3, make('td', null, l.bible || ''));
+      tb.append(tr);
+    });
+  });
+
+  dash.draw('sources', function (el) {
+    if (!state(el, ['stocks'])) return;
+    var s = current(); el.replaceChildren();
+    if (!s) { el.textContent = '—'; return; }
+    var src = lines(s.sources);
+    if (src.length) {
+      var ul = mark(make('ul', 'sd-list'), 'stocks', 'sources', where(s.ticker));
+      src.forEach(function (u) {
+        var li = make('li');
+        if (/^https?:\/\//.test(u)) { var a = make('a', null, u); a.href = u; a.target = '_blank'; a.rel = 'noopener'; li.append(a); } else li.textContent = u;
+        ul.append(li, document.createTextNode('\n'));
+      });
+      el.append(ul);
+    } else el.append(make('p', 'sd-empty', 'No sources stored.'));
+    if (s.data_notes) { el.append(make('span', 'sd-lab', 'Data notes')); el.append(listBlock(s, 'data_notes')); }
+  });
+
+  /* ═══ MARKET ═══ */
+  dash.draw('mktlive', function (el) {
+    el.replaceChildren();
+    var ids = ['live_qqq', 'live_vix', 'live_vix3m', 'live_nifty'];
+    var sts = ids.map(function (i) { return D(i).status; });
+    if (sts.some(function (x) { return x === 'connect' || x === 'declined'; })) { el.append(make('p', 'sd-note', 'Connect Interactive Brokers (IBKR) to see live index data here.')); return; }
+    if (sts.every(function (x) { return x === 'loading'; })) { el.textContent = '—'; el.classList.add('dash-skeleton'); return; }
+    el.classList.remove('dash-skeleton');
+    function card(id, label, fmtv) {
+      var b = make('div', 'sd-stat'); b.append(make('span', 'sd-lab', label));
+      if (D(id).status === 'error' || D(id).status === 'missing') { b.append(failLine()); return b; }
+      var r = rows(id)[0] || {};
+      b.append(markRow0(make('span', 'v', n(r.price) === null ? '—' : fmtv(r.price)), id, 'price'));
+      var c = markRow0(make('span', 'sd-note ' + (n(r.chg_pct) >= 0 ? 'sd-ok' : 'sd-bad'), pctTxt(r.chg_pct) + (r.status ? ' · ' + String(r.status).toLowerCase().replace('_', ' ') : '')), id, 'chg_pct');
+      b.append(c);
+      return b;
+    }
+    el.append(card('live_qqq', 'QQQ', function (v) { return '$' + F2(v); }));
+    el.append(card('live_nifty', 'NIFTY 50', function (v) { return F0(v); }));
+    el.append(card('live_vix', 'VIX (fear gauge)', function (v) { return F2(v); }));
+    el.append(card('live_vix3m', 'VIX 3-month', function (v) { return F2(v); }));
+    var rr = rows('vix_ratio')[0] || {};
+    var b = make('div', 'sd-stat'); b.append(make('span', 'sd-lab', 'VIX ÷ VIX3M'));
+    var rv = n(rr.ratio);
+    b.append(markRow0(make('span', 'v ' + (rv === null ? '' : rv >= 1 ? 'sd-bad' : rv >= 0.95 ? 'sd-warn' : 'sd-ok'), rv === null ? '—' : F2(rv)), 'vix_ratio', 'ratio'));
+    b.append(make('span', 'sd-note', rv === null ? '' : rv >= 1 ? 'inverted: near-term fear' : rv >= 0.95 ? 'flat: getting nervous' : 'normal upward slope: calm'));
+    el.append(b);
+  });
+
+  function marketBlock(el, prefix) {
+    if (!state(el, ['runs'])) return;
+    var r = latestRun(); el.replaceChildren();
+    if (!r) { el.append(make('p', 'sd-empty', 'No market reading stored yet.')); return; }
+    var w = 'run_id=' + enc(r.run_id);
+    var head = r[prefix + '_line'];
+    if (head) el.append(mark(make('p', 'sd-text', head), 'runs', prefix + '_line', w));
+    var dl = make('dl', 'sd-kv');
+    var fields = prefix === 'us'
+      ? [['us_index', 'QQQ / S&P posture'], ['vix_read', 'Fear gauge'], ['us_pcr', 'Put/call'], ['us_yield', '10-year yield'], ['us_fed', 'Fed'], ['us_flows', 'Breadth and flows']]
+      : [['in_index', 'NIFTY posture'], ['in_vix', 'India VIX'], ['in_pcr', 'NIFTY put/call'], ['in_yield', '10-year G-sec'], ['in_rbi', 'RBI'], ['in_flows', 'FII / DII flows']];
+    fields.forEach(function (f) { if (r[f[0]]) { dl.append(make('dt', null, f[1])); dl.append(mark(make('dd', null, r[f[0]]), 'runs', f[0], w)); } });
+    el.append(dl);
+    var eli = r[prefix + '_eli5'];
+    if (eli) { el.append(make('span', 'sd-lab', 'Like you’re five')); el.append(mark(make('p', 'sd-text', eli), 'runs', prefix + '_eli5', w)); }
+  }
+  dash.draw('mkt_us', function (el) { marketBlock(el, 'us'); });
+  dash.draw('mkt_in', function (el) { marketBlock(el, 'in'); });
+
+  dash.draw('clock', function (el) {
+    el.replaceChildren();
+    if (D('runs').status !== 'ok') { el.classList.add('dash-skeleton'); return; }
+    el.classList.remove('dash-skeleton');
+    var r = latestRun();
+    var phase = r ? String(r.rotation_phase || '').toLowerCase() : '';
+    var W = Math.max(260, Math.min(el.clientWidth || 360, 420)), H = 230, cx = W / 2, cy = 112, R = 92, r0 = 52;
+    var svg = d3.select(el).append('svg').attr('viewBox', '0 0 ' + W + ' ' + H).attr('width', '100%').attr('role', 'img').attr('aria-label', 'Sector rotation clock');
+    var g = svg.append('g').attr('transform', 'translate(' + cx + ',' + cy + ')');
+    if (r) g.attr('data-source', 'runs').attr('data-field', 'rotation_phase').attr('data-where', 'run_id=' + enc(r.run_id));
+    var phases = [['early', 'Early', 'financials · discretionary · industrials'], ['mid', 'Mid', 'tech · communications'], ['late', 'Late', 'energy · materials · staples · health'], ['recession', 'Recession', 'utilities · staples · health']];
+    var arc = d3.arc().innerRadius(r0).outerRadius(R).padAngle(0.02).cornerRadius(3);
+    phases.forEach(function (p, i) {
+      var a0 = i * Math.PI / 2, a1 = (i + 1) * Math.PI / 2, on = phase.indexOf(p[0]) === 0;
+      g.append('path').attr('d', arc({ startAngle: a0, endAngle: a1 })).attr('fill', on ? dash.colors[0] : 'var(--cds-chart-muted)').attr('fill-opacity', on ? 0.9 : 0.25);
+      var c = arc.centroid({ startAngle: a0, endAngle: a1 });
+      g.append('text').attr('x', c[0]).attr('y', c[1]).attr('dy', '0.35em').attr('text-anchor', 'middle').style('fill', on ? 'var(--color-bg)' : 'var(--color-fg)').style('font-weight', on ? '600' : '400').text(p[1]);
+    });
+    var cur0 = phases.filter(function (p) { return phase.indexOf(p[0]) === 0; })[0];
+    g.append('text').attr('y', -6).attr('text-anchor', 'middle').style('fill', 'var(--color-fg)').text(cur0 ? cur0[1] : 'phase');
+    g.append('text').attr('y', 12).attr('text-anchor', 'middle').text(cur0 ? 'cycle' : 'not set');
+    svg.append('text').attr('x', cx).attr('y', H - 6).attr('text-anchor', 'middle').text(cur0 ? 'Leads now: ' + cur0[2] : '');
+  });
+
+  dash.draw('regime', function (el) {
+    if (!state(el, ['runs'])) return;
+    var r = latestRun(); el.replaceChildren();
+    if (!r) { el.textContent = '—'; return; }
+    var w = 'run_id=' + enc(r.run_id), dl = make('dl', 'sd-kv');
+    [['rates_regime', 'Rates (ch.25)'], ['rotation', 'Rotation (ch.26)'], ['rs_leaders', 'Who leads on RS'], ['concentration', 'One bet, many tickers (ch.23)']].forEach(function (f) { if (r[f[0]]) { dl.append(make('dt', null, f[1])); dl.append(mark(make('dd', null, r[f[0]]), 'runs', f[0], w)); } });
+    el.append(dl);
+  });
+
+  dash.draw('calendar', function (el) {
+    if (!state(el, ['runs'])) return;
+    var r = latestRun(); el.replaceChildren();
+    if (!r || !r.calendar) { el.append(make('p', 'sd-empty', 'No dates stored on the last run.')); return; }
+    var ul = mark(make('ul', 'sd-list'), 'runs', 'calendar', 'run_id=' + enc(r.run_id));
+    lines(r.calendar).forEach(function (x) { ul.append(make('li', null, x), document.createTextNode('\n')); });
+    el.append(ul);
+  });
+
+  /* ═══ HISTORY ═══ */
+  dash.draw('histchart', function (el) {
+    el.replaceChildren();
+    if (D('history').status !== 'ok') { el.classList.add('dash-skeleton'); return; }
+    el.classList.remove('dash-skeleton');
+    var s = current(); if (!s) return;
+    var hs = rows('history').filter(function (h) { return h.ticker === s.ticker && n(h.price) !== null; }).sort(function (a, b) { return String(a.as_of).localeCompare(String(b.as_of)); });
+    if (!hs.length) { el.append(make('p', 'sd-empty', 'No runs stored for this stock yet.')); return; }
+    var W = Math.max(280, el.clientWidth || 600), H = 250, mL = 8, mR = 8, mT = 14, mB = 70;
+    var dates = hs.map(function (h) { return new Date(String(h.as_of).slice(0, 10) + 'T00:00:00Z'); });
+    var vals = hs.map(function (h) { return n(h.price); }).concat(hs.map(function (h) { return n(h.pt_avg); }).filter(function (v) { return v !== null; }));
+    var lo = d3.min(vals), hi = d3.max(vals), pad = (hi - lo) * 0.1 || hi * 0.05;
+    var y = d3.scaleLinear([lo - pad, hi + pad], [H - mB, mT]).nice();
+    var svg = d3.select(el).append('svg').attr('viewBox', '0 0 ' + W + ' ' + H).attr('width', '100%').attr('role', 'img').attr('aria-label', 'Price and lights score at each run');
+    var yAxis = svg.append('g').call(d3.axisLeft(y).ticks(4).tickFormat(function (v) { return money(v, s); }));
+    yAxis.attr('font-size', null).attr('font-family', null);
+    var maxW = 0; yAxis.selectAll('text').each(function () { maxW = Math.max(maxW, this.getComputedTextLength ? this.getComputedTextLength() : 40); });
+    mL = maxW + 12; yAxis.attr('transform', 'translate(' + mL + ',0)');
+    yAxis.select('.domain').remove();
+    yAxis.selectAll('line').attr('x2', W - mL - mR).attr('stroke', 'var(--cds-chart-grid)');
+    var x = hs.length > 1 ? d3.scaleUtc(d3.extent(dates), [mL + 14, W - mR - 14]) : function () { return (mL + W - mR) / 2; };
+    var g = svg.append('g').attr('data-source', 'history').attr('data-where', where(s.ticker));
+    var pts = hs.map(function (h, i) { return [x(dates[i]), y(n(h.price))]; });
+    g.append('path').attr('d', d3.line()(pts)).attr('fill', 'none').attr('stroke', dash.colors[0]).attr('stroke-width', 2).attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round');
+    pts.forEach(function (p) { g.append('circle').attr('cx', p[0]).attr('cy', p[1]).attr('r', 3.5).attr('fill', dash.colors[0]); });
+    var pt = hs.map(function (h, i) { return n(h.pt_avg) === null ? null : [x(dates[i]), y(n(h.pt_avg))]; }).filter(Boolean);
+    if (pt.length > 1) g.append('path').attr('d', d3.line()(pt)).attr('fill', 'none').attr('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '5 4').attr('stroke-width', 1.5);
+    else if (pt.length === 1) g.append('circle').attr('cx', pt[0][0]).attr('cy', pt[0][1]).attr('r', 3).attr('fill', 'none').attr('stroke', 'var(--cds-chart-reference)');
+    var sy = d3.scaleLinear([0, 7], [H - 22, H - mB + 18]);
+    hs.forEach(function (h, i) {
+      var sc = n(h.score); if (sc === null) return;
+      var xx = x(dates[i]);
+      g.append('rect').attr('x', xx - 7).attr('width', 14).attr('y', sy(sc)).attr('height', Math.max(1, sy(0) - sy(sc))).attr('rx', 2).attr('fill', sc >= 6 ? 'var(--color-ok)' : sc >= 4 ? 'var(--color-warn)' : 'var(--color-bad)').attr('fill-opacity', 0.75);
+      g.append('text').attr('x', xx).attr('y', sy(sc) - 3).attr('text-anchor', 'middle').text(String(sc));
+    });
+    var xa = svg.append('g').attr('transform', 'translate(0,' + (H - 4) + ')');
+    var fmtD = d3.utcFormat('%b %-d');
+    var lastX = -1e9;
+    hs.forEach(function (h, i) { var xx = x(dates[i]); if (xx - lastX < 44) return; lastX = xx; xa.append('text').attr('x', xx).attr('text-anchor', 'middle').text(fmtD(dates[i])); });
+    var tip = make('div', 'sd-tip'); tip.hidden = true; el.append(tip);
+    svg.on('mousemove', function (ev) {
+      var mx = d3.pointer(ev)[0], best = 0, bd = 1e9;
+      pts.forEach(function (p, i) { var dd = Math.abs(p[0] - mx); if (dd < bd) { bd = dd; best = i; } });
+      var h = hs[best]; tip.hidden = false;
+      tip.textContent = fmtD(dates[best]) + ' · ' + money(h.price, s) + ' · lights ' + (h.score === null || h.score === undefined ? '—' : h.score) + '/7' + (n(h.pt_avg) === null ? '' : ' · target ' + money(h.pt_avg, s));
+      var bw = el.clientWidth || W, px = pts[best][0] / W * bw;
+      tip.style.left = Math.max(0, Math.min(bw - tip.offsetWidth, px - tip.offsetWidth / 2)) + 'px';
+      tip.style.top = '0px';
+    }).on('mouseleave', function () { tip.hidden = true; });
+  });
+
+  dash.draw('histtable', function (tb) {
+    tb.replaceChildren();
+    if (D('history').status !== 'ok') return;
+    var s = current(); if (!s) return;
+    rows('history').filter(function (h) { return h.ticker === s.ticker; }).sort(function (a, b) { return String(b.as_of).localeCompare(String(a.as_of)); }).forEach(function (h) {
+      var tr = make('tr'); tr.setAttribute('data-key', enc(h.ticker) + ',' + enc(h.run_id)); tr.style.cursor = 'default';
+      var vd = make('td'); vd.append(pill(h.verdict || '—', tone(h.verdict)));
+      var rk = make('td', 'sd-hide-sm'); rk.append(pill(h.risk_tag || '—', riskTone(h.risk_tag)));
+      tr.append(make('td', null, h.as_of || '—'), make('td', 'r', money(h.price, s)), make('td', null, h.score === null || h.score === undefined ? '—' : String(h.score)), vd,
+        make('td', 'r', n(h.btsp_rating) === null ? '—' : String(h.btsp_rating)), make('td', 'sd-hide-sm', h.archetype || '—'), make('td', null, h.evc_c || '—'), make('td', null, h.evc_v || '—'), make('td', 'r', pctTxt(h.rs_3m)),
+        make('td', 'r sd-hide-sm', h.ivp_52w === null || h.ivp_52w === undefined ? '—' : String(h.ivp_52w)), make('td', 'sd-hide-sm', h.consensus || '—'), make('td', 'r', money(h.pt_avg, s)), rk);
+      tb.append(tr);
+    });
+  });
+
+  dash.draw('repeats', function (el) {
+    if (!state(el, ['stocks', 'history'])) return;
+    el.replaceChildren();
+    var rep = stocks().filter(function (s) { return n(s.times_seen) > 1; }).sort(function (a, b) { return n(b.times_seen) - n(a.times_seen); });
+    if (!rep.length) { el.append(make('p', 'sd-empty', 'No stock has come back yet. Names that reappear in later screens will collect here.')); return; }
+    var ul = make('ul', 'sd-news');
+    rep.forEach(function (s) {
+      var hs = rows('history').filter(function (h) { return h.ticker === s.ticker; }).sort(function (a, b) { return String(a.as_of).localeCompare(String(b.as_of)); });
+      var li = make('li');
+      var b = make('button', 'sd-pill', String(s.times_seen) + '×'); b.type = 'button'; b.addEventListener('click', function () { selectTicker(s.ticker); showTab('stock'); });
+      li.append(mark(b, 'stocks', 'times_seen', where(s.ticker)));
+      var body = make('div', 'sd-q');
+      body.append(make('b', null, s.ticker + (s.name ? ' · ' + s.name : '')));
+      body.append(mark(make('span', 'sd-note', 'Lights by run: ' + hs.map(function (h) { return h.score === null || h.score === undefined ? '—' : h.score; }).join(' → ') + ' · now ' + (s.verdict || '—')), 'history', 'score', where(s.ticker)));
+      li.append(body);
+      ul.append(li);
+    });
+    el.append(ul);
+  });
+
+  /* ═══ METHOD ═══ */
+  dash.draw('method', function (el) {
+    if (!state(el, ['method'])) return;
+    el.replaceChildren();
+    var rs = rows('method'), groups = [];
+    rs.forEach(function (r) { if (groups.indexOf(r.group) < 0) groups.push(r.group); });
+    groups.forEach(function (gname) {
+      var wrap = make('div');
+      wrap.append(make('h3', 'sd-sec', gname));
+      var box = make('div', 'sd-scroll'); box.style.maxHeight = 'none';
+      var t = make('table'); t.setAttribute('data-source', 'method'); t.setAttribute('data-row-key', 'id');
+      var th = make('thead'), trh = make('tr');
+      [['name', 'Name'], ['formula', 'Formula'], ['rule', 'Pass mark'], ['chapter', 'Bible'], ['meaning', 'In plain words']].forEach(function (c) { var h = make('th', null, c[1]); h.setAttribute('data-field', c[0]); trh.append(h); });
+      th.append(trh); t.append(th);
+      var tb = make('tbody');
+      rs.filter(function (r) { return r.group === gname; }).forEach(function (r) {
+        var tr = make('tr'); tr.setAttribute('data-key', enc(r.id));
+        tr.append(make('td', null, r.name), make('td', 'fx', r.formula || ''), make('td', null, r.rule || ''), make('td', null, r.chapter || ''), make('td', null, r.meaning || ''));
+        tb.append(tr);
+      });
+      t.append(tb); box.append(t); wrap.append(box); el.append(wrap);
+    });
+  });
+
+})();
+
+  /* ---------- journal-only overrides of the live IBKR pieces ---------- */
+  dash.draw("livestock",function(el){ el.classList.remove("dash-skeleton"); el.replaceChildren(); const p=document.createElement("p"); p.className="sd-note"; p.textContent="Live quotes run on IBKR inside claude.ai; the journal shows the values stored at the deep dive (options card above)."; el.append(p); });
+  dash.draw("mktlive",function(el){ el.classList.remove("dash-skeleton"); el.replaceChildren(); const r=(DATA.runs&&DATA.runs.data||[]).slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")))[0];
+    const p=document.createElement("p"); p.className="sd-note"; p.textContent=r?("Live index cards need IBKR inside claude.ai. The readings below were stored at the latest run ("+(r.date||r.run_id)+").") : "No deep-dive run stored yet."; el.append(p); });
+  }
+
+  /* ---------- REST ---------- */
+  async function req(path,method,body,prefer){
+    const o={method:method||"GET",headers:{...HDRJ}}; if(prefer) o.headers.Prefer=prefer; if(body!==undefined) o.body=JSON.stringify(body);
+    const res=await fetch(SB_URL+"/rest/v1/"+path,o); const txt=await res.text();
+    if(!res.ok){ let msg=txt; try{ const j=JSON.parse(txt); msg=j.message||j.hint||j.details||txt; }catch(e){} throw new Error("["+res.status+"] "+msg); }
+    return txt?JSON.parse(txt):null;
+  }
+  async function fetchAll(path){ let all=[],from=0; const page=1000;
+    while(true){ const res=await fetch(SB_URL+"/rest/v1/"+path,{headers:{...HDR,"Range-Unit":"items",Range:from+"-"+(from+page-1)}});
+      if(!res.ok) throw new Error(path.split("?")[0]+" "+res.status+": "+(await res.text())); const d=await res.json(); all=all.concat(d); if(d.length<page) break; from+=page; } return all; }
+  const inList=arr=>"in.("+arr.map(s=>'"'+String(s).replace(/"/g,'')+'"').join(",")+")";
+  function setStatus(m,c){ const e=$("ddStatus"); if(e){ e.innerHTML=m; e.className="dd-status "+(c||""); } }
+
+  /* ---------- load everything the page draws ---------- */
+  async function load(){
+    try{
+      setStatus("Loading deep dives…","");
+      const [runs,stocks,lights,ladder,history,news]=await Promise.all([
+        fetchAll(T.runs+"?select=data&order=as_of.asc"), fetchAll(T.stocks+"?select=data&order=as_of.desc"), fetchAll(T.lights+"?select=data"),
+        fetchAll(T.ladder+"?select=points"), fetchAll(T.history+"?select=data&order=as_of.asc"), fetchAll(T.news+"?select=data&order=date.desc")]);
+      dash.set("runs",runs.map(r=>r.data)); dash.set("stocks",stocks.map(r=>r.data)); dash.set("lights",lights.map(r=>r.data));
+      dash.set("ladder",ladder.flatMap(r=>Array.isArray(r.points)?r.points:[])); dash.set("history",history.map(r=>r.data)); dash.set("news",news.map(r=>r.data));
+      loaded=true;
+      const st=DATA.stocks.data; if(!PAR.t&&st.length){ const top=st.slice().sort((a,b)=>(b.score||0)-(a.score||0))[0]; PAR.t=top.ticker; PAR.cid=top.cid||null; }
+      dash.redrawAll();
+      setStatus(st.length?("<b>"+st.length+"</b> stock"+(st.length===1?"":"s")+" · "+DATA.runs.data.length+" run"+(DATA.runs.data.length===1?"":"s")+(DATA.runs.data.length?" · latest "+esc((DATA.runs.data[DATA.runs.data.length-1]||{}).date||""):"")):"No deep dive stored yet — run the stock-deep-dive skill in a chat, or drop its package here.",st.length?"ok":"warn");
+    }catch(e){ loaded=true; setStatus("Could not load the deep-dive tables: "+esc(e.message)+" — has dd_setup.sql been run in Supabase?","err"); dash.redrawAll(); }
+  }
+  async function pollInbox(){
+    try{
+      const pend=await req(T.inbox+"?select=run_id,source,received_at,payload&processed_at=is.null&order=received_at.asc");
+      $("ddInbox").textContent=pend.length?("inbox: "+pend.length+" new run"+(pend.length===1?"":"s")):"";
+      for(const p of pend){ await fold(p.payload,"inbox"); await req(T.inbox+"?run_id=eq."+encodeURIComponent(p.run_id),"PATCH",{processed_at:new Date().toISOString()},"return=minimal"); }
+      if(pend.length){ $("ddInbox").textContent=""; await load(); toast("Folded "+pend.length+" deep-dive run"+(pend.length===1?"":"s")+" from the inbox","success"); }
+    }catch(e){ $("ddInbox").textContent=""; }
+  }
+
+  /* ---------- the merge rules (same as scripts/engine.py merge) ---------- */
+  const fmtPct=(f,d,sign)=>{ if(f===null||f===undefined||!isFinite(f)) return "—"; const v=(f*100).toFixed(d==null?0:d); return (sign&&f>0?"+":"")+v+"%"; };
+  async function fold(pkg,source){
+    if(!pkg||!Array.isArray(pkg.records)) throw new Error("Not a deep-dive package (no records).");
+    const run=pkg.run||{}, runId=run.run_id||pkg.run_id; if(!runId) throw new Error("The package has no run_id.");
+    const tickers=[...new Set(pkg.records.map(r=>r.row&&r.row.ticker).filter(Boolean))];
+    // what the journal already holds for these names
+    const oldStocks={}; (tickers.length?await fetchAll(T.stocks+"?select=ticker,data&ticker="+inList(tickers)):[]).forEach(r=>oldStocks[r.ticker]=r.data);
+    const oldLights={}; (tickers.length?await fetchAll(T.lights+"?select=ticker,key,data&ticker="+inList(tickers)):[]).forEach(r=>{ (oldLights[r.ticker]=oldLights[r.ticker]||{})[r.key]=r.data; });
+    const upStocks=[], upLights=[], upLadder=[], upHist=[], upNews=[], keepOldLights=new Set();
+    for(const rec of pkg.records){
+      const row=Object.assign({},rec.row); const t=row.ticker; const old=oldStocks[t]; const changes=[];
+      const newQuick=row.depth==="quick", oldDeep=!!old&&(old.depth||"deep")==="deep";
+      if(newQuick&&oldDeep){        // back on the screen with only a quick card: keep the last deep dive, note the sighting
+        const kept=Object.assign({},old); kept.times_seen=(parseInt(old.times_seen)||1)+1; kept.run_id=row.run_id||kept.run_id; kept.screen_price=row.price; kept.is_new=false;
+        kept.changes=["Back on the screen in "+row.run_id+" (quick card only); the deep dive of "+old.as_of+" is kept",(old.price&&row.price)?"Price "+fmtPct(row.price/old.price-1,1,true)+" since then":""].filter(Boolean).join("\n");
+        upStocks.push(kept); keepOldLights.add(t); if(rec.history) upHist.push(rec.history); (rec.news||[]).forEach(n=>upNews.push(n)); continue;
+      }
+      if(old&&(newQuick||(old.depth||"deep")==="quick")){   // quick → quick or quick → deep
+        row.times_seen=(parseInt(old.times_seen)||1)+1; row.first_seen=old.first_seen||old.as_of; row.prev_run=old.run_id; row.prev_score=old.score; row.prev_price=old.price; row.is_new=false;
+        row.changes=!newQuick?("First deep dive (a quick card since "+row.first_seen+")"):("Quick card again"+(old.score!==row.score?"; lights "+old.score+" → "+row.score+"/7 (CSV proxies)":"")+((old.price&&row.price)?"; price "+fmtPct(row.price/old.price-1,1,true):""));
+      } else if(old){
+        row.times_seen=(parseInt(old.times_seen)||1)+1; row.first_seen=old.first_seen||old.as_of; row.prev_run=old.run_id; row.prev_score=old.score; row.prev_price=old.price;
+        if(old.score!==row.score) changes.push("Lights score "+old.score+" → "+row.score+"/7");
+        if(old.verdict!==row.verdict) changes.push("Verdict "+old.verdict+" → "+row.verdict);
+        if(old.archetype!==row.archetype) changes.push("Archetype "+old.archetype+" → "+row.archetype);
+        const ol=oldLights[t]||{};
+        (rec.lights||[]).forEach(l=>{ const o=ol[l.key]; if((l.group==="light"||l.group==="evc")&&o&&o.color!==l.color&&l.color!=="na") changes.push(l.name+" "+o.color+" → "+l.color); });
+        const flipsOff=(rec.lights||[]).filter(l=>l.group==="light"&&!l.on&&(ol[l.key]||{}).on);
+        if(flipsOff.length>=2) changes.push("THESIS EVENT: 2+ quality lights failed together - re-underwrite (ch.30)");
+        if(old.price&&row.price) changes.push("Price "+fmtPct(row.price/old.price-1,1,true)+" since "+old.as_of);
+        if(old.eps_est_next_fy&&row.eps_est_next_fy){ const ch=row.eps_est_next_fy/old.eps_est_next_fy-1; row.eps_rev_since_last_pct=Math.round(ch*1000)/10; if(Math.abs(ch)>=0.005) changes.push("Next-year EPS estimate "+old.eps_est_next_fy+" → "+row.eps_est_next_fy+" ("+(ch>0?"+":"")+(ch*100).toFixed(1)+"%): estimates "+(ch>0?"rising":"falling")); }
+        [["pt_avg","Average target"],["consensus","Consensus"],["ivp_52w","IV percentile"],["evc_c","EVC context"],["evc_v","EVC validation"],["risk_tag","Risk"]].forEach(([k,label])=>{ if(old[k]!=null&&row[k]!=null&&old[k]!==row[k]) changes.push(label+" "+old[k]+" → "+row[k]); });
+        row.is_new=false; row.changes=changes.length?changes.join("\n"):"No material change";
+      } else { row.times_seen=1; row.first_seen=row.as_of; row.is_new=true; row.changes=newQuick?"First seen on the screen (quick card)":"First deep dive on this stock"; }
+      upStocks.push(row); (rec.lights||[]).forEach(l=>upLights.push(l)); (rec.ladder||[]).forEach(p=>upLadder.push(p)); if(rec.history) upHist.push(rec.history); (rec.news||[]).forEach(n=>upNews.push(n));
+    }
+    // the run itself (+ the Bible ch.23 concentration note) and its market headlines
+    const cnt={}; pkg.records.forEach(r=>{ const k=r.row&&(r.row.industry||r.row.sector); if(k&&(r.row.depth||"deep")==="deep") (cnt[k]=cnt[k]||[]).push(r.row.ticker); });
+    const heavy=Object.entries(cnt).filter(([k,v])=>v.length>=3).map(([k,v])=>k+": "+v.join(", "));
+    const runRow=Object.assign({},run); const mk=runRow.market_news||[]; delete runRow.market_news;
+    if(heavy.length&&!runRow.concentration) runRow.concentration="Several names share one driver - one bet wearing several tickers; cap it near two full risk units (ch.23): "+heavy.join("; ");
+    mk.forEach((n,i)=>upNews.push({id:(n.ticker||"MARKET")+"-"+runId+"-"+(i+1),ticker:n.ticker||"MARKET-US",run_id:runId,date:n.date,source:n.source,headline:n.headline,url:n.url,impact:n.impact,why:n.why}));
+    // ── write ──
+    const replaced=upStocks.filter(s=>!keepOldLights.has(s.ticker)).map(s=>s.ticker);
+    if(Object.keys(runRow).length) await req(T.runs+"?on_conflict=run_id","POST",{run_id:runId,as_of:runRow.date||null,data:runRow,updated_at:new Date().toISOString()},"resolution=merge-duplicates,return=minimal");
+    if(upStocks.length) await req(T.stocks+"?on_conflict=ticker","POST",upStocks.map(s=>({ticker:s.ticker,run_id:s.run_id||runId,as_of:s.as_of||null,depth:s.depth||"deep",score:s.score==null?null:s.score,verdict:s.verdict||null,market:s.market||null,data:s,updated_at:new Date().toISOString()})),"resolution=merge-duplicates,return=minimal");
+    if(replaced.length){ await req(T.lights+"?ticker="+inList(replaced),"DELETE",undefined,"return=minimal"); await req(T.ladder+"?ticker="+inList(replaced),"DELETE",undefined,"return=minimal"); }
+    if(upLights.length) await req(T.lights+"?on_conflict=ticker,key","POST",upLights.map(l=>({ticker:l.ticker,key:l.key,grp:l.group||null,data:l})),"resolution=merge-duplicates,return=minimal");
+    const byT={}; upLadder.forEach(p=>(byT[p.ticker]=byT[p.ticker]||[]).push(p));
+    if(Object.keys(byT).length) await req(T.ladder+"?on_conflict=ticker","POST",Object.entries(byT).map(([t,pts])=>({ticker:t,points:pts})),"resolution=merge-duplicates,return=minimal");
+    if(upHist.length) await req(T.history+"?on_conflict=ticker,run_id","POST",upHist.map(h=>({ticker:h.ticker,run_id:h.run_id||runId,as_of:h.as_of||null,data:h})),"resolution=merge-duplicates,return=minimal");
+    if(upNews.length){
+      const nt=[...new Set(upNews.map(n=>n.ticker))];
+      await req(T.news+"?run_id=eq."+encodeURIComponent(runId)+"&ticker="+inList(nt),"DELETE",undefined,"return=minimal");
+      await req(T.news+"?on_conflict=id","POST",upNews.map((n,i)=>({id:n.id||(n.ticker+"-"+runId+"-"+(i+1)),ticker:n.ticker,run_id:n.run_id||runId,date:n.date||null,data:n})),"resolution=merge-duplicates,return=minimal");
+      // keep the newest 12 headlines per ticker
+      const all=await fetchAll(T.news+"?select=id,ticker,date&ticker="+inList(nt)+"&order=date.desc");
+      const seen={}, drop=[]; all.forEach(n=>{ seen[n.ticker]=(seen[n.ticker]||0)+1; if(seen[n.ticker]>12) drop.push(n.id); });
+      if(drop.length) await req(T.news+"?id="+inList(drop),"DELETE",undefined,"return=minimal");
+    }
+    if(source==="file") await req(T.inbox+"?on_conflict=run_id","POST",{run_id:runId,source:"file",payload:{run_id:runId,n:pkg.records.length,note:"dropped on the journal"},received_at:new Date().toISOString(),processed_at:new Date().toISOString()},"resolution=merge-duplicates,return=minimal").catch(()=>{});
+    return {runId,n:upStocks.length};
+  }
+
+  /* ---------- a package dropped on the tab ---------- */
+  async function importFile(file){
+    if(busy) return; busy=true;
+    try{ setStatus("Reading "+esc(file.name)+"…",""); const pkg=JSON.parse(await file.text()); const r=await fold(pkg,"file"); setStatus("Folded run <b>"+esc(r.runId)+"</b> · "+r.n+" stock"+(r.n===1?"":"s"),"ok"); toast("Deep dive imported ✓","success"); await load(); }
+    catch(e){ setStatus("Import failed: "+esc(e.message),"err"); toast("Import failed","error"); }
+    busy=false;
+  }
+  function bindDrop(el){
+    el.addEventListener("click",()=>{ const i=document.createElement("input"); i.type="file"; i.accept=".json,application/json"; i.onchange=e=>{ if(e.target.files[0]) importFile(e.target.files[0]); }; i.click(); });
+    ["dragenter","dragover"].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();el.classList.add("over");}));
+    ["dragleave","drop"].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();el.classList.remove("over");}));
+    el.addEventListener("drop",e=>{ const f=e.dataTransfer.files[0]; if(f) importFile(f); });
+  }
+  async function init(){
+    if(inited){ if(loaded) dash.redrawAll(); return; } inited=true;
+    bindDrop($("ddDrop")); $("ddRefresh").onclick=async()=>{ await load(); await pollInbox(); };
+    ensureD3(async()=>{ startPage(); await load(); await pollInbox(); });
+  }
+  window.DD={init, load, fold, pick:t=>dash.setParams({t}), data:()=>DATA};
+})();
+</script>
+
 
 <script>
 /* ═══════════ IBKR CORE — parser + FIFO engine (pure, no DOM) ═══════════ */
