@@ -862,6 +862,28 @@ td {
 #page-rs .rs2-explain{margin-top:14px;padding:12px 14px;background:var(--bg3);border-radius:8px;font-size:13px;line-height:1.65;color:var(--text2)}
 #page-rs .rs2-explain b{color:var(--text)}
 #page-rs td.rs2-idx{color:var(--text3);font-size:11px}
+/* universes + saved runs */
+#page-rs .rs-unibar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+#page-rs .rs-uni{display:flex;align-items:center;gap:8px;padding:7px 11px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:13px;color:var(--text)}
+#page-rs .rs-uni:hover{border-color:var(--border2)}
+#page-rs .rs-uni.on{border-color:var(--accent);color:var(--accent);background:var(--surface);font-weight:600}
+#page-rs .rs-uni .rs-cnt{font-size:10.5px;color:var(--text3);font-weight:400}
+#page-rs .rs-uni .rs-bm{font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;background:rgba(77,163,255,.15);color:#4da3ff;letter-spacing:.02em}
+#page-rs .rs-x{color:var(--text3);font-size:15px;padding:0 2px;border:0;background:none;cursor:pointer;line-height:1}
+#page-rs .rs-x:hover{color:var(--red)}
+#page-rs .rs-snaps{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;align-items:center}
+#page-rs .rs-snaps:empty{display:none}
+#page-rs .rs-snap{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;padding:4px 9px;border-radius:14px;border:1px solid var(--border);color:var(--text2);cursor:pointer;background:var(--bg3)}
+#page-rs .rs-snap:hover{border-color:var(--border2)}
+#page-rs .rs-snap.on{border-color:var(--accent);color:var(--text)}
+#page-rs .rs-snap b{color:var(--text)}
+#page-rs .rs-tag{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:4px;white-space:nowrap;vertical-align:middle;letter-spacing:.02em}
+#page-rs .rs-tag.o{background:rgba(240,120,80,.18);color:var(--orange)}
+#page-rs .rs-tag.g{background:rgba(61,214,140,.16);color:var(--green)}
+#page-rs .rs-tag.b{background:rgba(91,141,238,.18);color:var(--blue2)}
+#page-rs .rs-tag.gr{background:rgba(154,163,184,.14);color:var(--text2)}
+#page-rs .rs-err{color:var(--red);font-size:12px;margin-top:8px}
+#page-rs .rs-err:empty{display:none}
 </style>
 
 <style>
@@ -1562,23 +1584,34 @@ tr.flt-row .flt2{display:flex;gap:3px}
     <div class="section">
       <div class="section-header">
         <div class="section-title">RELATIVE <span>STRENGTH</span></div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="rs-note" id="rsSaveState" style="margin:0"></span>
+          <button class="btn btn-gold btn-sm" id="rsAddUni">+ Universe</button>
+        </div>
       </div>
-      <p class="rs-sub">Composite relative-strength ranking across six timeframes &middot; Z-Score (soft-capped) and Percentile &middot; dataset shared via your cloud (rs_dataset)</p>
+      <p class="rs-sub">Composite relative-strength ranking across six timeframes &middot; Z-Score (soft-capped) and Percentile &middot; one saved run per universe per date (rs_snapshots) &mdash; the Orange cockpit reads the latest run of every universe</p>
 
-      <div class="rs2-steptag">STEP 1 · PEER RANKING <span>each stock vs every other stock in your list</span></div>
+      <!-- universes + saved runs -->
+      <div class="rs-card">
+        <div class="rs-unibar" id="rsUnis"><div class="rs-note">Loading universes&hellip;</div></div>
+        <div class="rs-snaps" id="rsSnaps"></div>
+        <div class="rs-err" id="rsErr"></div>
+      </div>
+
+      <div class="rs2-steptag">STEP 1 · PEER RANKING <span>each stock vs every other stock in the same universe</span></div>
 
       <div class="rs-card">
         <div class="rs-row">
           <div class="rs-col">
             <div id="rsDrop" class="rs-drop">
-              <div style="font-size:15px;font-weight:600">Drop CSV / Excel here, or click to choose</div>
-              <div style="font-size:12px;margin-top:4px">TradingView Screener export &middot; replaces the cloud copy</div>
+              <div style="font-size:15px;font-weight:600">Drop this universe&rsquo;s screener export here, or click to choose</div>
+              <div style="font-size:12px;margin-top:4px">Funnel R1000 / Funnel R2000 CSV or Excel &middot; saved as a run under the selected universe &middot; same date = replaced</div>
               <input id="rsFile" type="file" accept=".csv,.xlsx,.xls" style="display:none">
             </div>
-            <div id="rsStatus" class="rs-status">Open this tab to load the latest dataset&hellip;</div>
-            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+            <div id="rsStatus" class="rs-status">Open this tab to load the latest run&hellip;</div>
+            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
               <button class="rs-ghost" id="rsReload">&#8635; Reload from cloud</button>
-              <span class="rs-note" id="rsCloudState" style="align-self:center"></span>
+              <span class="rs-note" id="rsCloudState" style="margin:0"></span>
             </div>
           </div>
           <div class="rs-col">
@@ -1603,6 +1636,11 @@ tr.flt-row .flt2{display:flex;gap:3px}
                 <input id="rsCap" type="number" min="1" max="6" step="0.5" value="2">
                 <div class="rs-note">Higher lets big leaders separate more.</div>
               </div>
+              <div style="max-width:220px">
+                <label>Min dollar volume ($M per day)</label>
+                <input id="rsMinDV" type="number" min="0" step="1" value="10">
+                <div class="rs-note">Price &times; average volume 30D. Names below this are dropped before ranking. 0 = off.</div>
+              </div>
               <div>
                 <button class="rs-ghost" id="rsResetW">Reset weights</button>
                 <button class="rs-btn" id="rsRecalc">Recalculate</button>
@@ -1621,7 +1659,7 @@ tr.flt-row .flt2{display:flex;gap:3px}
           <div class="rs-switch">
             <span>Display:</span><span id="rsModeLbl">Weighted</span>
             <div class="rs-toggle on" id="rsModeTog" title="Toggle weighted / unweighted display"></div>
-            <span class="rs-note">(Total &amp; Rank always weighted)</span>
+            <span class="rs-note" style="margin:0">(Total &amp; Rank always weighted)</span>
           </div>
           <div class="rs-exp">
             <label style="margin:0">Top</label>
@@ -1632,33 +1670,33 @@ tr.flt-row .flt2{display:flex;gap:3px}
         <div class="rs-tablewrap">
           <table class="rs-table" id="rsTable">
             <thead id="rsThead"></thead>
-            <tbody id="rsTbody"><tr><td class="rs-empty" colspan="9">Loading&hellip;</td></tr></tbody>
+            <tbody id="rsTbody"><tr><td class="rs-empty" colspan="10">Loading&hellip;</td></tr></tbody>
           </table>
         </div>
         <div class="rs-note" id="rsExportNote"></div>
       </div>
 
       <!-- ══════════════ STEP 2 ══════════════ -->
-      <div class="rs2-steptag rs2-s2">STEP 2 · INDEX-RELATIVE <span>each stock vs the index &mdash; 50 means it matched the index exactly</span></div>
+      <div class="rs2-steptag rs2-s2">STEP 2 · INDEX-RELATIVE <span>each stock vs its universe&rsquo;s benchmark &mdash; 50 means it matched the benchmark exactly</span></div>
 
       <div class="rs-card">
         <div class="rs-row">
           <div class="rs-col">
             <div id="rs2Drop" class="rs-drop">
-              <div style="font-size:15px;font-weight:600">Drop the INDEX csv / excel here, or click to choose</div>
-              <div style="font-size:12px;margin-top:4px">One index exported from the TradingView Screener &middot; replaces the cloud copy</div>
+              <div style="font-size:15px;font-weight:600">Drop the <b>Benchmarks</b> export here, or click to choose</div>
+              <div style="font-size:12px;margin-top:4px">One file holding QQQ, IWM, SPY&hellip; (TradingView screener on the Benchmarks watchlist) &middot; each universe picks its own symbol from it</div>
               <input id="rs2File" type="file" accept=".csv,.xlsx,.xls" style="display:none">
             </div>
-            <div id="rs2Status" class="rs-status">Open this tab to load the latest index file&hellip;</div>
+            <div id="rs2Status" class="rs-status">Open this tab to load the latest benchmark file&hellip;</div>
             <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
               <button class="rs-ghost" id="rs2Reload">&#8635; Reload from cloud</button>
-              <span class="rs-note" id="rs2CloudState" style="align-self:center"></span>
+              <span class="rs-note" id="rs2CloudState" style="margin:0"></span>
             </div>
           </div>
           <div class="rs-col">
-            <label>Index name</label>
+            <label>Benchmark symbol for <span id="rs2UniName">this universe</span></label>
             <input id="rs2Ticker" type="text" value="QQQ" placeholder="QQQ">
-            <div class="rs-note">Just a label for the columns and export file. Change it whenever you upload a different index.</div>
+            <div class="rs-note">Stored with the universe (QQQ for Russell 1000, IWM for Russell 2000). Change it and the run is re-measured against the new symbol.</div>
             <div id="rs2Vals" class="rs-note" style="margin-top:10px"></div>
           </div>
         </div>
@@ -1689,7 +1727,7 @@ tr.flt-row .flt2{display:flex;gap:3px}
           <div class="rs-switch">
             <span>Display:</span><span id="rs2ModeLbl">Weighted</span>
             <div class="rs-toggle on" id="rs2ModeTog" title="Toggle weighted / unweighted display"></div>
-            <span class="rs-note">(Total &amp; Rank always weighted)</span>
+            <span class="rs-note" style="margin:0">(Total &amp; Rank always weighted)</span>
           </div>
           <div class="rs-exp">
             <label style="margin:0">Top</label>
@@ -1700,14 +1738,14 @@ tr.flt-row .flt2{display:flex;gap:3px}
         <div class="rs-tablewrap">
           <table class="rs-table" id="rs2Table">
             <thead id="rs2Thead"></thead>
-            <tbody id="rs2Tbody"><tr><td class="rs-empty" colspan="10">Waiting for the index file&hellip;</td></tr></tbody>
+            <tbody id="rs2Tbody"><tr><td class="rs-empty" colspan="10">Waiting for the benchmark file&hellip;</td></tr></tbody>
           </table>
         </div>
         <div class="rs-note" id="rs2ExportNote"></div>
       </div>
 
       <!-- ══════════════ STEP 3 ══════════════ -->
-      <div class="rs2-steptag rs2-s3">STEP 3 · COMBINED <span>Step 1 and Step 2 merged into one ranking &mdash; nothing to upload</span></div>
+      <div class="rs2-steptag rs2-s3">STEP 3 · COMBINED <span>Step 1 and Step 2 merged into one ranking &mdash; nothing to upload &middot; stored with the run for the Orange and Momentum tabs</span></div>
 
       <div class="rs-card">
         <label>How should the two steps be combined?</label>
@@ -1747,8 +1785,9 @@ tr.flt-row .flt2{display:flex;gap:3px}
           <div class="rs-switch">
             <span>Display:</span><span id="rs3ModeLbl">Weighted</span>
             <div class="rs-toggle on" id="rs3ModeTog" title="Toggle weighted / unweighted display"></div>
-            <span class="rs-note">(Total &amp; Rank always weighted)</span>
+            <span class="rs-note" style="margin:0">(Total &amp; Rank always weighted)</span>
           </div>
+          <label class="rs2-chk" style="font-size:12px" title="Names whose next earnings date falls inside the next 5 trading sessions are left out of the export (they still show in the table with an EARN tag)."><input type="checkbox" id="rs3SkipEarn"> Export skips names reporting within 5 sessions</label>
           <div class="rs-exp">
             <label style="margin:0">Top</label>
             <input id="rs3Topn" type="number" min="1" value="20">
@@ -1762,6 +1801,7 @@ tr.flt-row .flt2{display:flex;gap:3px}
           </table>
         </div>
         <div class="rs-note" id="rs3ExportNote"></div>
+        <div class="rs-note"><b>&Delta; prev</b> = rank change against this universe&rsquo;s previous run (&#9650; = improved). <b>EARN</b> = reports within the next 5 trading sessions (needs the <i>Upcoming earnings date</i> column). The Orange and Momentum tabs read the <b>latest run of every universe</b> with the settings on this page.</div>
       </div>
     </div>
   </div>
@@ -1860,8 +1900,8 @@ tr.flt-row .flt2{display:flex;gap:3px}
             Drop TradingView CSV here<br><span class="mo-dim" style="font-size:10.5px">or click to browse</span>
           </div>
           <div class="mo-note">
-            Export one index at a time from the TradingView screener. Score each universe separately —
-            z-scores are relative to the pool they are computed in.
+            Drop the <b>same Funnel export</b> you gave the RS Score tab (Funnel R1000 → Russell 1000, Funnel R2000 → Russell 2000);
+            extra columns are ignored. Score each universe separately — z-scores are relative to the pool they are computed in.
           </div>
         </div>
 
@@ -1869,7 +1909,7 @@ tr.flt-row .flt2{display:flex;gap:3px}
         <div class="mo-pane">
           <div class="mo-ph">
             <div class="mo-pt">RANKING</div>
-            <div class="mo-dim" style="font-size:10.5px">Z(6M÷vol) + Z(12M÷vol), averaged</div>
+            <div class="mo-dim" style="font-size:10.5px" id="moRankSub">Z(6M÷vol) + Z(12M÷vol), averaged</div>
           </div>
 
           <div class="mo-kpi" id="moKpi"></div>
@@ -1879,7 +1919,13 @@ tr.flt-row .flt2{display:flex;gap:3px}
               <span title="Adds Z(3M÷vol) at half weight. Off by default — the momentum premium is strongest at 6-12 months.">Include 3M</span></div>
             <div class="mo-sw"><div class="mo-tg" id="moTgV"></div>
               <span title="Averages volatility across the last 3 uploads so one earnings gap cannot distort the denominator. Needs 3+ snapshots.">Smooth vol</span></div>
+            <div class="mo-seg" id="moRankBy" title="How the list is ranked. STDV = smoothness, Z(6M÷vol) + Z(12M÷vol). 12-1 = one-year return skipping the latest month. 6-1 = six-month return skipping the latest month.">
+              <button data-m="stdv" class="on">STDV</button><button data-m="m121">12-1</button><button data-m="m61">6-1</button></div>
+            <div class="mo-sw"><div class="mo-tg" id="moTgRS"></div>
+              <span title="Keeps only names that are in this universe's latest RS Score run (Step 3) with a total at or above the threshold. Needs a saved RS run for a universe with the same code (R1000, R2000…).">RS survivors only</span></div>
+            <label title="Step 3 total needed to count as an RS survivor. 50 = matched the benchmark.">RS ≥ <input type="number" id="moRsMin" min="0" max="100" step="1" value="50" style="width:58px"></label>
             <label>Top N <input type="number" id="moTopN" min="5" max="200" value="30"></label>
+            <label title="At most this many names from one industry in Export top N — the rest are skipped and the next-ranked names fill in. 0 = off.">Max / industry <input type="number" id="moIndCap" min="0" max="50" step="1" value="5" style="width:58px"></label>
             <label title="Flags rows whose price × 30-day average volume falls below this. 0 = off.">Min turnover $M <input type="number" id="moTurn" min="0" step="1" value="0"></label>
             <label title="Hide stocks with fewer fundamental lights than this. Applies to the table AND to Export top N. Ranks are not renumbered - they still show each stock's place in the full pool.">Min F <select id="moMinF" class="mo-sel"><option value="0">Any</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></label>
             <div style="margin-left:auto;display:flex;gap:7px">
@@ -1899,6 +1945,9 @@ tr.flt-row .flt2{display:flex;gap:3px}
             <b>NEW</b> = not in the previous snapshot. <b>F</b> = quick fundamental flags from the CSV
             (all seven lights &mdash; see the guide below); leverage and conversion lights are
             suppressed for financials. This is a coarse pre-filter — the real seven-light check is IVA Pro on the chart.
+            <b>→20</b> = price distance from the 20-day EMA in ATR(14): <b>READY</b> within 1 ATR, NEAR 1–2 ATR, <b>WAIT</b> more than 2 ATR above, BELOW more than 1 ATR under.
+            <b>Earn</b> = trading sessions to the next report (tagged inside 5). <b>RS</b> = Step 3 total and rank in the same universe's latest RS Score run.
+            <b>Export top N</b> applies the industry cap and writes READY / NEAR / WAIT / EARNINGS sections into one TradingView file.
           </div>
         </div>
       </div>
@@ -2038,7 +2087,8 @@ tr.flt-row .flt2{display:flex;gap:3px}
       <div class="or-note">
         <b>Lights</b> are the same seven tests as the Momentum tab (solid = pass, dull = fail, hollow = no column) &mdash; open the card for the stacked view with values and plain-English explanations.
         <b>&rarr;20 EMA</b> is the distance from the 20-day EMA in ATR(14) units, the same reading as your EVC indicator.
-        <b>&Delta;</b> compares with the previous upload. <b>RS</b> / <b>Mom</b> / <b>ETFs</b> / <b>IBKR</b> come from the other tabs &mdash; open those tabs once if they show &ldquo;&mdash;&rdquo;.
+        <b>&Delta;</b> compares with the previous upload. <b>Index</b> = the universe whose RS run (or momentum snapshot) holds the name.
+        <b>RS</b> = rank in the latest RS Score run of that universe, &#9650;&#9660; against the universe&rsquo;s previous run; hover for the score and date. <b>Mom</b> / <b>ETFs</b> / <b>IBKR</b> come from the other tabs &mdash; open those tabs once if they show &ldquo;&mdash;&rdquo;.
       </div>
     </details>
 
@@ -3230,279 +3280,89 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 
 
 <script>
-/* ====================== RS SCORING MODULE (isolated) ====================== */
-(function(){
-  const RS_SB_URL = "https://jpkniqmqoizscqdkaxag.supabase.co";
-  const RS_SB_KEY = "sb_publishable_SKiVUnE0b4BkDh9JPRT0Ng_pYgjLErJ";
-  const RS_TABLE  = "rs_dataset";
-  const TFS = ["1W","1M","3M","6M","1Y","5Y"];
-  const DEFAULT_WEIGHTS = {"1W":10,"1M":20,"3M":30,"6M":25,"1Y":10,"5Y":5};
-
-  let RAW=[], HEADERS=[], MAP={}, WEIGHTS={...DEFAULT_WEIGHTS}, CAP=2, MODEL=[];
-  let activeTab="z", weighted=true, sortState={col:"total",dir:"desc"}, inited=false;
-
-  const $=id=>document.getElementById(id);
-  function num(v){
-    if(v===null||v===undefined) return null;
-    let s=String(v).trim();
-    if(s===""||/^(n\/?a|--|—|-)$/i.test(s)) return null;
-    let neg=false;
-    if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1);}
-    s=s.replace(/[%,\s]/g,"").replace(/[\u2212\u2013\u2014]/g,"-");
-    let f=parseFloat(s); if(isNaN(f)) return null; return neg?-f:f;
-  }
-  function mean(a){return a.reduce((x,y)=>x+y,0)/a.length;}
-  function stdev(a){const m=mean(a);return Math.sqrt(a.reduce((x,y)=>x+(y-m)*(y-m),0)/a.length);}
-
-  const TF_RX={
-    "1W":/(\b1\s*-?\s*w[a-z]*\b)|(\bweek)/i,
-    "1M":/\b1\s*-?\s*m[a-z]*\b/i,
-    "3M":/(\b3\s*-?\s*m[a-z]*\b)|(\bquarter)/i,
-    "6M":/\b6\s*-?\s*m[a-z]*\b/i,
-    "1Y":/(\b1\s*-?\s*y[a-z]*\b)|(\b12\s*-?\s*m[a-z]*\b)|(\bannual)|(\byearly)/i,
-    "5Y":/(\b5\s*-?\s*y[a-z]*\b)|(\b60\s*-?\s*m[a-z]*\b)/i
-  };
-  function autodetect(){
-    const used=new Set();
-    let tk=HEADERS.find(h=>/symbol|ticker/i.test(h))||HEADERS[0];
-    MAP.ticker=tk; used.add(tk);
-    let ex=HEADERS.find(h=>/exchange/i.test(h)); MAP.exchange=ex||""; if(ex)used.add(ex);
-    const order=["1W","5Y","1Y","6M","3M","1M"];
-    for(const tf of order){const hit=HEADERS.find(h=>!used.has(h)&&TF_RX[tf].test(h));MAP[tf]=hit||"";if(hit)used.add(hit);}
-  }
-  function parseCSV(text){
-    const rows=[];let i=0,field="",row=[],q=false;
-    while(i<text.length){const c=text[i];
-      if(q){if(c==='"'){if(text[i+1]==='"'){field+='"';i++;}else q=false;}else field+=c;}
-      else{if(c==='"')q=true;else if(c===','){row.push(field);field="";}else if(c==='\n'){row.push(field);rows.push(row);row=[];field="";}else if(c==='\r'){}else field+=c;}
-      i++;}
-    if(field!==""||row.length){row.push(field);rows.push(row);}
-    return rows.filter(r=>r.length&&!(r.length===1&&r[0].trim()===""));
-  }
-  function ingest(matrix){
-    HEADERS=matrix[0].map(h=>String(h).trim());
-    RAW=matrix.slice(1).map(r=>{const o={};HEADERS.forEach((h,j)=>o[h]=r[j]);return o;});
-    autodetect(); renderMapping(); compute();
-    setStatus("Loaded "+RAW.length+" rows.","ok");
-  }
-  function loadFile(file){
-    const ext=file.name.split(".").pop().toLowerCase();
-    const rd=new FileReader();
-    if(ext==="csv"){
-      rd.onload=e=>{const txt=e.target.result; ingest(parseCSV(txt)); cloudSave(txt,file.name);};
-      rd.readAsText(file);
-    }else{
-      rd.onload=e=>{
-        try{
-          const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"});
-          const ws=wb.Sheets[wb.SheetNames[0]];
-          const m=XLSX.utils.sheet_to_json(ws,{header:1,raw:false});
-          ingest(m.filter(r=>r.length));
-          cloudSave(XLSX.utils.sheet_to_csv(ws), file.name.replace(/\.(xlsx|xls)$/i,".csv"));
-        }catch(err){setStatus("Excel read failed: "+err.message,"err");}
-      };
-      rd.readAsArrayBuffer(file);
-    }
-  }
-  /* ---- cloud (separate table; does not touch journal data) ---- */
-  async function cloudLoad(){
-    try{
-      const res=await fetch(RS_SB_URL+"/rest/v1/"+RS_TABLE+"?id=eq.1&select=csv_text,filename,uploaded_at",
-        {headers:{apikey:RS_SB_KEY,Authorization:"Bearer "+RS_SB_KEY}});
-      if(!res.ok) throw new Error("["+res.status+"] "+(await res.text()));
-      const arr=await res.json();
-      if(arr&&arr[0]&&arr[0].csv_text){
-        ingest(parseCSV(arr[0].csv_text));
-        const when=arr[0].uploaded_at? new Date(arr[0].uploaded_at).toLocaleString():"";
-        setStatus("Loaded from cloud"+(arr[0].filename?(" — "+arr[0].filename):"")+(when?(" · updated "+when):""),"ok");
-      }else{
-        setStatus("Cloud is empty. Drag a CSV/Excel here to publish the first dataset.","warn");
-      }
-    }catch(e){ setStatus("Cloud read failed: "+(e.message||e)+". You can still drag a file to load locally.","err"); }
-  }
-  async function cloudSave(csvText,filename){
-    try{
-      setStatus("Saving to cloud (replacing previous dataset)…","");
-      const res=await fetch(RS_SB_URL+"/rest/v1/"+RS_TABLE,{
-        method:"POST",
-        headers:{apikey:RS_SB_KEY,Authorization:"Bearer "+RS_SB_KEY,"Content-Type":"application/json",Prefer:"resolution=merge-duplicates,return=minimal"},
-        body:JSON.stringify({id:1,csv_text:csvText,filename:filename||"",uploaded_at:new Date().toISOString()})
-      });
-      if(!res.ok) throw new Error("["+res.status+"] "+(await res.text()));
-      setStatus("Saved to cloud — previous dataset replaced. Live on every device.","ok");
-    }catch(e){ setStatus("Cloud save failed: "+(e.message||e)+" (data still loaded locally).","err"); }
-  }
-  /* ---- compute ---- */
-  function normWeights(){const sum=TFS.reduce((s,t)=>s+(parseFloat(WEIGHTS[t])||0),0)||1;const o={};TFS.forEach(t=>o[t]=(parseFloat(WEIGHTS[t])||0)/sum*100);return o;}
-  function rankBy(key,rk){const idx=MODEL.map((r,i)=>i).sort((a,b)=>MODEL[b][key]-MODEL[a][key]);idx.forEach((mi,pos)=>MODEL[mi][rk]=pos+1);}
-  function compute(){
-    if(!RAW.length)return;
-    CAP=parseFloat($("rsCap").value)||2;
-    const stats={};
-    for(const tf of TFS){
-      const col=MAP[tf];const vals=[];
-      RAW.forEach(r=>{const v=col?num(r[col]):null;if(v!==null)vals.push(v);});
-      if(vals.length){stats[tf]={m:mean(vals),sd:stdev(vals),sorted:[...vals].sort((a,b)=>a-b),has:!!col};}
-      else{stats[tf]={m:0,sd:0,sorted:[],has:!!col};}
-    }
-    const Wn=normWeights();
-    MODEL=RAW.map(r=>{
-      const tk=String(r[MAP.ticker]||"").trim();
-      const exVal=MAP.exchange?String(r[MAP.exchange]||"").trim():"";
-      let exportSym=tk;
-      if(tk.includes(":"))exportSym=tk; else if(exVal)exportSym=exVal+":"+tk;
-      const cells={};let totZ=0,totP=0;
-      for(const tf of TFS){
-        const st=stats[tf];const raw=st.has?num(r[MAP[tf]]):null;
-        let s01=0.5;
-        if(raw!==null&&st.sd>0){let z=(raw-st.m)/st.sd;let zc=CAP*Math.tanh(z/CAP);s01=(zc+CAP)/(2*CAP);}
-        let pc=50;
-        if(raw!==null&&st.sorted.length){let below=0,equal=0;for(const v of st.sorted){if(v<raw)below++;else if(v===raw)equal++;}pc=(below+0.5*equal)/st.sorted.length*100;}
-        cells[tf]={raw,s01,zDisp:s01*100,p:pc};
-        totZ+=Wn[tf]*s01; totP+=Wn[tf]*(pc/100);
-      }
-      return {ticker:tk,exportSym,cells,totZ,totP};
-    });
-    rankBy("totZ","rankZ"); rankBy("totP","rankP");
-    render();
-    if(window.RS&&typeof window.RS.onChange==="function")window.RS.onChange();
-  }
-  /* ---- render ---- */
-  function setStatus(msg,cls){const s=$("rsStatus");if(s){s.innerHTML=msg;s.className="rs-status "+(cls||"");}}
-  function renderWeights(){
-    const g=$("rsWeights");g.innerHTML="";
-    TFS.forEach(tf=>{const d=document.createElement("div");d.innerHTML='<label>'+tf+'</label><input type="number" step="1" data-w="'+tf+'" value="'+WEIGHTS[tf]+'">';g.appendChild(d);});
-    g.querySelectorAll("input").forEach(inp=>inp.addEventListener("input",e=>{WEIGHTS[e.target.dataset.w]=e.target.value;updateWsum();if(MODEL.length)compute();}));
-    updateWsum();
-  }
-  function updateWsum(){
-    const sum=TFS.reduce((s,t)=>s+(parseFloat(WEIGHTS[t])||0),0);
-    const active=TFS.filter(t=>(parseFloat(WEIGHTS[t])||0)>0);
-    const dropped=TFS.filter(t=>!((parseFloat(WEIGHTS[t])||0)>0));
-    let msg="Active timeframes: "+active.length+" of "+TFS.length+"  ·  Sum: "+sum.toFixed(0);
-    if(dropped.length)msg+="  ·  Excluded (0): "+dropped.join(", ");
-    if(Math.round(sum)!==100)msg+="   ⚠ not 100 — still works (auto-normalised), but set to 100 for a clean 0–100 score";
-    $("rsWsum").textContent=msg;
-  }
-  function renderMapping(){
-    const box=$("rsMapping");
-    const opts=h=>HEADERS.map(o=>'<option value="'+o+'" '+(o===h?"selected":"")+'>'+o+'</option>').join("");
-    let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-    html+='<div><label>Ticker</label><select data-m="ticker"><option value="">—</option>'+opts(MAP.ticker)+'</select></div>';
-    html+='<div><label>Exchange (optional)</label><select data-m="exchange"><option value="">—</option>'+opts(MAP.exchange)+'</select></div>';
-    TFS.forEach(tf=>{html+='<div><label>'+tf+'</label><select data-m="'+tf+'"><option value="">—</option>'+opts(MAP[tf])+'</select></div>';});
-    html+='</div>';
-    box.innerHTML=html;
-    box.querySelectorAll("select").forEach(sel=>sel.addEventListener("change",e=>{MAP[e.target.dataset.m]=e.target.value;compute();}));
-  }
-  function fmt(n){return (Math.round(n*10)/10).toFixed(1);}
-  function rsHeat(v){const t=Math.max(0,Math.min(100,v))/100;const r=Math.round(240+(61-240)*t),g=Math.round(82+(214-82)*t),b=Math.round(82+(140-82)*t);return "rgba("+r+","+g+","+b+",0.16)";}
-  function currentRows(){
-    const Wn=normWeights();
-    const rows=MODEL.map(m=>{
-      const o={ticker:m.ticker,exportSym:m.exportSym};
-      if(activeTab==="z"){o.total=m.totZ;o.rank=m.rankZ;}else{o.total=m.totP;o.rank=m.rankP;}
-      TFS.forEach(tf=>{
-        const excluded=!((parseFloat(WEIGHTS[tf])||0)>0);
-        if(excluded){o[tf]=null;return;}
-        const c=m.cells[tf];
-        if(activeTab==="z")o[tf]=weighted?Wn[tf]*c.s01:c.zDisp;
-        else o[tf]=weighted?Wn[tf]*(c.p/100):c.p;
-      });
-      return o;
-    });
-    const col=sortState.col,dir=sortState.dir==="asc"?1:-1;
-    rows.sort((a,b)=>{let x=a[col],y=b[col];if(col==="ticker")return x.localeCompare(y)*dir;if(x===null||x===undefined)x=-Infinity;if(y===null||y===undefined)y=-Infinity;return (x-y)*dir;});
-    return rows;
-  }
-  function render(){
-    const thead=$("rsThead"),tbody=$("rsTbody");
-    if(!MODEL.length){tbody.innerHTML='<tr><td class="rs-empty" colspan="9">No data yet.</td></tr>';thead.innerHTML="";return;}
-    const cols=[{k:"ticker",t:"Ticker"},...TFS.map(t=>({k:t,t:t})),{k:"total",t:"Total"},{k:"rank",t:"Rank"}];
-    thead.innerHTML="<tr>"+cols.map(c=>{const arr=sortState.col===c.k?(sortState.dir==="asc"?"▲":"▼"):"";return '<th data-c="'+c.k+'">'+c.t+'<span class="rs-arr">'+arr+'</span></th>';}).join("")+"</tr>";
-    thead.querySelectorAll("th").forEach(th=>th.addEventListener("click",()=>{const c=th.dataset.c;if(sortState.col===c)sortState.dir=sortState.dir==="asc"?"desc":"asc";else{sortState.col=c;sortState.dir=(c==="ticker")?"asc":"desc";}render();}));
-    const Wn=normWeights();
-    const rows=currentRows();
-    tbody.innerHTML=rows.map(r=>{
-      let tds='<td class="rs-tk">'+r.ticker+'</td>';
-      TFS.forEach(tf=>{
-        if(r[tf]===null||r[tf]===undefined){tds+='<td style="color:var(--text3)">—</td>';return;}
-        const heatVal=weighted?(r[tf]/(Wn[tf]||1))*100:r[tf];
-        tds+='<td style="background:'+rsHeat(heatVal)+'">'+fmt(r[tf])+'</td>';
-      });
-      tds+='<td class="rs-tot" style="background:'+rsHeat(r.total)+'">'+fmt(r.total)+'</td>';
-      tds+='<td class="rs-rk">'+r.rank+'</td>';
-      return "<tr>"+tds+"</tr>";
-    }).join("");
-    $("rsTopn").max=MODEL.length;
-  }
-  function exportTxt(){
-    if(!MODEL.length){setStatus("Nothing to export — load a file first.","warn");return;}
-    let n=parseInt($("rsTopn").value)||0; n=Math.max(1,Math.min(n,MODEL.length));
-    const rows=currentRows().slice(0,n);
-    const syms=rows.map(r=>r.exportSym).filter(Boolean);
-    const blob=new Blob([syms.join(",")],{type:"text/plain"});
-    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="tv_watchlist_top"+n+".txt";a.click();
-    const tabName=activeTab==="z"?"Z-Score":"Percentile";
-    $("rsExportNote").textContent="Exported top "+n+" from the "+tabName+" tab in current sort order ("+sortState.col+" "+sortState.dir+"). Import via TradingView → watchlist name → Upload list.";
-  }
-  /* ---- init (lazy, on first tab open) ---- */
-  function init(){
-    if(inited)return; inited=true;
-    renderWeights();
-    const drop=$("rsDrop"),file=$("rsFile");
-    drop.addEventListener("click",()=>file.click());
-    file.addEventListener("change",e=>{if(e.target.files[0])loadFile(e.target.files[0]);});
-    ["dragover","dragenter"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over");}));
-    ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over");}));
-    drop.addEventListener("drop",e=>{if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);});
-    document.querySelectorAll("#page-rs .rs-tab").forEach(t=>t.addEventListener("click",()=>{
-      document.querySelectorAll("#page-rs .rs-tab").forEach(x=>x.classList.remove("active"));
-      t.classList.add("active");activeTab=t.dataset.rstab;sortState={col:"total",dir:"desc"};render();
-    }));
-    $("rsModeTog").addEventListener("click",function(){weighted=!weighted;this.classList.toggle("on",weighted);$("rsModeLbl").textContent=weighted?"Weighted":"Unweighted";render();});
-    $("rsResetW").addEventListener("click",()=>{WEIGHTS={...DEFAULT_WEIGHTS};renderWeights();compute();});
-    $("rsRecalc").addEventListener("click",()=>compute());
-    $("rsCap").addEventListener("change",()=>compute());
-    $("rsExportBtn").addEventListener("click",exportTxt);
-    $("rsReload").addEventListener("click",()=>{setStatus("Reloading from cloud…","");cloudLoad();});
-    $("rsCloudState").textContent="Cloud: connected (rs_dataset)";
-    setStatus("Connecting to cloud…","");
-    cloudLoad();
-  }
-  /* additive: read-only snapshot + change hook for Steps 2 & 3. Does not alter any Step 1 computation. */
-  window.RS={ensureInit:init, getState:()=>({RAW,MAP,MODEL,WEIGHTS,CAP,TFS,activeTab,weighted}), onChange:null};
-})();
-</script>
-
-<script>
-/* ============ RS STEP 2 (index-relative) + STEP 3 (combined) — isolated ============ */
+/* ====================== RS SCORE TAB — universes · saved runs · Steps 1-3 (isolated) ======================
+   Every upload is a RUN: one row in rs_snapshots per universe per date (rows = the screener file as a matrix,
+   bench = the benchmark values used in Step 2, result = the Step 3 output). The Orange cockpit and the
+   Momentum tab read the latest run of EVERY universe through window.RS2, with the settings on this page.
+   Tables rs_universes / rs_snapshots come from rs_universe_setup.sql. rs_index_dataset keeps holding the
+   shared Benchmarks file; rs_dataset (the old single list) is only read by the one-time import button. */
 (function(){
   const SB_URL="https://jpkniqmqoizscqdkaxag.supabase.co";
   const SB_KEY="sb_publishable_SKiVUnE0b4BkDh9JPRT0Ng_pYgjLErJ";
-  const T_STOCK="rs_dataset";        // Step 1 dataset (read timestamp only)
-  const T_INDEX="rs_index_dataset";  // Step 2 index file
+  const T_UNI="rs_universes", T_SNAP="rs_snapshots", T_OLD="rs_dataset", T_BENCH="rs_index_dataset";
+  const HDR={apikey:SB_KEY,Authorization:"Bearer "+SB_KEY}, HDRJ={...HDR,"Content-Type":"application/json"};
   const TFS=["1W","1M","3M","6M","1Y","5Y"];
-  const HDR={apikey:SB_KEY,Authorization:"Bearer "+SB_KEY};
-  const HDRJ={apikey:SB_KEY,Authorization:"Bearer "+SB_KEY,"Content-Type":"application/json"};
-  const MS24=24*60*60*1000;
+  const DEFAULT_WEIGHTS={"1W":10,"1M":20,"3M":30,"6M":25,"1Y":10,"5Y":5};
+  const SNAP_META="id,universe_id,as_of,filename,n_rows,uploaded_at,bench";
+  const EARN_WIN=5;      // trading sessions: "reporting soon"
+  const BENCH_TOL=3;     // days: a benchmark file this close to the run's date is matched to it automatically
 
-  let IDXROW=null, IDXVALS={}, IDXNAME="QQQ", IDXMAP={};
-  let stockAt=null, indexAt=null, overrideStale=false, inited=false;
-  let M2=[], M3=[];
-  let tab2="z", w2=true, sort2={col:"total",dir:"desc"}, W2=null;
-  let tab3="z", w3=true, sort3={col:"total",dir:"desc"}, W3=null;
+  /* ---------- state ---------- */
+  let UNIS=[], SNAPS=[], BODY={};            // universes · run list (no rows) · run id -> {rows,result}
+  let curUni=null, curSnap=null, inited=false, listErr="";
+  let BENCH=null;                             // shared Benchmarks file {rows:[{symbol,vals}],filename,as_of,uploaded_at}
+  let OLD=null;                               // stamp of the old single dataset (one-time import button)
+  let S=blank();                              // the run on screen
+  let WEIGHTS={...DEFAULT_WEIGHTS}, CAP=2, minDV=10;
+  let W2=null, W3=null, overrideStale=false;
+  let tab1="z", w1=true, sort1={col:"total",dir:"desc"};
+  let tab2="z", w2=true, sort2={col:"total",dir:"desc"};
+  let tab3="z", w3=true, sort3={col:"total",dir:"desc"};
+  let saveTimer=null, lastSaved={id:null,key:""}, CACHE={}, benchTimer=null;
+  function blank(){ return {HEADERS:[],RAW:[],MAP:{},MODEL:[],M2:[],M3:[],IDX:null,bInfo:null,dropped:0,prevRank:{}}; }
 
+  /* ---------- helpers ---------- */
   const $=id=>document.getElementById(id);
+  const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   function num(v){
-    if(v===null||v===undefined)return null;
+    if(v===null||v===undefined) return null;
     let s=String(v).trim();
-    if(s===""||/^(n\/?a|--|—|-)$/i.test(s))return null;
+    if(s===""||/^(n\/?a|--|—|-|null)$/i.test(s)) return null;
     let neg=false;
     if(/^\(.*\)$/.test(s)){neg=true;s=s.slice(1,-1);}
-    s=s.replace(/[%,\s]/g,"").replace(/[\u2212\u2013\u2014]/g,"-");
-    let f=parseFloat(s); if(isNaN(f))return null; return neg?-f:f;
+    s=s.replace(/[%,\s$]/g,"").replace(/[−–—]/g,"-");
+    const f=parseFloat(s); if(isNaN(f)) return null; return neg?-f:f;
   }
+  function mean(a){return a.reduce((x,y)=>x+y,0)/a.length;}
+  function stdev(a){const m=mean(a);return Math.sqrt(a.reduce((x,y)=>x+(y-m)*(y-m),0)/a.length);}
+  function fmt(n){return (Math.round(n*10)/10).toFixed(1);}
+  const pad=n=>String(n).padStart(2,"0");
+  const todayISO=()=>{const d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());};
+  const MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const dfmt=s=>{ if(!s) return "—"; const p=String(s).slice(0,10).split("-"); return MN[+p[1]-1]+" "+(+p[2])+", "+p[0]; };
+  function dateFromName(name,fallback){ const m=String(name||"").match(/(20\d{2})[-_]?(\d{2})[-_]?(\d{2})/); if(m) return m[1]+"-"+m[2]+"-"+m[3]; return fallback?String(fallback).slice(0,10):todayISO(); }
+  function dayDiff(a,b){ const x=new Date(String(a).slice(0,10)+"T00:00:00"), y=new Date(String(b).slice(0,10)+"T00:00:00"); if(isNaN(x)||isNaN(y)) return null; return Math.round((y-x)/86400000); }
+  function bizDays(a,b){          // weekdays strictly after a, up to and including b (negative when b is earlier)
+    const x=new Date(String(a).slice(0,10)+"T00:00:00"), y=new Date(String(b).slice(0,10)+"T00:00:00"); if(isNaN(x)||isNaN(y)) return null;
+    const sign=y>=x?1:-1; let n=0, guard=0;
+    while(((sign>0&&x<y)||(sign<0&&x>y))&&guard++<800){ x.setDate(x.getDate()+sign); const w=x.getDay(); if(w!==0&&w!==6) n+=sign; }
+    return n;
+  }
+  function parseCSV(text){
+    const rows=[];let i=0,field="",row=[],q=false;
+    if(text.charCodeAt(0)===0xFEFF) text=text.slice(1);
+    while(i<text.length){const c=text[i];
+      if(q){if(c==='"'){if(text[i+1]==='"'){field+='"';i++;}else q=false;}else field+=c;}
+      else{if(c==='"')q=true;else if(c===','){row.push(field);field="";}else if(c==='\n'){row.push(field);rows.push(row);row=[];field="";}else if(c==='\r'){}else field+=c;}
+      i++;}
+    if(field!==""||row.length){row.push(field);rows.push(row);}
+    return rows.filter(r=>r.length&&!(r.length===1&&String(r[0]).trim()===""));
+  }
+  const slug=s=>String(s||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+  const uniOf=id=>UNIS.find(u=>u.id===id)||null;
+  const snapOf=id=>SNAPS.find(s=>s.id===id)||null;
+  function runsOf(uid){ return SNAPS.filter(s=>s.universe_id===uid).sort((a,b)=>a.as_of<b.as_of?1:a.as_of>b.as_of?-1:b.id-a.id); }   // newest first
+  const codeOf=u=>slug(u&&(u.code||u.name))||"UNIVERSE";
+
+  /* ---------- REST ---------- */
+  async function req(path,method,body,prefer){
+    const o={method:method||"GET",headers:{...HDRJ}}; if(prefer) o.headers.Prefer=prefer; if(body!==undefined) o.body=JSON.stringify(body);
+    const res=await fetch(SB_URL+"/rest/v1/"+path,o); const txt=await res.text();
+    if(!res.ok){ let msg=txt; try{ const j=JSON.parse(txt); msg=j.message||j.hint||j.details||txt; }catch(e){} throw new Error("["+res.status+"] "+msg); }
+    return txt?JSON.parse(txt):null;
+  }
+
+  /* ---------- column detection ---------- */
   const TF_RX={
     "1W":/(\b1\s*-?\s*w[a-z]*\b)|(\bweek)/i,
     "1M":/\b1\s*-?\s*m[a-z]*\b/i,
@@ -3511,308 +3371,416 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     "1Y":/(\b1\s*-?\s*y[a-z]*\b)|(\b12\s*-?\s*m[a-z]*\b)|(\bannual)|(\byearly)/i,
     "5Y":/(\b5\s*-?\s*y[a-z]*\b)|(\b60\s*-?\s*m[a-z]*\b)/i
   };
-  function parseCSV(text){
-    const rows=[];let i=0,field="",row=[],q=false;
-    while(i<text.length){const c=text[i];
-      if(q){if(c==='"'){if(text[i+1]==='"'){field+='"';i++;}else q=false;}else field+=c;}
-      else{if(c==='"')q=true;else if(c===','){row.push(field);field="";}else if(c==='\n'){row.push(field);rows.push(row);row=[];field="";}else if(c==='\r'){}else field+=c;}
-      i++;}
-    if(field!==""||row.length){row.push(field);rows.push(row);}
-    return rows.filter(r=>r.length&&!(r.length===1&&r[0].trim()===""));
+  function autodetect(H){
+    const used=new Set(), M={};
+    const pick=rx=>{ const h=H.find(x=>!used.has(x)&&rx.test(x)); if(h){ used.add(h); return h; } return ""; };
+    M.ticker=pick(/^symbol$|^ticker$/i)||H[0]||""; used.add(M.ticker);
+    M.exchange=pick(/^exchange$/i);
+    M.name=pick(/^description$|^name$/i);
+    M.industry=pick(/^industry$/i);
+    M.price=pick(/^price$/i);
+    M.avol=pick(/average\s*volume/i);
+    M.earn=pick(/upcoming earnings/i);
+    const order=["1W","5Y","1Y","6M","3M","1M"];
+    for(const tf of order){                      // performance columns first, then anything that looks like the timeframe
+      let h=H.find(x=>!used.has(x)&&/perf/i.test(x)&&TF_RX[tf].test(x));
+      if(!h) h=H.find(x=>!used.has(x)&&TF_RX[tf].test(x));
+      M[tf]=h||""; if(h) used.add(h);
+    }
+    return M;
   }
-  function setStatus(m,c){const e=$("rs2Status");if(e){e.innerHTML=m;e.className="rs-status "+(c||"");}}
-  function fmt(n){return (Math.round(n*10)/10).toFixed(1);}
-  function heat(v){ // 0..100 with 50 = neutral grey (matches the index)
-    if(v===null||v===undefined)return "transparent";
-    const t=Math.max(0,Math.min(100,v));
-    if(Math.abs(t-50)<0.05)return "rgba(140,140,150,0.14)";
-    if(t>50){const k=(t-50)/50;return "rgba(61,214,140,"+(0.04+0.24*k).toFixed(3)+")";}
-    const k=(50-t)/50;return "rgba(240,82,82,"+(0.04+0.24*k).toFixed(3)+")";
+  function toRows(matrix){ const H=matrix[0].map(h=>String(h).trim()); const RAW=matrix.slice(1).filter(r=>r&&r.length).map(r=>{const o={};H.forEach((h,j)=>o[h]=r[j]);return o;}); return {H,RAW}; }
+
+  /* ---------- the maths (pure: no DOM, no network) ---------- */
+  function normW(w){const sum=TFS.reduce((s,t)=>s+(parseFloat(w[t])||0),0)||1;const o={};TFS.forEach(t=>o[t]=(parseFloat(w[t])||0)/sum*100);return o;}
+  function rank(M,key,rk){const idx=M.map((r,i)=>i).sort((x,y)=>M[y][key]-M[x][key]);idx.forEach((mi,pos)=>M[mi][rk]=pos+1);}
+  function step1(RAW,MAP,W,cap,floorM,today){
+    const keep=[]; let dropped=0;
+    RAW.forEach(r=>{ const px=MAP.price?num(r[MAP.price]):null, av=MAP.avol?num(r[MAP.avol]):null; const dv=(px!=null&&av!=null)?px*av:null;
+      if(floorM>0&&dv!=null&&dv<floorM*1e6) dropped++; else keep.push({r,dv,px}); });
+    const stats={};
+    for(const tf of TFS){ const col=MAP[tf], vals=[]; keep.forEach(k=>{const v=col?num(k.r[col]):null; if(v!==null) vals.push(v);});
+      stats[tf]=vals.length?{m:mean(vals),sd:stdev(vals),sorted:vals.slice().sort((a,b)=>a-b),has:!!col}:{m:0,sd:0,sorted:[],has:!!col}; }
+    const Wn=normW(W);
+    const MODEL=keep.map(k=>{ const r=k.r;
+      const tk=String(r[MAP.ticker]||"").trim(), exVal=MAP.exchange?String(r[MAP.exchange]||"").trim():"";
+      const exportSym=tk.includes(":")?tk:(exVal?exVal+":"+tk:tk);
+      const cells={}; let totZ=0,totP=0;
+      for(const tf of TFS){ const st=stats[tf]; const raw=st.has?num(r[MAP[tf]]):null; let s01=0.5;
+        if(raw!==null&&st.sd>0){ const z=(raw-st.m)/st.sd, zc=cap*Math.tanh(z/cap); s01=(zc+cap)/(2*cap); }
+        let pc=50; if(raw!==null&&st.sorted.length){ let below=0,equal=0; for(const v of st.sorted){ if(v<raw)below++; else if(v===raw)equal++; } pc=(below+0.5*equal)/st.sorted.length*100; }
+        cells[tf]={raw,s01,zDisp:s01*100,p:pc}; totZ+=Wn[tf]*s01; totP+=Wn[tf]*(pc/100); }
+      let earn=MAP.earn?String(r[MAP.earn]||"").trim():""; earn=/^\d{4}-\d{2}-\d{2}/.test(earn)?earn.slice(0,10):"";
+      const earnDays=earn?bizDays(today,earn):null;
+      return {ticker:tk,exportSym,name:MAP.name?String(r[MAP.name]||"").trim():"",industry:MAP.industry?String(r[MAP.industry]||"").trim():"",earn,earnDays,earnSoon:earnDays!=null&&earnDays>=0&&earnDays<=EARN_WIN,dv:k.dv,px:k.px,cells,totZ,totP};
+    }).filter(m=>m.ticker);
+    rank(MODEL,"totZ","rankZ"); rank(MODEL,"totP","rankP");
+    return {MODEL,dropped,stats};
+  }
+  function step2(MODEL,IDX,W,cap){
+    const sd={}, spreads={};
+    for(const tf of TFS){ const vals=MODEL.map(m=>m.cells[tf].raw).filter(v=>v!==null); sd[tf]=vals.length>1?stdev(vals):0; spreads[tf]=[];
+      if(IDX[tf]===null||IDX[tf]===undefined) continue; vals.forEach(v=>spreads[tf].push(v-IDX[tf])); spreads[tf].sort((a,b)=>a-b); }
+    const Wn=normW(W);
+    const M2=MODEL.map(m=>{ const cells={}; let totZ=0,totP=0,beatW=0,beatDen=0;
+      for(const tf of TFS){ const raw=m.cells[tf].raw, q=IDX[tf];
+        if(raw===null||q===null||q===undefined||!(sd[tf]>0)){ cells[tf]={sp:null,s01:null,p:null}; continue; }
+        const sp=raw-q, z=sp/sd[tf], zc=cap*Math.tanh(z/cap), s01=(zc+cap)/(2*cap);
+        let below=0,equal=0; const arr=spreads[tf]; for(const v of arr){ if(v<sp)below++; else if(v===sp)equal++; }
+        const p=arr.length?(below+0.5*equal)/arr.length*100:50;
+        cells[tf]={sp,s01,p}; totZ+=Wn[tf]*s01; totP+=Wn[tf]*(p/100); beatW+=Wn[tf]*(sp>0?1:sp<0?0:0.5); beatDen+=Wn[tf]; }
+      return {ticker:m.ticker,exportSym:m.exportSym,earnSoon:m.earnSoon,earnDays:m.earnDays,cells,totZ,totP,beat:beatDen?beatW/beatDen*100:null}; });
+    rank(M2,"totZ","rankZ"); rank(M2,"totP","rankP"); return M2;
+  }
+  function step3(MODEL,M2,W,mode,a){
+    const Wn=normW(W);
+    const cmb=(x,y)=>{ if(x===null||y===null) return null; if(mode==="blend") return a*x+(1-a)*y; if(mode==="balanced") return Math.sqrt(Math.max(0,x)*Math.max(0,y)); return Math.min(x,y); };
+    const M3=MODEL.map((m,i)=>{ const two=M2[i], cells={}; let totZ=0,totP=0;
+      for(const tf of TFS){ const c1=m.cells[tf], c2=two?two.cells[tf]:null;
+        const z1=(c1&&c1.raw!==null)?c1.s01*100:null, z2=(c2&&c2.s01!==null)?c2.s01*100:null, p1=(c1&&c1.raw!==null)?c1.p:null, p2=(c2&&c2.p!==null)?c2.p:null;
+        const zc=cmb(z1,z2), pc=cmb(p1,p2); cells[tf]={z:zc,p:pc};
+        if(zc!==null) totZ+=Wn[tf]*(zc/100); if(pc!==null) totP+=Wn[tf]*(pc/100); }
+      return {ticker:m.ticker,exportSym:m.exportSym,name:m.name,industry:m.industry,earn:m.earn,earnDays:m.earnDays,earnSoon:m.earnSoon,cells,totZ,totP,s1:m.totZ,s2:two?two.totZ:null}; });
+    rank(M3,"totZ","rankZ"); rank(M3,"totP","rankP"); return M3;
   }
 
-  /* ---------- index file ---------- */
-  function ingestIndex(matrix){
-    const heads=matrix[0].map(h=>String(h).trim());
-    const rows=matrix.slice(1).map(r=>{const o={};heads.forEach((h,j)=>o[h]=r[j]);return o;});
-    if(!rows.length){setStatus("That file has no data rows.","err");return false;}
-    const used=new Set();
-    let tk=heads.find(h=>/symbol|ticker/i.test(h))||heads[0];
-    IDXMAP={ticker:tk}; used.add(tk);
-    const order=["1W","5Y","1Y","6M","3M","1M"];
-    for(const tf of order){const hit=heads.find(h=>!used.has(h)&&TF_RX[tf].test(h));IDXMAP[tf]=hit||"";if(hit)used.add(hit);}
-    const typed=($("rs2Ticker").value||"").trim().toUpperCase();
-    let pick=rows.find(r=>String(r[tk]||"").trim().toUpperCase().includes(typed)&&typed!=="")||rows[0];
-    IDXROW=pick;
-    IDXVALS={}; TFS.forEach(tf=>{IDXVALS[tf]=IDXMAP[tf]?num(pick[IDXMAP[tf]]):null;});
-    const miss=TFS.filter(tf=>IDXVALS[tf]===null);
-    let note='<b>'+(String(pick[tk]||"index")).trim()+'</b> &nbsp; '+TFS.map(tf=>tf+": "+(IDXVALS[tf]===null?"—":IDXVALS[tf].toFixed(2)+"%")).join(" &nbsp;·&nbsp; ");
-    if(miss.length)note+='<br><span style="color:#f5a623">Missing: '+miss.join(", ")+' — those timeframes are skipped in Step 2.</span>';
-    $("rs2Vals").innerHTML=note;
-    return true;
+  /* ---------- benchmark values for a run ---------- */
+  function pickBench(want){
+    if(!BENCH||!BENCH.rows.length) return null; const w=slug(want);
+    let row=w?BENCH.rows.find(r=>slug(r.symbol.split(":").pop())===w):null;
+    if(!row&&w) row=BENCH.rows.find(r=>slug(r.symbol).includes(w));
+    if(!row&&!w&&BENCH.rows.length===1) row=BENCH.rows[0];
+    return row||null;
+  }
+  function benchFor(uni,snap,allowStale){     // -> {vals,symbol,as_of,src} | {stale,gap,symbol} | {missing,have} | null
+    if(snap&&snap.bench&&snap.bench.vals) return {vals:snap.bench.vals,symbol:snap.bench.symbol,as_of:snap.bench.as_of,filename:snap.bench.filename,src:"saved"};
+    if(!BENCH) return null;
+    const want=uni?(uni.benchmark||""):"", row=pickBench(want);
+    if(!row) return {missing:want||"(none set)",have:BENCH.rows.map(r=>r.symbol)};
+    const gap=snap&&BENCH.as_of?Math.abs(dayDiff(snap.as_of,BENCH.as_of)||0):0;
+    if(gap<=BENCH_TOL||allowStale) return {vals:row.vals,symbol:row.symbol,as_of:BENCH.as_of,filename:BENCH.filename,src:"file",gap};
+    return {stale:true,gap,symbol:row.symbol,as_of:BENCH.as_of};
+  }
+  async function persistBench(snap,b,force){
+    if(!snap||!b||!b.vals) return; if(!force&&snap.bench&&snap.bench.vals) return;
+    const bench={symbol:b.symbol,as_of:b.as_of,filename:b.filename||"",vals:b.vals,saved_at:new Date().toISOString()};
+    snap.bench=bench;                                                   // local first, so the UI shows it at once
+    try{ await req(T_SNAP+"?id=eq."+snap.id,"PATCH",{bench},"return=minimal"); }catch(e){ $("rsErr").textContent="Could not store the benchmark on the run: "+e.message; }
+  }
+
+  /* ---------- settings from the page ---------- */
+  function baseW(){ return WEIGHTS; }
+  function wFor(step){ if(step===2&&$("rs2Override").checked&&W2) return W2; if(step===3&&$("rs3Override").checked&&W3) return W3; return baseW(); }
+  function readSettings(){ CAP=parseFloat($("rsCap").value)||2; minDV=parseFloat($("rsMinDV").value); if(isNaN(minDV)||minDV<0) minDV=0; }
+  const mode3=()=>$("rs3Mode").value, blend3=()=>(parseFloat($("rs3Blend").value)||50)/100;
+
+  /* ---------- full pipeline for any loaded run (cockpit + Momentum) ---------- */
+  function computeFor(uid,snapId,allowStale){
+    const key=uid+"|"+snapId+"|"+(allowStale?1:0); if(CACHE[key]!==undefined) return CACHE[key];
+    const uni=uniOf(uid), snap=snapOf(snapId), body=BODY[snapId];
+    if(!uni||!snap||!body||!body.rows||body.rows.length<2) return (CACHE[key]=null);
+    const {H,RAW}=toRows(body.rows), MAP=autodetect(H);
+    const r1=step1(RAW,MAP,WEIGHTS,CAP,minDV,todayISO());
+    const b=benchFor(uni,snap,allowStale);
+    if(b&&b.vals&&b.src==="file") persistBench(snap,b,false);
+    const M2=(b&&b.vals&&r1.MODEL.length)?step2(r1.MODEL,b.vals,wFor(2),CAP):[];
+    const M3=M2.length?step3(r1.MODEL,M2,wFor(3),mode3(),blend3()):[];
+    return (CACHE[key]={uni,snap,MAP,MODEL:r1.MODEL,M2,M3,bench:b&&b.vals?b:null,bInfo:b,dropped:r1.dropped});
+  }
+
+  /* ---------- the run on screen ---------- */
+  function recompute(){
+    readSettings(); CACHE={};
+    const uni=uniOf(curUni), snap=snapOf(curSnap);
+    if(S.RAW.length){ const r1=step1(S.RAW,S.MAP,WEIGHTS,CAP,minDV,todayISO()); S.MODEL=r1.MODEL; S.dropped=r1.dropped; } else { S.MODEL=[]; S.dropped=0; }
+    const b=benchFor(uni,snap,overrideStale); S.bInfo=b; S.IDX=(b&&b.vals)?b:null;
+    if(S.IDX&&snap&&b.src==="file") persistBench(snap,b,overrideStale);
+    S.M2=(S.MODEL.length&&S.IDX)?step2(S.MODEL,S.IDX.vals,wFor(2),CAP):[];
+    S.M3=S.M2.length?step3(S.MODEL,S.M2,wFor(3),mode3(),blend3()):[];
+    // rank change against the previous run of this universe
+    S.prevRank={}; if(snap){ const list=runsOf(snap.universe_id), i=list.findIndex(x=>x.id===snap.id), prev=list[i+1]; if(prev&&BODY[prev.id]){ const c=computeFor(snap.universe_id,prev.id,false); if(c&&c.M3.length) c.M3.forEach(m=>S.prevRank[m.ticker]={z:m.rankZ,p:m.rankP}); } }
+    render1(); render2(); render3(); renderBench(); renderStatus();
+    scheduleResultSave();
+    if(window.OR&&OR.onRS) OR.onRS(); if(window.MO&&MO.onRS) MO.onRS();
+  }
+  function ingestMatrix(matrix){ const {H,RAW}=toRows(matrix); S.HEADERS=H; S.RAW=RAW; S.MAP=autodetect(H); renderMapping(); recompute(); }
+
+  /* ---------- Step 3 result → stored with the run ---------- */
+  function scheduleResultSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(saveResult,1500); }
+  async function saveResult(){
+    const snap=snapOf(curSnap); if(!snap||!S.M3.length) return;
+    const res={tab:tab3,mode:mode3(),blend:Math.round(blend3()*100),weights:normW(WEIGHTS),cap:CAP,min_dv:minDV,bench:S.IDX?S.IDX.symbol:null,n:S.M3.length,saved_at:new Date().toISOString(),
+      rows:S.M3.map(m=>({t:m.ticker,sym:m.exportSym,z:+m.totZ.toFixed(2),p:+m.totP.toFixed(2),rz:m.rankZ,rp:m.rankP}))};
+    const key=JSON.stringify([res.rows,res.mode,res.blend,res.tab,res.bench]);
+    if(lastSaved.id===snap.id&&lastSaved.key===key) return;
+    try{ await req(T_SNAP+"?id=eq."+snap.id,"PATCH",{result:res},"return=minimal"); lastSaved={id:snap.id,key}; if(BODY[snap.id]) BODY[snap.id].result=res;
+      $("rsSaveState").textContent="Step 3 stored with the "+esc(snap.as_of)+" run · "+new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}); }
+    catch(e){ $("rsSaveState").textContent="Step 3 not stored: "+e.message; }
+  }
+
+  /* ---------- data layer ---------- */
+  async function ensureBody(id){
+    if(BODY[id]) return BODY[id];
+    try{ const a=await req(T_SNAP+"?id=eq."+id+"&select=rows,result"); BODY[id]=a&&a[0]?{rows:a[0].rows||[],result:a[0].result||null}:{rows:[],result:null}; }
+    catch(e){ BODY[id]={rows:[],result:null,err:e.message}; }
+    return BODY[id];
+  }
+  async function loadBenchFile(){
+    try{ const a=await req(T_BENCH+"?id=eq.1&select=csv_text,filename,ticker,uploaded_at");
+      if(a&&a[0]&&a[0].csv_text){ ingestBench(a[0].csv_text,a[0].filename||"",a[0].uploaded_at||null); $("rs2CloudState").textContent="Benchmark file: "+(a[0].filename||"stored")+(a[0].uploaded_at?" · uploaded "+new Date(a[0].uploaded_at).toLocaleString():""); setStatus2("Benchmark file loaded from cloud ("+BENCH.rows.length+" symbol"+(BENCH.rows.length===1?"":"s")+": "+BENCH.rows.map(r=>r.symbol).join(", ")+").","ok"); }
+      else { BENCH=null; setStatus2("No benchmark file stored yet — drop the Benchmarks export above.","warn"); }
+    }catch(e){ BENCH=null; setStatus2("Benchmark file load failed: "+esc(e.message),"err"); }
+  }
+  async function loadOldStamp(){ try{ const a=await req(T_OLD+"?id=eq.1&select=filename,uploaded_at"); OLD=a&&a[0]?a[0]:null; }catch(e){ OLD=null; } }
+  async function loadAll(){
+    setStatus("Connecting to cloud…","");
+    try{ UNIS=await req(T_UNI+"?select=*&order=sort.asc,id.asc")||[]; SNAPS=await req(T_SNAP+"?select="+SNAP_META+"&order=as_of.desc,id.desc")||[]; listErr=""; $("rsErr").textContent=""; }
+    catch(e){ UNIS=[]; SNAPS=[]; listErr=e.message; }
+    if(curUni&&!uniOf(curUni)) curUni=null; if(!curUni&&UNIS.length) curUni=UNIS[0].id;
+    await loadBenchFile(); await loadOldStamp();          // the stamp is two small fields; it decides whether the one-time import button shows
+    const need=[]; UNIS.forEach(u=>runsOf(u.id).slice(0,2).forEach(s=>need.push(s.id)));     // latest = cockpit + default view · previous = rank moves
+    await Promise.all(need.map(ensureBody));
+    $("rsCloudState").textContent=listErr?"":("Cloud: "+UNIS.length+" universe"+(UNIS.length===1?"":"s")+" · "+SNAPS.length+" saved run"+(SNAPS.length===1?"":"s"));
+    const list=runsOf(curUni); const snap=(curSnap&&list.find(s=>s.id===curSnap))||list[0]||null;
+    await selectSnap(snap?snap.id:null);
+  }
+  async function selectSnap(id){
+    if(id) await ensureBody(id);
+    curSnap=id; overrideStale=false; S=blank();
+    const body=id?BODY[id]:null;
+    if(body&&body.rows&&body.rows.length>1) ingestMatrix(body.rows); else { renderMapping(); recompute(); }
+    renderUnis();
+  }
+  async function pick(uid){ if(uid===curUni) return; curUni=uid; const list=runsOf(uid); if(list[0]) await ensureBody(list[0].id); await selectSnap(list[0]?list[0].id:null); }
+
+  async function saveSnapshot(matrix,fname,asOf){
+    try{
+      setStatus("Saving the run to your cloud…","");
+      const rows=matrix.filter(r=>r&&r.length).map(r=>r.map(v=>v==null?"":String(v)));
+      const rec={universe_id:curUni,as_of:asOf,filename:fname||"",n_rows:Math.max(0,rows.length-1),rows,bench:{},result:[],uploaded_at:new Date().toISOString()};
+      const out=await req(T_SNAP+"?on_conflict=universe_id,as_of","POST",rec,"resolution=merge-duplicates,return=representation");
+      const id=out&&out[0]?out[0].id:null; BODY={}; CACHE={}; if(id) curSnap=id;
+      await loadAll();
+      toast("Run saved · "+rec.n_rows+" names · "+asOf,"success");
+    }catch(e){ setStatus("Save failed: "+esc(e.message)+" — has rs_universe_setup.sql been run in Supabase?","err"); toast("Save failed","error"); }
   }
   function loadFile(file){
-    const ext=file.name.split(".").pop().toLowerCase();
-    const rd=new FileReader();
-    if(ext==="csv"){
-      rd.onload=e=>{const txt=e.target.result;if(ingestIndex(parseCSV(txt))){cloudSave(txt,file.name);compute();}};
-      rd.readAsText(file);
-    }else{
-      rd.onload=e=>{
-        try{
-          const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"});
-          const ws=wb.Sheets[wb.SheetNames[0]];
-          const m=XLSX.utils.sheet_to_json(ws,{header:1,raw:false});
-          if(ingestIndex(m)){cloudSave(XLSX.utils.sheet_to_csv(ws),file.name.replace(/\.(xlsx|xls)$/i,".csv"));compute();}
-        }catch(err){setStatus("Could not read that workbook: "+err.message,"err");}
-      };
-      rd.readAsArrayBuffer(file);
-    }
+    if(!curUni){ toast("Add or select a universe first","error"); return; }
+    const ext=file.name.split(".").pop().toLowerCase(), rd=new FileReader();
+    const go=matrix=>{ if(!matrix||matrix.length<2){ setStatus("That file has no data rows.","err"); return; }
+      const d=prompt("Date this export represents (YYYY-MM-DD):",dateFromName(file.name)); if(!d) return;
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(d.trim())){ toast("Date must be YYYY-MM-DD","error"); return; }
+      saveSnapshot(matrix,file.name,d.trim()); };
+    if(ext==="csv"){ rd.onload=e=>go(parseCSV(e.target.result)); rd.readAsText(file); }
+    else{ rd.onload=e=>{ try{ const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"}); const ws=wb.Sheets[wb.SheetNames[0]]; go(XLSX.utils.sheet_to_json(ws,{header:1,raw:false}).filter(r=>r.length)); }catch(err){ setStatus("Excel read failed: "+esc(err.message),"err"); } }; rd.readAsArrayBuffer(file); }
   }
-  async function cloudSave(csvText,filename){
-    try{
-      const now=new Date().toISOString();
-      const res=await fetch(SB_URL+"/rest/v1/"+T_INDEX,{
-        method:"POST",headers:{...HDRJ,Prefer:"resolution=merge-duplicates,return=minimal"},
-        body:JSON.stringify({id:1,csv_text:csvText,filename:filename||"",ticker:($("rs2Ticker").value||"").trim(),uploaded_at:now})});
-      if(!res.ok)throw new Error(res.status+" "+(await res.text()));
-      indexAt=new Date(now);
-      setStatus("Index saved to your cloud.","ok");
-      $("rs2CloudState").textContent="Index uploaded "+indexAt.toLocaleString();
-      freshness();
-    }catch(e){setStatus("Cloud save failed: "+e.message,"err");}
+  async function importOld(){
+    if(!curUni) return; const u=uniOf(curUni);
+    try{ setStatus("Reading the old dataset…","");
+      const a=await req(T_OLD+"?id=eq.1&select=csv_text,filename,uploaded_at"); if(!a||!a[0]||!a[0].csv_text){ setStatus("The old rs_dataset is empty.","warn"); return; }
+      const matrix=parseCSV(a[0].csv_text); const asOf=dateFromName(a[0].filename,a[0].uploaded_at);
+      if(!confirm("Import "+(matrix.length-1)+" names from "+(a[0].filename||"rs_dataset")+" as the "+asOf+" run of "+(u?u.name:"this universe")+"?\n\nThe old table is left untouched.")) return;
+      await saveSnapshot(matrix,a[0].filename||"rs_dataset.csv",asOf);
+    }catch(e){ setStatus("Import failed: "+esc(e.message),"err"); }
   }
-  async function cloudLoad(){
-    try{
-      const res=await fetch(SB_URL+"/rest/v1/"+T_INDEX+"?id=eq.1&select=csv_text,filename,ticker,uploaded_at",{headers:HDR});
-      if(!res.ok)throw new Error(res.status+" "+(await res.text()));
-      const arr=await res.json();
-      if(arr.length&&arr[0].csv_text){
-        if(arr[0].ticker)$("rs2Ticker").value=arr[0].ticker;
-        indexAt=arr[0].uploaded_at?new Date(arr[0].uploaded_at):null;
-        $("rs2CloudState").textContent=indexAt?("Index uploaded "+indexAt.toLocaleString()):"";
-        if(ingestIndex(parseCSV(arr[0].csv_text)))setStatus("Loaded index from cloud"+(arr[0].filename?" ("+arr[0].filename+")":"")+".","ok");
-      }else{setStatus("No index file stored yet — drop one above.","warn");}
-    }catch(e){setStatus("Cloud load failed: "+e.message+" — has the rs_index_dataset table been created?","err");}
-    await stockStamp();
-    compute();
+  async function addUni(){
+    const n=prompt("Universe name (e.g. Russell 1000):"); if(!n||!n.trim()) return;
+    const code=(prompt("Short code for exports (e.g. R1000):","")||n).trim().toUpperCase().replace(/[^A-Z0-9]/g,"");
+    const bm=(prompt("Benchmark symbol for Step 2 (QQQ, IWM, SPY…):","QQQ")||"").trim().toUpperCase();
+    try{ const out=await req(T_UNI,"POST",{name:n.trim(),code,benchmark:bm,sort:UNIS.length+1},"return=representation"); curUni=out&&out[0]?out[0].id:null; curSnap=null; await loadAll(); toast("Universe added","success"); }
+    catch(e){ toast("Add failed: "+e.message,"error"); $("rsErr").textContent="Add failed: "+e.message; }
   }
-  async function stockStamp(){
-    try{
-      const res=await fetch(SB_URL+"/rest/v1/"+T_STOCK+"?id=eq.1&select=uploaded_at",{headers:HDR});
-      if(res.ok){const a=await res.json();stockAt=(a.length&&a[0].uploaded_at)?new Date(a[0].uploaded_at):null;}
-    }catch(e){}
-    freshness();
+  async function delUni(id,ev){
+    if(ev) ev.stopPropagation(); const u=uniOf(id), k=runsOf(id).length;
+    if(!confirm("Delete \""+(u?u.name:"")+"\" and its "+k+" saved run(s)? This cannot be undone.")) return;
+    try{ await req(T_UNI+"?id=eq."+id,"DELETE",undefined,"return=minimal"); if(curUni===id){ curUni=null; curSnap=null; } await loadAll(); toast("Deleted","success"); }
+    catch(e){ toast("Delete failed: "+e.message,"error"); }
   }
-  function freshness(){
-    const el=$("rs2Fresh"); if(!el)return;
-    const s=stockAt?stockAt.toLocaleString():"never";
-    const i=indexAt?indexAt.toLocaleString():"never";
-    let html='Step 1 stocks uploaded: <b>'+s+'</b> &nbsp;·&nbsp; Step 2 index uploaded: <b>'+i+'</b>';
-    if(stockAt&&indexAt){
-      const gap=Math.abs(stockAt-indexAt);
-      const hrs=(gap/3600000).toFixed(1);
-      if(gap>MS24){
-        el.className="rs2-fresh warn";
-        const older=stockAt<indexAt?"Step 1 (stocks)":"Step 2 (index)";
-        html+='<br>⚠ These files are <b>'+hrs+' hours</b> apart. Re-upload '+older+' so both describe the same moment.'
-            +' <button class="rs-ghost" id="rs2Ovr" style="margin-left:6px">'+(overrideStale?"Stale override ON":"Use anyway")+'</button>';
-        el.innerHTML=html;
-        const b=$("rs2Ovr"); if(b)b.addEventListener("click",()=>{overrideStale=!overrideStale;freshness();compute();});
-        return;
-      }
-      html+=' &nbsp;·&nbsp; <span style="color:var(--green)">'+hrs+'h apart — in sync</span>';
-    }
-    el.className="rs2-fresh ok"; el.innerHTML=html;
+  async function delSnap(id,ev){
+    if(ev) ev.stopPropagation(); const s=snapOf(id); if(!confirm("Delete the run of "+(s?s.as_of:"")+"?")) return;
+    try{ await req(T_SNAP+"?id=eq."+id,"DELETE",undefined,"return=minimal"); delete BODY[id]; if(curSnap===id) curSnap=null; await loadAll(); toast("Run deleted","success"); }
+    catch(e){ toast("Delete failed: "+e.message,"error"); }
+  }
+  async function setBenchmark(sym){
+    const u=uniOf(curUni); if(!u) return; sym=String(sym||"").trim().toUpperCase(); if(!sym||sym===(u.benchmark||"")) return;
+    u.benchmark=sym;
+    try{ await req(T_UNI+"?id=eq."+u.id,"PATCH",{benchmark:sym},"return=minimal"); }catch(e){ $("rsErr").textContent="Could not store the benchmark symbol: "+e.message; }
+    // the runs of this universe now measure against the new symbol: forget their stored values
+    for(const s of runsOf(u.id).slice(0,2)){ if(s.bench&&s.bench.vals&&slug(String(s.bench.symbol||"").split(":").pop())!==slug(sym)){ s.bench={}; try{ await req(T_SNAP+"?id=eq."+s.id,"PATCH",{bench:{}},"return=minimal"); }catch(e){} } }
+    overrideStale=false; renderUnis(); recompute();
   }
 
-  /* ---------- weights ---------- */
-  function baseW(){const st=window.RS&&window.RS.getState?window.RS.getState():null;return st?st.WEIGHTS:{"1W":10,"1M":20,"3M":30,"6M":25,"1Y":10,"5Y":5};}
-  function normW(w){const sum=TFS.reduce((s,t)=>s+(parseFloat(w[t])||0),0)||1;const o={};TFS.forEach(t=>o[t]=(parseFloat(w[t])||0)/sum*100);return o;}
-  function wFor(step){
-    if(step===2&&$("rs2Override").checked&&W2)return W2;
-    if(step===3&&$("rs3Override").checked&&W3)return W3;
-    return baseW();
+  /* ---------- benchmark file ---------- */
+  function ingestBench(text,filename,uploaded_at){
+    const m=parseCSV(text); if(m.length<2) throw new Error("The benchmark file has no data rows.");
+    const {H,RAW}=toRows(m), MAP=autodetect(H);
+    const rows=RAW.map(r=>{ const sym=String(r[MAP.ticker]||"").trim().toUpperCase(); const vals={}; TFS.forEach(tf=>vals[tf]=MAP[tf]?num(r[MAP[tf]]):null); return {symbol:sym,vals}; }).filter(r=>r.symbol);
+    BENCH={rows,filename:filename||"",as_of:dateFromName(filename,uploaded_at),uploaded_at:uploaded_at||null};
+  }
+  function loadBenchLocal(file){
+    const ext=file.name.split(".").pop().toLowerCase(), rd=new FileReader();
+    const go=async text=>{ try{ ingestBench(text,file.name,new Date().toISOString()); }catch(e){ setStatus2(esc(e.message),"err"); return; } await saveBenchFile(text,file.name); };
+    if(ext==="csv"){ rd.onload=e=>go(e.target.result); rd.readAsText(file); }
+    else{ rd.onload=e=>{ try{ const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"}); go(XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]])); }catch(err){ setStatus2("Could not read that workbook: "+esc(err.message),"err"); } }; rd.readAsArrayBuffer(file); }
+  }
+  async function saveBenchFile(text,filename){
+    const u=uniOf(curUni), now=new Date().toISOString();
+    try{ await req(T_BENCH,"POST",{id:1,csv_text:text,filename:filename||"",ticker:u?(u.benchmark||""):"",uploaded_at:now},"resolution=merge-duplicates,return=minimal");
+      BENCH.uploaded_at=now; $("rs2CloudState").textContent="Benchmark file: "+filename+" · uploaded "+new Date(now).toLocaleString();
+      setStatus2("Benchmark file saved ("+BENCH.rows.map(r=>r.symbol).join(", ")+"). Each universe takes its own symbol from it.","ok");
+    }catch(e){ setStatus2("Cloud save failed: "+esc(e.message)+" (values still used locally)","err"); }
+    // this week's values go to every universe's latest run that is close in date
+    for(const x of UNIS){ const s=runsOf(x.id)[0]; if(!s) continue; const b=benchFor(x,{...s,bench:null},false); if(b&&b.vals) await persistBench(s,b,true); }
+    overrideStale=false; CACHE={}; recompute();
+  }
+
+  /* ---------- rendering: universes & runs ---------- */
+  function renderUnis(){
+    const el=$("rsUnis"), sn=$("rsSnaps"); if(!el) return;
+    if(!UNIS.length){
+      el.innerHTML='<div class="rs-note" style="margin:0">'+(listErr?'Could not load the RS universes ('+esc(listErr)+'). Run <code>rs_universe_setup.sql</code> once in the Supabase SQL editor, then reload.':'No universes yet — click <b>+ Universe</b> (Russell 1000 / QQQ, Russell 2000 / IWM).')+'</div>';
+      sn.innerHTML=""; return;
+    }
+    el.innerHTML=UNIS.map(u=>{ const n=runsOf(u.id).length;
+      return '<div class="rs-uni'+(u.id===curUni?" on":"")+'" onclick="RS.pick('+u.id+')"><span>'+esc(u.name)+'</span><span class="rs-bm" title="Step 2 benchmark">vs '+esc(u.benchmark||"?")+'</span><span class="rs-cnt">'+n+' run'+(n===1?"":"s")+'</span><button class="rs-x" title="Delete this universe and its runs" onclick="RS.delUni('+u.id+',event)">&times;</button></div>'; }).join("");
+    const list=runsOf(curUni);
+    if(!list.length){
+      sn.innerHTML='<span class="rs-note" style="margin:0">No run saved for this universe yet — drop its screener export in Step 1.</span>'
+        +(OLD?'<button class="rs-ghost" id="rsImportOld" style="padding:5px 10px;font-size:12px">Import the old rs_dataset ('+esc(OLD.filename||"single list")+(OLD.uploaded_at?', '+esc(String(OLD.uploaded_at).slice(0,10)):'')+') as the first run</button>':'');
+      const b=$("rsImportOld"); if(b) b.onclick=importOld; return;
+    }
+    sn.innerHTML=list.slice(0,12).map((s,i)=>'<span class="rs-snap'+(s.id===curSnap?" on":"")+'" onclick="RS.open('+s.id+')"><b>'+esc(s.as_of)+'</b>'+(i===0?'<span class="rs-tag g">latest</span>':'')+'<span>'+(s.n_rows||0)+' names</span>'
+      +(s.bench&&s.bench.symbol?'<span class="rs-tag b" title="benchmark stored with this run ('+esc(s.bench.as_of||"")+')">'+esc(s.bench.symbol)+'</span>':'<span class="rs-tag gr" title="no benchmark stored yet">no bench</span>')
+      +'<button class="rs-x" title="Delete this run" onclick="RS.delSnap('+s.id+',event)">&times;</button></span>').join("")+(list.length>12?'<span class="rs-note" style="margin:0">+ '+(list.length-12)+' older</span>':'');
+  }
+  function setStatus(msg,cls){const s=$("rsStatus");if(s){s.innerHTML=msg;s.className="rs-status "+(cls||"");}}
+  function setStatus2(m,c){const e=$("rs2Status");if(e){e.innerHTML=m;e.className="rs-status "+(c||"");}}
+  function renderStatus(){
+    const u=uniOf(curUni), s=snapOf(curSnap);
+    if(!u){ setStatus(listErr?"Universes not loaded — see above.":"Add a universe to begin.",listErr?"err":"warn"); return; }
+    if(!s){ setStatus("<b>"+esc(u.name)+"</b> has no saved run yet. Drop its screener export above"+(OLD?", or import the old dataset":"")+".","warn"); return; }
+    const body=BODY[s.id]; if(body&&body.err){ setStatus("Could not read the run: "+esc(body.err),"err"); return; }
+    setStatus("<b>"+esc(u.name)+"</b> · run of <b>"+dfmt(s.as_of)+"</b> · "+S.MODEL.length+" names scored"+(S.dropped?" · <span style='color:var(--accent)'>"+S.dropped+" dropped below $"+minDV+"M/day</span>":"")+(s.filename?" · "+esc(s.filename):"")+(s.uploaded_at?" · uploaded "+new Date(s.uploaded_at).toLocaleString():""),"ok");
+  }
+  function renderBench(){
+    const u=uniOf(curUni), s=snapOf(curSnap), b=S.bInfo, el=$("rs2Fresh"), vals=$("rs2Vals");
+    $("rs2UniName").textContent=u?u.name:"this universe";
+    if(u&&document.activeElement!==$("rs2Ticker")) $("rs2Ticker").value=u.benchmark||"";
+    if(!b){ vals.innerHTML=""; el.className="rs2-fresh warn"; el.innerHTML=BENCH?"":"No benchmark file yet — drop the Benchmarks export above (QQQ, IWM, SPY in one file)."; if(!BENCH&&!u) el.innerHTML=""; return; }
+    if(b.missing){ vals.innerHTML=""; el.className="rs2-fresh warn"; el.innerHTML="⚠ <b>"+esc(b.missing)+"</b> is not in the benchmark file (it has: "+esc((b.have||[]).join(", ")||"nothing")+"). Add it to the Benchmarks watchlist and export again, or change the symbol above."; return; }
+    if(b.stale){ vals.innerHTML=""; el.className="rs2-fresh warn";
+      el.innerHTML="⚠ The benchmark file is dated <b>"+dfmt(b.as_of)+"</b>, "+b.gap+" days from this run ("+(s?dfmt(s.as_of):"")+"). Upload the Benchmarks export of the same week, or <button class='rs-ghost' id='rs2Ovr' style='margin-left:6px;padding:4px 9px;font-size:12px'>Use anyway</button>";
+      const btn=$("rs2Ovr"); if(btn) btn.onclick=()=>{ overrideStale=true; recompute(); }; return; }
+    const miss=TFS.filter(tf=>b.vals[tf]===null||b.vals[tf]===undefined);
+    vals.innerHTML='<b>'+esc(b.symbol)+'</b> &nbsp; '+TFS.map(tf=>tf+": "+((b.vals[tf]===null||b.vals[tf]===undefined)?"—":b.vals[tf].toFixed(2)+"%")).join(" &nbsp;·&nbsp; ")+(miss.length?'<br><span style="color:#f5a623">Missing: '+miss.join(", ")+' — those timeframes are skipped in Step 2.</span>':'');
+    el.className="rs2-fresh ok";
+    el.innerHTML="Run date <b>"+(s?dfmt(s.as_of):"—")+"</b> &nbsp;·&nbsp; benchmark <b>"+esc(b.symbol)+"</b> "+(b.as_of?"dated <b>"+dfmt(b.as_of)+"</b>":"")+(b.src==="saved"?" (stored with this run)":" (from the benchmark file)")+(b.gap?" &nbsp;·&nbsp; "+b.gap+" day"+(b.gap===1?"":"s")+" apart":"");
+  }
+
+  /* ---------- rendering: weights & mapping ---------- */
+  function renderWeights(){
+    const g=$("rsWeights");g.innerHTML="";
+    TFS.forEach(tf=>{const d=document.createElement("div");d.innerHTML='<label>'+tf+'</label><input type="number" step="1" data-w="'+tf+'" value="'+WEIGHTS[tf]+'">';g.appendChild(d);});
+    g.querySelectorAll("input").forEach(inp=>inp.addEventListener("input",e=>{WEIGHTS[e.target.dataset.w]=e.target.value;updateWsum();recompute();}));
+    updateWsum();
+  }
+  function updateWsum(){
+    const sum=TFS.reduce((s,t)=>s+(parseFloat(WEIGHTS[t])||0),0), active=TFS.filter(t=>(parseFloat(WEIGHTS[t])||0)>0), dropped=TFS.filter(t=>!((parseFloat(WEIGHTS[t])||0)>0));
+    let msg="Active timeframes: "+active.length+" of "+TFS.length+"  ·  Sum: "+sum.toFixed(0); if(dropped.length) msg+="  ·  Excluded (0): "+dropped.join(", ");
+    if(Math.round(sum)!==100) msg+="   ⚠ not 100 — still works (auto-normalised), but set to 100 for a clean 0–100 score";
+    $("rsWsum").textContent=msg;
   }
   function renderWGrid(step){
-    const gid=step===2?"rs2Weights":"rs3Weights", sid=step===2?"rs2Wsum":"rs3Wsum";
-    const cur=step===2?(W2||{...baseW()}):(W3||{...baseW()});
-    if(step===2)W2=cur; else W3=cur;
+    const gid=step===2?"rs2Weights":"rs3Weights"; const cur=step===2?(W2||{...baseW()}):(W3||{...baseW()}); if(step===2) W2=cur; else W3=cur;
     const g=$(gid); g.innerHTML="";
-    TFS.forEach(tf=>{const d=document.createElement("div");
-      d.innerHTML='<label>'+tf+'</label><input type="number" step="1" data-w="'+tf+'" value="'+cur[tf]+'">';g.appendChild(d);});
-    g.querySelectorAll("input").forEach(inp=>inp.addEventListener("input",e=>{cur[e.target.dataset.w]=e.target.value;sumW(step);compute();}));
+    TFS.forEach(tf=>{const d=document.createElement("div"); d.innerHTML='<label>'+tf+'</label><input type="number" step="1" data-w="'+tf+'" value="'+cur[tf]+'">'; g.appendChild(d);});
+    g.querySelectorAll("input").forEach(inp=>inp.addEventListener("input",e=>{cur[e.target.dataset.w]=e.target.value;sumW(step);recompute();}));
     sumW(step);
   }
-  function sumW(step){
-    const cur=step===2?W2:W3, sid=step===2?"rs2Wsum":"rs3Wsum";
-    const s=TFS.reduce((a,t)=>a+(parseFloat(cur[t])||0),0);
-    $(sid).textContent="Sum: "+s+(Math.abs(s-100)<0.001?" ✓":" (auto-normalised)");
+  function sumW(step){ const cur=step===2?W2:W3, sid=step===2?"rs2Wsum":"rs3Wsum"; const s=TFS.reduce((a,t)=>a+(parseFloat(cur[t])||0),0); $(sid).textContent="Sum: "+s+(Math.abs(s-100)<0.001?" ✓":" (auto-normalised)"); }
+  function renderMapping(){
+    const box=$("rsMapping"); if(!S.HEADERS.length){ box.innerHTML='<div class="rs-note">Load a run to map columns.</div>'; return; }
+    const opts=h=>S.HEADERS.map(o=>'<option value="'+esc(o)+'" '+(o===h?"selected":"")+'>'+esc(o.replace(/\s+/g," "))+'</option>').join("");
+    const sel=(k,l)=>'<div><label>'+l+'</label><select data-m="'+k+'"><option value="">—</option>'+opts(S.MAP[k])+'</select></div>';
+    let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+sel("ticker","Ticker")+sel("exchange","Exchange (optional)");
+    TFS.forEach(tf=>html+=sel(tf,tf));
+    html+=sel("price","Price (for the $ floor)")+sel("avol","Average volume (for the $ floor)")+sel("earn","Upcoming earnings date")+sel("industry","Industry")+'</div><div class="rs-note">Detected automatically on every load; a change here lasts until the run is reloaded.</div>';
+    box.innerHTML=html;
+    box.querySelectorAll("select").forEach(x=>x.addEventListener("change",e=>{S.MAP[e.target.dataset.m]=e.target.value;recompute();}));
   }
 
-  /* ---------- compute ---------- */
-  function compute(){ computeCore(); if(window.OR&&OR.onRS) OR.onRS(); }
-  function computeCore(){
-    const st=window.RS&&window.RS.getState?window.RS.getState():null;
-    if(!st||!st.MODEL||!st.MODEL.length){
-      $("rs2Tbody").innerHTML='<tr><td class="rs-empty" colspan="10">Load your stock list in Step 1 first.</td></tr>';
-      $("rs3Tbody").innerHTML='<tr><td class="rs-empty" colspan="10">Load your stock list in Step 1 first.</td></tr>';
-      M2=[];M3=[];return;
-    }
-    if(!IDXROW){
-      $("rs2Tbody").innerHTML='<tr><td class="rs-empty" colspan="10">Drop the index file above to build Step 2.</td></tr>';
-      $("rs3Tbody").innerHTML='<tr><td class="rs-empty" colspan="10">Step 3 needs Step 2 &mdash; drop the index file above.</td></tr>';
-      M2=[];M3=[];return;
-    }
-    if(stockAt&&indexAt&&Math.abs(stockAt-indexAt)>MS24&&!overrideStale){
-      const msg='<tr><td class="rs-empty" colspan="10">Files are more than 24 hours apart — re-upload the older one, or press &ldquo;Use anyway&rdquo; above.</td></tr>';
-      $("rs2Tbody").innerHTML=msg;$("rs3Tbody").innerHTML=msg;M2=[];M3=[];return;
-    }
-    const CAP=st.CAP||2, MAP=st.MAP, RAW=st.RAW;
-    // cross-sectional stdev per TF (the scale; the CENTRE is the index)
-    const sd={};
-    for(const tf of TFS){
-      const col=MAP[tf], vals=[];
-      RAW.forEach(r=>{const v=col?num(r[col]):null;if(v!==null)vals.push(v);});
-      if(vals.length>1){const m=vals.reduce((a,b)=>a+b,0)/vals.length;
-        sd[tf]=Math.sqrt(vals.reduce((a,b)=>a+(b-m)*(b-m),0)/vals.length);}
-      else sd[tf]=0;
-    }
-    // spreads vs the index
-    const spreads={};
-    for(const tf of TFS){
-      spreads[tf]=[];
-      if(IDXVALS[tf]===null)continue;
-      RAW.forEach(r=>{const v=MAP[tf]?num(r[MAP[tf]]):null;if(v!==null)spreads[tf].push(v-IDXVALS[tf]);});
-      spreads[tf].sort((a,b)=>a-b);
-    }
-    const W2n=normW(wFor(2));
-    M2=st.MODEL.map((m,i)=>{
-      const r=RAW[i], cells={}; let totZ=0,totP=0,beatW=0,beatDen=0;
-      for(const tf of TFS){
-        const raw=MAP[tf]?num(r[MAP[tf]]):null, q=IDXVALS[tf];
-        if(raw===null||q===null||sd[tf]<=0){cells[tf]={sp:null,s01:null,p:null};continue;}
-        const sp=raw-q;
-        const z=sp/sd[tf], zc=CAP*Math.tanh(z/CAP), s01=(zc+CAP)/(2*CAP);
-        let below=0,equal=0;const arr=spreads[tf];
-        for(const v of arr){if(v<sp)below++;else if(v===sp)equal++;}
-        const p=arr.length?(below+0.5*equal)/arr.length*100:50;
-        cells[tf]={sp,s01,p};
-        totZ+=W2n[tf]*s01; totP+=W2n[tf]*(p/100);
-        beatW+=W2n[tf]*(sp>0?1:sp<0?0:0.5); beatDen+=W2n[tf];
-      }
-      return {ticker:m.ticker,exportSym:m.exportSym,cells,totZ,totP,beat:beatDen?beatW/beatDen*100:null};
-    });
-    rank(M2,"totZ","rankZ"); rank(M2,"totP","rankP");
-
-    // ---- Step 3 : combine like-for-like, per timeframe ----
-    const W3n=normW(wFor(3));
-    const mode=$("rs3Mode").value, a=(parseFloat($("rs3Blend").value)||50)/100;
-    const cmb=(x,y)=>{
-      if(x===null||y===null)return null;
-      if(mode==="blend")return a*x+(1-a)*y;
-      if(mode==="balanced")return Math.sqrt(Math.max(0,x)*Math.max(0,y));
-      return Math.min(x,y);
-    };
-    M3=st.MODEL.map((m,i)=>{
-      const two=M2[i], cells={}; let totZ=0,totP=0;
-      for(const tf of TFS){
-        const c1=m.cells[tf], c2=two?two.cells[tf]:null;
-        const z1=(c1&&c1.raw!==null)?c1.s01*100:null;
-        const z2=(c2&&c2.s01!==null)?c2.s01*100:null;
-        const p1=(c1&&c1.raw!==null)?c1.p:null;
-        const p2=(c2&&c2.p!==null)?c2.p:null;
-        const zc=cmb(z1,z2), pc=cmb(p1,p2);
-        cells[tf]={z:zc,p:pc};
-        if(zc!==null)totZ+=W3n[tf]*(zc/100);
-        if(pc!==null)totP+=W3n[tf]*(pc/100);
-      }
-      return {ticker:m.ticker,exportSym:m.exportSym,cells,totZ,totP,s1:m.totZ,s2:two?two.totZ:null};
-    });
-    rank(M3,"totZ","rankZ"); rank(M3,"totP","rankP");
-    render2(); render3(); explain();
+  /* ---------- rendering: tables ---------- */
+  function rsHeat(v){const t=Math.max(0,Math.min(100,v))/100;const r=Math.round(240+(61-240)*t),g=Math.round(82+(214-82)*t),b=Math.round(82+(140-82)*t);return "rgba("+r+","+g+","+b+",0.16)";}
+  function heat(v){ if(v===null||v===undefined)return "transparent"; const t=Math.max(0,Math.min(100,v)); if(Math.abs(t-50)<0.05)return "rgba(140,140,150,0.14)";
+    if(t>50){const k=(t-50)/50;return "rgba(61,214,140,"+(0.04+0.24*k).toFixed(3)+")";} const k=(50-t)/50;return "rgba(240,82,82,"+(0.04+0.24*k).toFixed(3)+")"; }
+  const earnTag=m=>m&&m.earnSoon?' <span class="rs-tag o" title="reports in '+m.earnDays+' trading session'+(m.earnDays===1?"":"s")+' ('+esc(m.earn)+')">EARN '+m.earnDays+'d</span>':'';
+  function sortRows(out,st){ const col=st.col, dir=st.dir==="asc"?1:-1;
+    out.sort((x,y)=>{ let A=x[col],B=y[col]; if(col==="ticker") return String(A).localeCompare(String(B))*dir; if(A===null||A===undefined)A=-Infinity; if(B===null||B===undefined)B=-Infinity; return (A-B)*dir; }); return out; }
+  function headRow(th,cols,st,onSort){
+    th.innerHTML="<tr>"+cols.map(c=>{const ar=st.col===c.k?(st.dir==="asc"?"▲":"▼"):"";return '<th data-c="'+c.k+'">'+c.t+'<span class="rs-arr">'+ar+'</span></th>';}).join("")+"</tr>";
+    th.querySelectorAll("th").forEach(x=>x.addEventListener("click",()=>{const c=x.dataset.c; if(st.col===c) st.dir=st.dir==="asc"?"desc":"asc"; else { st.col=c; st.dir=(c==="ticker")?"asc":"desc"; } onSort();}));
   }
-  function rank(M,key,rk){const idx=M.map((r,i)=>i).sort((x,y)=>M[y][key]-M[x][key]);idx.forEach((mi,pos)=>M[mi][rk]=pos+1);}
-
-  /* ---------- render ---------- */
+  function rows1(){
+    const Wn=normW(WEIGHTS);
+    const out=S.MODEL.map(m=>{ const o={ticker:m.ticker,exportSym:m.exportSym,dv:m.dv,m}; if(tab1==="z"){o.total=m.totZ;o.rank=m.rankZ;}else{o.total=m.totP;o.rank=m.rankP;}
+      TFS.forEach(tf=>{ if(!((parseFloat(WEIGHTS[tf])||0)>0)){o[tf]=null;return;} const c=m.cells[tf]; if(tab1==="z") o[tf]=w1?Wn[tf]*c.s01:c.zDisp; else o[tf]=w1?Wn[tf]*(c.p/100):c.p; });
+      return o; });
+    return sortRows(out,sort1);
+  }
+  function render1(){
+    const th=$("rsThead"), tb=$("rsTbody"); if(!th) return;
+    if(!S.MODEL.length){ th.innerHTML=""; tb.innerHTML='<tr><td class="rs-empty" colspan="10">'+(S.RAW.length?"No rows survive the current settings.":"No run loaded.")+'</td></tr>'; return; }
+    const hasDV=S.MODEL.some(m=>m.dv!=null);
+    const cols=[{k:"ticker",t:"Ticker"},...TFS.map(t=>({k:t,t:t})),...(hasDV?[{k:"dv",t:"$M/day"}]:[]),{k:"total",t:"Total"},{k:"rank",t:"Rank"}];
+    headRow(th,cols,sort1,render1);
+    const Wn=normW(WEIGHTS);
+    tb.innerHTML=rows1().map(r=>{ let td='<td class="rs-tk">'+esc(r.ticker)+earnTag(r.m)+'</td>';
+      TFS.forEach(tf=>{ if(r[tf]===null||r[tf]===undefined){td+='<td style="color:var(--text3)">—</td>';return;} const hv=w1?(r[tf]/(Wn[tf]||1))*100:r[tf]; td+='<td style="background:'+rsHeat(hv)+'">'+fmt(r[tf])+'</td>'; });
+      if(hasDV) td+='<td style="color:var(--text3)">'+(r.dv==null?"—":(r.dv/1e6).toFixed(1))+'</td>';
+      td+='<td class="rs-tot" style="background:'+rsHeat(r.total)+'">'+fmt(r.total)+'</td><td class="rs-rk">'+r.rank+'</td>'; return "<tr>"+td+"</tr>"; }).join("");
+    $("rsTopn").max=S.MODEL.length;
+  }
   function rows2(){
-    const Wn=normW(wFor(2));
-    const out=M2.map(m=>{
-      const o={ticker:m.ticker,exportSym:m.exportSym,beat:m.beat};
-      if(tab2==="z"){o.total=m.totZ;o.rank=m.rankZ;}else{o.total=m.totP;o.rank=m.rankP;}
-      TFS.forEach(tf=>{
-        const off=!((parseFloat(wFor(2)[tf])||0)>0), c=m.cells[tf];
-        if(off||!c||c.s01===null){o[tf]=null;return;}
-        if(tab2==="z")o[tf]=w2?Wn[tf]*c.s01:c.s01*100;
-        else o[tf]=w2?Wn[tf]*(c.p/100):c.p;
-      });
-      return o;
-    });
-    const col=sort2.col,dir=sort2.dir==="asc"?1:-1;
-    out.sort((x,y)=>{let A=x[col],B=y[col];if(col==="ticker")return A.localeCompare(B)*dir;
-      if(A===null||A===undefined)A=-Infinity;if(B===null||B===undefined)B=-Infinity;return (A-B)*dir;});
-    return out;
+    const W=wFor(2), Wn=normW(W);
+    const out=S.M2.map(m=>{ const o={ticker:m.ticker,exportSym:m.exportSym,beat:m.beat,m}; if(tab2==="z"){o.total=m.totZ;o.rank=m.rankZ;}else{o.total=m.totP;o.rank=m.rankP;}
+      TFS.forEach(tf=>{ const off=!((parseFloat(W[tf])||0)>0), c=m.cells[tf]; if(off||!c||c.s01===null){o[tf]=null;return;} if(tab2==="z") o[tf]=w2?Wn[tf]*c.s01:c.s01*100; else o[tf]=w2?Wn[tf]*(c.p/100):c.p; });
+      return o; });
+    return sortRows(out,sort2);
   }
   function render2(){
-    const th=$("rs2Thead"),tb=$("rs2Tbody");
-    if(!M2.length){tb.innerHTML='<tr><td class="rs-empty" colspan="10">No data yet.</td></tr>';th.innerHTML="";return;}
-    IDXNAME=($("rs2Ticker").value||"IDX").trim().toUpperCase();
-    const cols=[{k:"ticker",t:"Ticker"},...TFS.map(t=>({k:t,t:t})),{k:"beat",t:"Beat "+IDXNAME},{k:"total",t:"Total"},{k:"rank",t:"Rank"}];
-    th.innerHTML="<tr>"+cols.map(c=>{const ar=sort2.col===c.k?(sort2.dir==="asc"?"▲":"▼"):"";return '<th data-c="'+c.k+'">'+c.t+'<span class="rs-arr">'+ar+'</span></th>';}).join("")+"</tr>";
-    th.querySelectorAll("th").forEach(x=>x.addEventListener("click",()=>{const c=x.dataset.c;
-      if(sort2.col===c)sort2.dir=sort2.dir==="asc"?"desc":"asc";else{sort2.col=c;sort2.dir=(c==="ticker")?"asc":"desc";}render2();}));
+    const th=$("rs2Thead"), tb=$("rs2Tbody"); if(!th) return;
+    if(!S.M2.length){ th.innerHTML=""; tb.innerHTML='<tr><td class="rs-empty" colspan="10">'+(S.MODEL.length?(S.bInfo&&S.bInfo.stale?"Benchmark file is from another week — press “Use anyway” above, or upload this week's file.":"Drop the Benchmarks file above to build Step 2."):"Load a run in Step 1 first.")+'</td></tr>'; return; }
+    const name=S.IDX?S.IDX.symbol:"IDX";
+    const cols=[{k:"ticker",t:"Ticker"},...TFS.map(t=>({k:t,t:t})),{k:"beat",t:"Beat "+esc(name)},{k:"total",t:"Total"},{k:"rank",t:"Rank"}];
+    headRow(th,cols,sort2,render2);
     const Wn=normW(wFor(2));
-    tb.innerHTML=rows2().map(r=>{
-      let td='<td class="rs-tk">'+r.ticker+'</td>';
-      TFS.forEach(tf=>{
-        if(r[tf]===null||r[tf]===undefined){td+='<td style="color:var(--text3)">—</td>';return;}
-        const hv=w2?(r[tf]/(Wn[tf]||1))*100:r[tf];
-        td+='<td style="background:'+heat(hv)+'">'+fmt(r[tf])+'</td>';
-      });
+    tb.innerHTML=rows2().map(r=>{ let td='<td class="rs-tk">'+esc(r.ticker)+earnTag(r.m)+'</td>';
+      TFS.forEach(tf=>{ if(r[tf]===null||r[tf]===undefined){td+='<td style="color:var(--text3)">—</td>';return;} const hv=w2?(r[tf]/(Wn[tf]||1))*100:r[tf]; td+='<td style="background:'+heat(hv)+'">'+fmt(r[tf])+'</td>'; });
       td+=(r.beat===null||r.beat===undefined)?'<td style="color:var(--text3)">—</td>':'<td style="background:'+heat(r.beat)+'">'+fmt(r.beat)+'%</td>';
-      td+='<td class="rs-tot" style="background:'+heat(r.total)+'">'+fmt(r.total)+'</td>';
-      td+='<td class="rs-rk">'+r.rank+'</td>';
-      return "<tr>"+td+"</tr>";
-    }).join("");
-    $("rs2Topn").max=M2.length;
+      td+='<td class="rs-tot" style="background:'+heat(r.total)+'">'+fmt(r.total)+'</td><td class="rs-rk">'+r.rank+'</td>'; return "<tr>"+td+"</tr>"; }).join("");
+    $("rs2Topn").max=S.M2.length;
   }
   function rows3(){
-    const Wn=normW(wFor(3));
-    const out=M3.map(m=>{
-      const o={ticker:m.ticker,exportSym:m.exportSym};
-      if(tab3==="z"){o.total=m.totZ;o.rank=m.rankZ;}else{o.total=m.totP;o.rank=m.rankP;}
-      TFS.forEach(tf=>{
-        const off=!((parseFloat(wFor(3)[tf])||0)>0), c=m.cells[tf];
-        const v=tab3==="z"?(c?c.z:null):(c?c.p:null);
-        if(off||v===null||v===undefined){o[tf]=null;return;}
-        o[tf]=w3?Wn[tf]*(v/100):v;
-      });
-      return o;
-    });
-    const col=sort3.col,dir=sort3.dir==="asc"?1:-1;
-    out.sort((x,y)=>{let A=x[col],B=y[col];if(col==="ticker")return A.localeCompare(B)*dir;
-      if(A===null||A===undefined)A=-Infinity;if(B===null||B===undefined)B=-Infinity;return (A-B)*dir;});
-    return out;
+    const W=wFor(3), Wn=normW(W);
+    const out=S.M3.map(m=>{ const o={ticker:m.ticker,exportSym:m.exportSym,m}; if(tab3==="z"){o.total=m.totZ;o.rank=m.rankZ;}else{o.total=m.totP;o.rank=m.rankP;}
+      const pr=S.prevRank[m.ticker]; o.dprev=pr?((tab3==="z"?pr.z:pr.p)-o.rank):null; o.isNew=Object.keys(S.prevRank).length&&!pr;
+      TFS.forEach(tf=>{ const off=!((parseFloat(W[tf])||0)>0), c=m.cells[tf]; const v=tab3==="z"?(c?c.z:null):(c?c.p:null); if(off||v===null||v===undefined){o[tf]=null;return;} o[tf]=w3?Wn[tf]*(v/100):v; });
+      return o; });
+    return sortRows(out,sort3);
   }
   function render3(){
-    const th=$("rs3Thead"),tb=$("rs3Tbody");
-    if(!M3.length){tb.innerHTML='<tr><td class="rs-empty" colspan="10">No data yet.</td></tr>';th.innerHTML="";return;}
-    const cols=[{k:"ticker",t:"Ticker"},...TFS.map(t=>({k:t,t:t})),{k:"total",t:"Total"},{k:"rank",t:"Rank"}];
-    th.innerHTML="<tr>"+cols.map(c=>{const ar=sort3.col===c.k?(sort3.dir==="asc"?"▲":"▼"):"";return '<th data-c="'+c.k+'">'+c.t+'<span class="rs-arr">'+ar+'</span></th>';}).join("")+"</tr>";
-    th.querySelectorAll("th").forEach(x=>x.addEventListener("click",()=>{const c=x.dataset.c;
-      if(sort3.col===c)sort3.dir=sort3.dir==="asc"?"desc":"asc";else{sort3.col=c;sort3.dir=(c==="ticker")?"asc":"desc";}render3();}));
+    const th=$("rs3Thead"), tb=$("rs3Tbody"); if(!th) return;
+    if(!S.M3.length){ th.innerHTML=""; tb.innerHTML='<tr><td class="rs-empty" colspan="10">'+(S.MODEL.length?"Step 3 needs Step 2 — the benchmark is not loaded for this run.":"Load a run in Step 1 first.")+'</td></tr>'; return; }
+    const hasPrev=Object.keys(S.prevRank).length>0;
+    const cols=[{k:"ticker",t:"Ticker"},...TFS.map(t=>({k:t,t:t})),{k:"total",t:"Total"},{k:"rank",t:"Rank"},...(hasPrev?[{k:"dprev",t:"Δ prev"}]:[])];
+    headRow(th,cols,sort3,render3);
     const Wn=normW(wFor(3));
-    tb.innerHTML=rows3().map(r=>{
-      let td='<td class="rs-tk">'+r.ticker+'</td>';
-      TFS.forEach(tf=>{
-        if(r[tf]===null||r[tf]===undefined){td+='<td style="color:var(--text3)">—</td>';return;}
-        const hv=w3?(r[tf]/(Wn[tf]||1))*100:r[tf];
-        td+='<td style="background:'+heat(hv)+'">'+fmt(r[tf])+'</td>';
-      });
-      td+='<td class="rs-tot" style="background:'+heat(r.total)+'">'+fmt(r.total)+'</td>';
-      td+='<td class="rs-rk">'+r.rank+'</td>';
-      return "<tr>"+td+"</tr>";
-    }).join("");
-    $("rs3Topn").max=M3.length;
+    tb.innerHTML=rows3().map(r=>{ let td='<td class="rs-tk">'+esc(r.ticker)+earnTag(r.m)+'</td>';
+      TFS.forEach(tf=>{ if(r[tf]===null||r[tf]===undefined){td+='<td style="color:var(--text3)">—</td>';return;} const hv=w3?(r[tf]/(Wn[tf]||1))*100:r[tf]; td+='<td style="background:'+heat(hv)+'">'+fmt(r[tf])+'</td>'; });
+      td+='<td class="rs-tot" style="background:'+heat(r.total)+'">'+fmt(r.total)+'</td><td class="rs-rk">'+r.rank+'</td>';
+      if(hasPrev) td+='<td>'+(r.isNew?'<span class="rs-tag b">NEW</span>':r.dprev===null?'<span style="color:var(--text3)">—</span>':r.dprev===0?'<span style="color:var(--text3)">0</span>':'<span style="color:'+(r.dprev>0?"var(--green)":"var(--red)")+';font-weight:600">'+(r.dprev>0?"▲":"▼")+Math.abs(r.dprev)+'</span>')+'</td>';
+      return "<tr>"+td+"</tr>"; }).join("");
+    $("rs3Topn").max=S.M3.length;
   }
   function explain(){
     const mode=$("rs3Mode").value, a=Math.round(parseFloat($("rs3Blend").value)||50);
@@ -3835,62 +3803,92 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     }
     $("rs3Explain").innerHTML=h;
   }
+
+  /* ---------- exports ---------- */
+  function dl(txt,fname){ const b=new Blob([txt],{type:"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download=fname; a.click(); }
   function exportTxt(step){
-    const M=step===2?M2:M3, rows=step===2?rows2():rows3();
-    const noteId=step===2?"rs2ExportNote":"rs3ExportNote", topId=step===2?"rs2Topn":"rs3Topn";
-    if(!M.length){$(noteId).textContent="Nothing to export yet.";return;}
+    const M=step===1?S.MODEL:step===2?S.M2:S.M3, rows=step===1?rows1():step===2?rows2():rows3();
+    const noteId="rs"+(step===1?"":step)+"ExportNote", topId="rs"+(step===1?"":step)+"Topn";
+    if(!M.length){ $(noteId).textContent="Nothing to export yet."; return; }
     let n=parseInt($(topId).value)||0; n=Math.max(1,Math.min(n,M.length));
-    const syms=rows.slice(0,n).map(r=>r.exportSym).filter(Boolean);
-    const blob=new Blob([syms.join(",")],{type:"text/plain"});
-    const a=document.createElement("a");a.href=URL.createObjectURL(blob);
-    a.download="tv_step"+step+"_top"+n+".txt";a.click();
-    const t=step===2?(tab2==="z"?"Z-Score vs Index":"Percentile"):(tab3==="z"?"Z-Score combined":"Percentile combined");
-    const st=step===2?sort2:sort3;
-    $(noteId).textContent="Exported top "+n+" from the "+t+" tab in current sort order ("+st.col+" "+st.dir+"). Import via TradingView → watchlist name → Upload list.";
+    const skipEarn=step===3&&$("rs3SkipEarn").checked;
+    const picked=[], skipped=[]; for(const r of rows){ if(picked.length>=n) break; if(skipEarn&&r.m&&r.m.earnSoon){ skipped.push(r.ticker); continue; } picked.push(r); }
+    const u=uniOf(curUni), s=snapOf(curSnap), code=codeOf(u), date=s?s.as_of:todayISO();
+    const syms=picked.map(r=>r.exportSym).filter(Boolean);
+    dl("###RS_"+code+"_STEP"+step+"_TOP"+n+"\n"+syms.join(",")+"\n","rs_step"+step+"_"+code.toLowerCase()+"_"+date+"_top"+n+".txt");
+    const tabName=step===1?(tab1==="z"?"Z-Score":"Percentile"):step===2?(tab2==="z"?"Z-Score vs Index":"Percentile"):(tab3==="z"?"Z-Score combined":"Percentile combined");
+    const st=step===1?sort1:step===2?sort2:sort3;
+    $(noteId).textContent="Exported "+syms.length+" from the "+tabName+" tab in current sort order ("+st.col+" "+st.dir+")"+(skipped.length?" · skipped "+skipped.length+" reporting soon: "+skipped.join(", "):"")+". Import via TradingView → watchlist name → Upload list.";
   }
 
-  /* ---------- init ---------- */
+  /* ---------- read by the Orange cockpit and the Momentum tab ---------- */
+  function getStep3(){
+    readSettings();
+    const rows=[], byUni={}, left=[]; let reason="";
+    UNIS.forEach(u=>{
+      const list=runsOf(u.id); if(!list.length) return;
+      const cur=(list[0].id===curSnap&&S.RAW.length)?{M3:S.M3,bInfo:S.bInfo}:computeFor(u.id,list[0].id,false);
+      if(!cur||!cur.M3.length){ if(!reason) reason=(cur&&cur.bInfo&&cur.bInfo.stale)?"benchmark file is from another week for "+u.name:(cur&&!cur.bInfo)?"no benchmark file for "+u.name:(cur&&cur.bInfo&&cur.bInfo.missing)?"benchmark "+cur.bInfo.missing+" missing from the file":"run not loaded for "+u.name; return; }
+      const prev=list[1]?computeFor(u.id,list[1].id,false):null, pm={}; if(prev&&prev.M3.length) prev.M3.forEach(m=>pm[m.ticker]=m);
+      const code=codeOf(u), n=cur.M3.length;
+      byUni[code]={id:u.id,name:u.name,benchmark:u.benchmark,as_of:list[0].as_of,n,prev_as_of:(prev&&prev.M3.length)?list[1].as_of:null};
+      cur.M3.forEach(m=>{ const p=pm[m.ticker]; rows.push({ticker:m.ticker,exportSym:m.exportSym,totZ:m.totZ,totP:m.totP,rankZ:m.rankZ,rankP:m.rankP,n,uniCode:code,uniName:u.name,as_of:list[0].as_of,
+        prevRank:p?(tab3==="p"?p.rankP:p.rankZ):null,isNew:(prev&&prev.M3.length)?!p:false,earnDays:m.earnDays,earnSoon:m.earnSoon}); });
+      if(prev&&prev.M3.length){ const now=new Set(cur.M3.map(m=>m.ticker)); prev.M3.forEach(m=>{ if(!now.has(m.ticker)) left.push({ticker:m.ticker,uniCode:code,rank:tab3==="p"?m.rankP:m.rankZ,n:prev.M3.length}); }); }
+    });
+    if(!rows.length&&!reason) reason=listErr?"RS universes not set up (run rs_universe_setup.sql)":UNIS.length?"no RS run saved yet":"no RS universe yet";
+    return {rows,tab:tab3,byUni,left,reason};
+  }
+  function universeResult(codeOrName){
+    const k=slug(codeOrName); if(!k) return null;
+    const u=UNIS.find(x=>slug(x.code)===k)||UNIS.find(x=>slug(x.name)===k); if(!u) return null;
+    const list=runsOf(u.id); if(!list.length) return {code:u.code,name:u.name,as_of:null,n:0,rows:{},reason:"no run saved"};
+    readSettings(); const c=(list[0].id===curSnap&&S.RAW.length)?{M3:S.M3}:computeFor(u.id,list[0].id,false);
+    if(!c||!c.M3.length) return {code:u.code,name:u.name,as_of:list[0].as_of,n:0,rows:{},reason:"benchmark not loaded"};
+    const rows={}; c.M3.forEach(m=>{ rows[slug(m.ticker.split(":").pop())]={total:tab3==="p"?m.totP:m.totZ,rank:tab3==="p"?m.rankP:m.rankZ,z:m.totZ,p:m.totP}; });
+    return {code:u.code,name:u.name,as_of:list[0].as_of,n:c.M3.length,rows,tab:tab3};
+  }
+
+  /* ---------- init (lazy, on first tab open) ---------- */
   function init(){
-    if(inited)return; inited=true;
-    const drop=$("rs2Drop"),file=$("rs2File");
-    drop.addEventListener("click",()=>file.click());
-    file.addEventListener("change",e=>{if(e.target.files[0])loadFile(e.target.files[0]);});
-    ["dragover","dragenter"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over");}));
-    drop.addEventListener("dragleave",e=>{e.preventDefault();drop.classList.remove("over");});
-    drop.addEventListener("drop",e=>{e.preventDefault();drop.classList.remove("over");if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0]);});
-    $("rs2Reload").addEventListener("click",()=>{setStatus("Reloading index from cloud…","");cloudLoad();});
-    $("rs2Ticker").addEventListener("input",()=>{render2();});
-    document.querySelectorAll("[data-rs2tab]").forEach(t=>t.addEventListener("click",()=>{
-      document.querySelectorAll("[data-rs2tab]").forEach(x=>x.classList.remove("active"));t.classList.add("active");
-      tab2=t.dataset.rs2tab;render2();}));
-    document.querySelectorAll("[data-rs3tab]").forEach(t=>t.addEventListener("click",()=>{
-      document.querySelectorAll("[data-rs3tab]").forEach(x=>x.classList.remove("active"));t.classList.add("active");
-      tab3=t.dataset.rs3tab;render3();}));
-    $("rs2ModeTog").addEventListener("click",()=>{w2=!w2;$("rs2ModeTog").classList.toggle("on",w2);$("rs2ModeLbl").textContent=w2?"Weighted":"Unweighted";render2();});
-    $("rs3ModeTog").addEventListener("click",()=>{w3=!w3;$("rs3ModeTog").classList.toggle("on",w3);$("rs3ModeLbl").textContent=w3?"Weighted":"Unweighted";render3();});
-    $("rs2ExportBtn").addEventListener("click",()=>exportTxt(2));
-    $("rs3ExportBtn").addEventListener("click",()=>exportTxt(3));
-    $("rs2Override").addEventListener("change",e=>{$("rs2WWrap").style.display=e.target.checked?"block":"none";if(e.target.checked){W2={...baseW()};renderWGrid(2);}compute();});
-    $("rs3Override").addEventListener("change",e=>{$("rs3WWrap").style.display=e.target.checked?"block":"none";if(e.target.checked){W3={...baseW()};renderWGrid(3);}compute();});
-    $("rs2ResetW").addEventListener("click",()=>{W2={...baseW()};renderWGrid(2);compute();});
-    $("rs3ResetW").addEventListener("click",()=>{W3={...baseW()};renderWGrid(3);compute();});
-    $("rs3Mode").addEventListener("change",()=>{explain();compute();});
-    $("rs3Blend").addEventListener("input",()=>{explain();compute();});
-    if(window.RS)window.RS.onChange=()=>{stockStamp().then(()=>compute());};   // re-read the Step 1 upload time whenever Step 1 changes
+    if(inited) return; inited=true;
+    renderWeights();
+    const bind=(drop,file,handler)=>{ drop.addEventListener("click",()=>file.click()); file.addEventListener("change",e=>{if(e.target.files[0])handler(e.target.files[0]); e.target.value="";});
+      ["dragover","dragenter"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add("over");}));
+      ["dragleave","drop"].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove("over");}));
+      drop.addEventListener("drop",e=>{if(e.dataTransfer.files[0])handler(e.dataTransfer.files[0]);}); };
+    bind($("rsDrop"),$("rsFile"),loadFile); bind($("rs2Drop"),$("rs2File"),loadBenchLocal);
+    document.querySelectorAll("[data-rstab]").forEach(t=>t.addEventListener("click",()=>{document.querySelectorAll("[data-rstab]").forEach(x=>x.classList.remove("active"));t.classList.add("active");tab1=t.dataset.rstab;sort1={col:"total",dir:"desc"};render1();}));
+    document.querySelectorAll("[data-rs2tab]").forEach(t=>t.addEventListener("click",()=>{document.querySelectorAll("[data-rs2tab]").forEach(x=>x.classList.remove("active"));t.classList.add("active");tab2=t.dataset.rs2tab;sort2={col:"total",dir:"desc"};render2();}));
+    document.querySelectorAll("[data-rs3tab]").forEach(t=>t.addEventListener("click",()=>{document.querySelectorAll("[data-rs3tab]").forEach(x=>x.classList.remove("active"));t.classList.add("active");tab3=t.dataset.rs3tab;sort3={col:"total",dir:"desc"};render3();scheduleResultSave();if(window.OR&&OR.onRS)OR.onRS();if(window.MO&&MO.onRS)MO.onRS();}));
+    $("rsModeTog").addEventListener("click",function(){w1=!w1;this.classList.toggle("on",w1);$("rsModeLbl").textContent=w1?"Weighted":"Unweighted";render1();});
+    $("rs2ModeTog").addEventListener("click",function(){w2=!w2;this.classList.toggle("on",w2);$("rs2ModeLbl").textContent=w2?"Weighted":"Unweighted";render2();});
+    $("rs3ModeTog").addEventListener("click",function(){w3=!w3;this.classList.toggle("on",w3);$("rs3ModeLbl").textContent=w3?"Weighted":"Unweighted";render3();});
+    $("rsResetW").addEventListener("click",()=>{WEIGHTS={...DEFAULT_WEIGHTS};renderWeights();recompute();});
+    $("rsRecalc").addEventListener("click",()=>recompute());
+    $("rsCap").addEventListener("change",()=>recompute());
+    $("rsMinDV").addEventListener("change",()=>recompute());
+    $("rsExportBtn").addEventListener("click",()=>exportTxt(1)); $("rs2ExportBtn").addEventListener("click",()=>exportTxt(2)); $("rs3ExportBtn").addEventListener("click",()=>exportTxt(3));
+    $("rsReload").addEventListener("click",()=>{BODY={};CACHE={};loadAll();});
+    $("rs2Reload").addEventListener("click",async()=>{setStatus2("Reloading benchmark file…","");await loadBenchFile();overrideStale=false;recompute();});
+    $("rs2Ticker").addEventListener("change",e=>setBenchmark(e.target.value));
+    $("rs2Ticker").addEventListener("keydown",e=>{ if(e.key==="Enter") e.target.blur(); });
+    $("rs2Override").addEventListener("change",e=>{$("rs2WWrap").style.display=e.target.checked?"block":"none";if(e.target.checked){W2={...baseW()};renderWGrid(2);}recompute();});
+    $("rs3Override").addEventListener("change",e=>{$("rs3WWrap").style.display=e.target.checked?"block":"none";if(e.target.checked){W3={...baseW()};renderWGrid(3);}recompute();});
+    $("rs2ResetW").addEventListener("click",()=>{W2={...baseW()};renderWGrid(2);recompute();});
+    $("rs3ResetW").addEventListener("click",()=>{W3={...baseW()};renderWGrid(3);recompute();});
+    $("rs3Mode").addEventListener("change",()=>{explain();recompute();});
+    $("rs3Blend").addEventListener("input",()=>{explain();recompute();});
+    $("rsAddUni").addEventListener("click",addUni);
     explain();
-    cloudLoad();
+    loadAll();
   }
-  function getStep3(){            // read by the RS x Momentum intersect on the Momentum tab
-    let reason="";
-    const st=window.RS&&window.RS.getState?window.RS.getState():null;
-    if(!st||!st.MODEL||!st.MODEL.length) reason="Step 1 stock list not loaded";
-    else if(!IDXROW) reason="Step 2 index file not loaded";
-    else if(stockAt&&indexAt&&Math.abs(stockAt-indexAt)>MS24&&!overrideStale) reason="Step 1 and Step 2 files are more than 24 hours apart";
-    return { rows:M3.map(m=>({ticker:m.ticker,exportSym:m.exportSym,totZ:m.totZ,totP:m.totP,rankZ:m.rankZ,rankP:m.rankP})), tab:tab3, stockAt, indexAt, reason };
-  }
-  window.RS2={ensureInit:init,getStep3};
-})();
 
+  /* public surface — same names the other tabs already use, plus the universe calls */
+  window.RS={ ensureInit:init, getState:()=>({RAW:S.RAW,MAP:S.MAP,MODEL:S.MODEL,WEIGHTS,CAP,TFS,activeTab:tab1,weighted:w1,universe:curUni,run:curSnap}), onChange:null,
+    pick, open:id=>selectSnap(id), delUni, delSnap };
+  window.RS2={ ensureInit:init, getStep3, universeResult, universes:()=>UNIS.map(u=>({id:u.id,name:u.name,code:u.code,benchmark:u.benchmark,runs:runsOf(u.id).length,latest:(runsOf(u.id)[0]||{}).as_of||null})) };
+})();
 </script>
 <script>
 /* ═════════════ ETF FLOW (EF) — sectors · snapshots · flow maths ═════════════ */
@@ -4945,7 +4943,21 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 
   let UNIS=[], SNAPS=[], curUni=null, inited=false, stampMissing=false;
   let use3M=false, volSmooth=true, sortBy={c:"rank",d:"asc"}, topN=30, minTurn=0, minF=0;
+  let rankMode="stdv", rsOnly=false, rsMin=50, indCap=5;          // ranking mode · RS-survivor filter · industry cap for the export
   const passF=r=>minF===0||(r.fscore||0)>=minF;
+  const passRS=r=>!rsOnly||!!(r.rs&&r.rs.total>=rsMin);
+  const EARN_WIN=5;
+  const todayISO=()=>{ const d=new Date(), p=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); };
+  function bizDays(a,b){          // weekdays strictly after a, up to and including b (negative when b is earlier)
+    const x=new Date(String(a).slice(0,10)+"T00:00:00"), y=new Date(String(b).slice(0,10)+"T00:00:00"); if(isNaN(x)||isNaN(y)) return null;
+    const sign=y>=x?1:-1; let n=0, guard=0;
+    while(((sign>0&&x<y)||(sign<0&&x>y))&&guard++<800){ x.setDate(x.getDate()+sign); const w=x.getDay(); if(w!==0&&w!==6) n+=sign; }
+    return n;
+  }
+  function rsFor(uid){            // this universe's latest RS Score run (matched by code, then by name)
+    const u=UNIS.find(x=>x.id===uid); if(!u||!window.RS2||!RS2.universeResult) return null;
+    try{ return RS2.universeResult(u.code||u.name)||RS2.universeResult(u.name)||null; }catch(e){ return null; }
+  }
   let MODEL={rows:[],churn:null,secTop:[],prev:null};
 
   const $=id=>document.getElementById(id);
@@ -5012,7 +5024,10 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     ["fcfcur",[/free cash flow.*currency/i]],
     ["mcapcur",[/market\s*cap.*currency/i]],
     ["nd",   [/net debt(?!.*currency)/i]],
-    ["ebit", [/^ebitda(?!.*currency)/i,/\bebitda\b(?!.*currency)/i]]
+    ["ebit", [/^ebitda(?!.*currency)/i,/\bebitda\b(?!.*currency)/i]],
+    ["earn", [/upcoming earnings/i,/next earnings/i]],
+    ["e20",  [/exponential moving average[\s,(]*20\b/i]],
+    ["atr",  [/average true range(?!\s*%)/i]]
   ];
   function mapHeaders(heads){
     const m={},used=new Set();
@@ -5024,7 +5039,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     });
     return m;
   }
-  const TEXTF=new Set(["t","n","ex","sec","ind","fcfcur","mcapcur"]);
+  const TEXTF=new Set(["t","n","ex","sec","ind","fcfcur","mcapcur","earn"]);
   function ingest(matrix){
     const heads=matrix[0].map(h=>String(h).trim());
     const m=mapHeaders(heads);
@@ -5040,6 +5055,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       for(const k in m){
         const v=raw[m[k]];
         o[k]=TEXTF.has(k)?String(v==null?"":v).trim():num(v);
+        if(k==="earn") o[k]=/^\d{4}-\d{2}-\d{2}/.test(o[k])?o[k].slice(0,10):"";
       }
       if(!o.t)continue;
       o.t=o.t.toUpperCase();
@@ -5099,7 +5115,13 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     const z6=zmaker(rows.map(r=>r._ra6)), z12=zmaker(rows.map(r=>r._ra12)), z3=zmaker(rows.map(r=>r._ra3));
     // winsorize at +/-3 sd, the standard index-provider treatment
     const CLIP=3, clip=z=>z===null||z===undefined?null:Math.max(-CLIP,Math.min(CLIP,z));
-    rows.forEach(r=>{
+    if(opts.mode==="m121"||opts.mode==="m61"){
+      // plain price momentum that skips the latest month (the classic 12-1 / 6-1), z-scored across the universe:
+      //   12-1 = (1 + 1Y return) ÷ (1 + 1M return) − 1        6-1 = (1 + 6M return) ÷ (1 + 1M return) − 1
+      rows.forEach(r=>{ const a=opts.mode==="m121"?r.p1y:r.p6m; r._mom=(a!=null&&r.p1m!=null&&r.p1m>-100)?((1+a/100)/(1+r.p1m/100)-1)*100:null; });
+      const zm=zmaker(rows.map(r=>r._mom));
+      rows.forEach(r=>{ r._z6=null; r._z12=null; r._z3=null; r.score=clip(zm(r._mom)); });
+    } else rows.forEach(r=>{
       const a=clip(z6(r._ra6)), b=clip(z12(r._ra12)), c=opts.use3M?clip(z3(r._ra3)):null;
       r._z6=a; r._z12=b; r._z3=c;
       if(a===null||b===null){ r.score=null; return; }
@@ -5108,8 +5130,14 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     rows.filter(r=>r.score!==null).sort((x,y)=>y.score-x.score).forEach((r,i)=>r.rank=i+1);
     return rows;
   }
-  function enrich(r){   // turnover flag, bank test and the seven lights — used by build() and by rankFor()
+  function enrich(r,rsu){   // turnover, stretch, earnings window, RS link, bank test and the seven lights — used by build() and by rankFor()
     r.turn = (r.px!=null&&r.avol!=null)?r.px*r.avol:null;
+    r.stretch = (r.px!=null&&r.e20!=null&&r.atr!=null&&r.atr>0)?(r.px-r.e20)/r.atr:null;     // price → 20 EMA in ATR(14)
+    r.bucket = r.stretch==null?null:r.stretch>2?"WAIT":r.stretch>1?"NEAR":r.stretch>=-1?"READY":"BELOW";
+    r.earnD = r.earn?bizDays(todayISO(),r.earn):null;
+    r.earnSoon = r.earnD!=null&&r.earnD>=0&&r.earnD<=EARN_WIN;
+    r.rs = (rsu&&rsu.rows)?(rsu.rows[String(r.t).toUpperCase().replace(/[^A-Z0-9]/g,"")]||null):null;
+    r.rsT = r.rs?r.rs.total:null;
     r.thin = (minTurn>0&&r.turn!=null)?r.turn<minTurn*1e6:false;
     r.ndeb = (r.nd!=null&&r.ebit!=null&&r.ebit>0)?r.nd/r.ebit:null;
     const bank=/financ|bank/i.test(r.sec||"");
@@ -5147,7 +5175,8 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     const list=snapsFor(uid);
     if(!list.length){render();return;}
     const idx=list.length-1;
-    const opts={use3M,smooth:volSmooth};
+    const opts={use3M,smooth:volSmooth,mode:rankMode};
+    const rsu=rsFor(uid); MODEL.rsu=rsu;
     const cur=rankSnapshot(list,idx,opts);
     const back=k=>(idx-k>=0)?rankSnapshot(list,idx-k,opts):null;
     const p1=back(1), p3=back(3), p6=back(6);
@@ -5158,7 +5187,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       r.d3 = (r.rank&&R3[r.t])?R3[r.t]-r.rank:null;
       r.d6 = (r.rank&&R6[r.t])?R6[r.t]-r.rank:null;
       r.isNew = p1 ? !(r.t in R1) : false;
-      enrich(r);
+      enrich(r,rsu);
     });
     // dropped names (were ranked last time, absent now)
     const nowSet=new Set(cur.map(r=>r.t));
@@ -5173,7 +5202,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     const bys={}; topRows.forEach(r=>{const s=r.sec||"—";bys[s]=(bys[s]||0)+1;});
     MODEL.secTop=Object.entries(bys).sort((a,b)=>b[1]-a[1]).slice(0,4)
       .map(([s,n])=>({s,n,pct:topRows.length?n/topRows.length*100:0}));
-    MODEL.rows=cur; MODEL.dropped=dropped; MODEL.prev=p1; MODEL.snap=list[idx]; MODEL.count=list.length;
+    MODEL.rows=cur; MODEL.dropped=dropped; MODEL.prev=p1; MODEL.snap=list[idx]; MODEL.count=list.length; MODEL.rsu=rsu;
     render();
   }
 
@@ -5253,13 +5282,27 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     const b=new Blob([txt],{type:"text/plain"});
     const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download=fname; a.click();
   }
+  function pickTop(){   // ranked, filtered, industry cap applied — the list the export and the KPI tiles use
+    const ranked=(MODEL.rows||[]).filter(r=>r.rank&&!r.thin&&passF(r)&&passRS(r)).sort((a,b)=>a.rank-b.rank);
+    const by={}, pick=[], skipped=[];
+    for(const r of ranked){ if(pick.length>=topN) break; const k=(r.ind||r.sec||"—"); if(indCap>0&&(by[k]||0)>=indCap){ skipped.push(r); continue; } by[k]=(by[k]||0)+1; pick.push(r); }
+    return {pick,skipped};
+  }
   function exportTop(){
-    const rows=MODEL.rows.filter(r=>r.rank&&!r.thin&&passF(r)).sort((a,b)=>a.rank-b.rank).slice(0,topN);
-    if(!rows.length){toast("Nothing passes the current filters","error");return;}
-    const code=uniCode(), tag=minF>0?"_F"+minF:"";
-    dl("###MOMO_"+code+"_TOP"+topN+tag+"\n"+rows.map(sym).join(",")+"\n",
-       "momentum_"+code.toLowerCase()+"_top"+topN+tag.toLowerCase()+".txt");
-    toast("Exported top "+rows.length,"success");
+    const {pick,skipped}=pickTop();
+    if(!pick.length){toast("Nothing passes the current filters","error");return;}
+    const code=uniCode(), tag=(minF>0?"_F"+minF:"")+(rsOnly?"_RS":"")+(rankMode!=="stdv"?"_"+rankMode.toUpperCase():"");
+    let t="";
+    if(pick.some(r=>r.stretch!=null)){
+      // one file, several TradingView sections: where each name sits against its 20 EMA, earnings names kept apart
+      const sec=(name,arr)=>arr.length?"###MOMO_"+code+"_"+name+"\n"+arr.map(sym).join(",")+"\n\n":"";
+      const soon=pick.filter(r=>r.earnSoon), rest=pick.filter(r=>!r.earnSoon);
+      t=sec("READY_within_1ATR_of_20EMA",rest.filter(r=>r.bucket==="READY"))+sec("NEAR_1to2ATR",rest.filter(r=>r.bucket==="NEAR"))
+       +sec("WAIT_over_2ATR",rest.filter(r=>r.bucket==="WAIT"))+sec("BELOW_20EMA",rest.filter(r=>r.bucket==="BELOW"))
+       +sec("NO_EMA_DATA",rest.filter(r=>r.stretch==null))+sec("EARNINGS_within_5_sessions",soon);
+    } else t="###MOMO_"+code+"_TOP"+topN+tag+"\n"+pick.map(sym).join(",")+"\n";
+    dl(t,"momentum_"+code.toLowerCase()+"_top"+topN+tag.toLowerCase()+".txt");
+    toast("Exported "+pick.length+(skipped.length?" · "+skipped.length+" skipped by the industry cap":""),"success");
   }
   function exportMoves(){
     const inN=MODEL.rows.filter(r=>r.rank&&r.rank<=topN&&(r.isNew||(r.d1!==null&&(r.rank+ (r.d1||0))>topN))).sort((a,b)=>a.rank-b.rank);
@@ -5385,6 +5428,9 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     {k:"p6m",  t:"6M",     f:pct},
     {k:"p1y",  t:"1Y",     f:pct},
     {k:"_vol", t:"Vol",    f:v=>v==null?"—":v.toFixed(2)},
+    {k:"stretch",t:"→20",  f:null},
+    {k:"earnD",t:"Earn",   f:null},
+    {k:"rsT",  t:"RS",     f:null},
     {k:"fscore",t:"F",     f:null},
     {k:"story", t:"Read",  f:null},
     {k:"sec",  t:"Sector"}
@@ -5408,8 +5454,9 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       return;
     }
     $("moDrop2").style.display="block";
-    let rows=MODEL.rows.filter(passF);
-    if(!rows.length){ el.innerHTML='<div class="mo-empty">No stock has '+minF+' or more lights. Lower <b>Min F</b>, or add the extra columns to your screener export.</div>'; return; }
+    $("moRankSub").textContent = rankMode==="stdv"?"Z(6M÷vol) + Z(12M÷vol), averaged":rankMode==="m121"?"12-1 momentum: (1+1Y) ÷ (1+1M) − 1, z-scored":"6-1 momentum: (1+6M) ÷ (1+1M) − 1, z-scored";
+    let rows=MODEL.rows.filter(r=>passF(r)&&passRS(r));
+    if(!rows.length){ el.innerHTML='<div class="mo-empty">'+(rsOnly&&!(MODEL.rsu&&MODEL.rsu.n)?'No RS Score run found for this universe — save one in the RS Score tab (same code, e.g. R1000), or switch “RS survivors only” off.':rsOnly?'No name of this snapshot has an RS total of '+rsMin+' or more. Lower the threshold or switch the filter off.':'No stock has '+minF+' or more lights. Lower <b>Min F</b>, or add the extra columns to your screener export.')+'</div>'; return; }
     const s=sortBy;
     rows.sort((a,b)=>{
       let x=a[s.c],y=b[s.c];
@@ -5432,6 +5479,9 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
         if(c.k==="d1")    return '<td>'+deltaCell(r.d1,r.isNew)+'</td>';
         if(c.k==="d3")    return '<td>'+deltaCell(r.d3,false)+'</td>';
         if(c.k==="d6")    return '<td>'+deltaCell(r.d6,false)+'</td>';
+        if(c.k==="stretch") return '<td style="color:'+(r.stretch==null?"var(--text3)":r.bucket==="READY"?"var(--green)":r.bucket==="WAIT"?"var(--orange)":"var(--text)")+'" title="price → 20 EMA in ATR(14)">'+(r.stretch==null?"—":(r.stretch>0?"+":"")+r.stretch.toFixed(1))+(r.bucket&&r.bucket!=="NEAR"?' <span class="mo-tag '+(r.bucket==="READY"?"mo-in":r.bucket==="WAIT"?"mo-warn":"mo-out")+'">'+r.bucket+'</span>':'')+'</td>';
+        if(c.k==="earnD") return '<td>'+(r.earnD==null?'<span class="mo-dim">—</span>':r.earnD<0?'<span class="mo-dim" title="'+esc(r.earn)+'">done</span>':'<span class="'+(r.earnSoon?'mo-tag mo-warn':'mo-dim')+'" title="'+esc(r.earn)+' · '+r.earnD+' trading session'+(r.earnD===1?'':'s')+'">'+(r.earnD===0?"today":r.earnD+"s")+'</span>')+'</td>';
+        if(c.k==="rsT")   return '<td>'+(r.rs?'<span title="RS Step 3 total '+r.rs.total.toFixed(1)+' · rank '+r.rs.rank+(MODEL.rsu?' of '+MODEL.rsu.n+' · '+esc(MODEL.rsu.code||MODEL.rsu.name||"")+' run '+esc(MODEL.rsu.as_of||""):'')+'" style="color:'+(r.rs.total>=rsMin?"var(--green)":"var(--text2)")+'">'+r.rs.total.toFixed(0)+'<span class="mo-dim"> #'+r.rs.rank+'</span></span>':'<span class="mo-dim">—</span>')+'</td>';
         if(c.k==="fscore"){
           // three states, because "failed" and "no column for it" are not the
           // same thing: solid = pass, dull = fail, hollow = nothing to judge
@@ -5464,6 +5514,12 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     const lit=m.rows.length?Math.max(...m.rows.map(r=>r.fmax||0)):0;
     h+='<div class="mo-k'+(lit<7?" alert":"")+'" title="How many of the 7 screener lights your CSV columns can score">Lights active<b>'+lit+' / 7</b></div>';
     if(minF>0)h+='<div class="mo-k">Min F '+minF+'<b>'+m.rows.filter(passF).length+' shown</b></div>';
+    if(m.rsu&&m.rsu.n){ const surv=m.rows.filter(r=>r.rs&&r.rs.total>=rsMin).length;
+      h+='<div class="mo-k" title="Names of this snapshot that are in the latest RS Score run of the same universe with a Step 3 total of '+rsMin+' or more">RS survivors ≥ '+rsMin+(rsOnly?' (on)':'')+'<b>'+surv+' / '+m.rows.length+'</b><span class="mo-dim" style="display:block">'+esc(m.rsu.code||m.rsu.name||"")+' run '+esc(m.rsu.as_of||"")+'</span></div>'; }
+    else if(rsOnly) h+='<div class="mo-k alert">RS survivors<b>no RS run</b><span class="mo-dim" style="display:block">save one for this universe in the RS Score tab</span></div>';
+    const tp=pickTop(); if(tp.pick.some(r=>r.stretch!=null)){ const rd=tp.pick.filter(r=>r.bucket==="READY"&&!r.earnSoon).length, wt=tp.pick.filter(r=>r.bucket==="WAIT"&&!r.earnSoon).length, es=tp.pick.filter(r=>r.earnSoon).length;
+      h+='<div class="mo-k" title="In the export list: READY = within 1 ATR of the 20 EMA · WAIT = more than 2 ATR above it · EARN = reports within 5 sessions">Export '+tp.pick.length+' · ready / wait / earn<b>'+rd+' / '+wt+' / '+es+'</b></div>'; }
+    if(tp.skipped.length) h+='<div class="mo-k" title="Skipped by the industry cap ('+indCap+' per industry); the next-ranked names took their place">Industry cap<b>'+tp.skipped.length+' skipped</b></div>';
     if(m.churn){
       h+='<div class="mo-k'+(m.churn.warn?" alert":"")+'">Membership<b>'+m.churn.now+' vs '+m.churn.prev+
          ' ('+m.churn.pct.toFixed(1)+'%)</b></div>';
@@ -5499,6 +5555,10 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     $("moTopN").onchange=function(){ topN=parseInt(this.value)||30; build(); };
     $("moTurn").onchange=function(){ minTurn=parseFloat(this.value)||0; build(); };
     $("moMinF").onchange=function(){ minF=parseInt(this.value)||0; render(); };
+    $("moTgRS").onclick=function(){ rsOnly=!rsOnly; this.classList.toggle("on",rsOnly); build(); if(window.OR&&OR.onMO)OR.onMO(); };
+    $("moRsMin").onchange=function(){ rsMin=parseFloat(this.value); if(isNaN(rsMin)) rsMin=50; build(); };
+    $("moIndCap").onchange=function(){ indCap=parseInt(this.value)||0; render(); };
+    $("moRankBy").querySelectorAll("button").forEach(b=>b.onclick=()=>{ rankMode=b.dataset.m; $("moRankBy").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); build(); if(window.OR&&OR.onMO)OR.onMO(); });
     $("moTgV").classList.toggle("on",volSmooth);
     load();
   }
@@ -5511,12 +5571,14 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   function rankFor(id){
     const sn=SNAPS.find(x=>x.id===id); if(!sn) return null;
     const list=snapsFor(sn.universe_id), idx=list.findIndex(x=>x.id===id); if(idx<0) return null;
-    const rows=rankSnapshot(list,idx,{use3M,smooth:volSmooth})||[]; rows.forEach(enrich);
+    const rsu=rsFor(sn.universe_id);
+    const rows=rankSnapshot(list,idx,{use3M,smooth:volSmooth,mode:rankMode})||[]; rows.forEach(r=>enrich(r,rsu));
     return { rows, uni:UNIS.find(x=>x.id===sn.universe_id)||null, snap:{id:sn.id,as_of:sn.as_of,uploaded_at:sn.uploaded_at||sn.created_at||null,n:sn.n_rows||0},
-             filters:{minF,minTurn,use3M,volSmooth}, pass:r=>!!r.rank&&!r.thin&&passF(r) };
+             rs:rsu, filters:{minF,minTurn,use3M,volSmooth,rankMode,rsOnly,rsMin}, pass:r=>!!r.rank&&!r.thin&&passF(r)&&passRS(r) };
   }
   window.MO={
     ensureInit:init, runs, rankFor, current:()=>curUni, stampMissing:()=>stampMissing,
+    onRS:()=>{ if(inited&&curUni) build(); },          // the RS Score tab recomputed: refresh the RS column / survivor filter
     pick:id=>{curUni=id;renderUnis();build();},
     delUni, delSnap,
     sort:c=>{ if(sortBy.c===c)sortBy.d=sortBy.d==="asc"?"desc":"asc"; else sortBy={c:c,d:(c==="rank"||c==="t"||c==="n"||c==="sec")?"asc":"desc"}; render(); },
@@ -5533,7 +5595,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const HDR={apikey:SB_KEY,Authorization:"Bearer "+SB_KEY}, HDRJ={...HDR,"Content-Type":"application/json"};
   const MN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"], MF=["January","February","March","April","May","June","July","August","September","October","November","December"], DN=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-  let UPS=[], STOCKS=[], ROWS={}, PREV={}, LAST={}, HIST={}, L=null, P=null, MODEL=[], BY={};
+  let UPS=[], STOCKS=[], ROWS={}, PREV={}, LAST={}, HIST={}, L=null, P=null, MODEL=[], BY={}, LASTX={rs:{},rsLeft:[],rsUni:{},moUni:{}};
   let inited=false, ready=false, filt="all", q="", showOff=false, calOff=false, sortBy={c:"earnDays",d:"asc"}, calYM=null, scY="p6m";
   let chart=null, hchart=null, cardSym=null, xTimer=null;
 
@@ -5576,8 +5638,8 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     ["nd",[/net debt(?!.*currency)/i]],["ebit",[/^ebitda(?!.*currency)/i]],["fcf",[/free cash flow(?!.*currency)/i]],
     ["pe",[/price to earnings/i,/^p\/e/i]],["gm",[/gross margin.*(ttm|trailing)/i]],["gmfy",[/gross margin.*(annual|fiscal|\bfy\b)/i]],
     ["bby",[/buyback yield/i]],["shg",[/shares.*outstanding.*(growth|change)/i]],["epsg",[/earnings per share.*growth/i,/eps.*growth/i]],
-    ["e5",[/exponential moving average,?\s*5\b/i]],["e10",[/exponential moving average,?\s*10\b/i]],["e20",[/exponential moving average,?\s*20\b/i]],["e50",[/exponential moving average,?\s*50\b/i]],["e200",[/exponential moving average,?\s*200\b/i]],
-    ["atr",[/average true range/i]],["rsi",[/relative strength index/i]],["volat",[/volatil/i]],
+    ["e5",[/exponential moving average[\s,(]*5\b/i]],["e10",[/exponential moving average[\s,(]*10\b/i]],["e20",[/exponential moving average[\s,(]*20\b/i]],["e50",[/exponential moving average[\s,(]*50\b/i]],["e200",[/exponential moving average[\s,(]*200\b/i]],
+    ["atr",[/average true range(?!\s*%)/i,/average true range/i]],["rsi",[/relative strength index/i]],["volat",[/volatil/i]],
     ["hi52",[/^high,?\s*52(?!.*currency)/i,/52.?week high/i]],["lo52",[/^low,?\s*52(?!.*currency)/i,/52.?week low/i]],
     ["avol",[/average volume/i]],["rvol",[/relative volume/i]],
     ["ex",[/^exchange$/i]],["sec",[/^sector$/i]],["ind",[/^industry$/i]],
@@ -5663,17 +5725,23 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 
   /* ---------- cross-references from the other tabs ---------- */
   function xrefIndex(){
-    const X={rs:{},rsN:0,rsTab:"z",mo:{},ef:null,ib:null};
-    try{ const s3=(window.RS2&&RS2.getStep3)?RS2.getStep3():null; if(s3&&s3.rows&&s3.rows.length){ X.rsN=s3.rows.length; X.rsTab=s3.tab; s3.rows.forEach(r=>{ X.rs[bare(r.ticker)]={total:s3.tab==="p"?r.totP:r.totZ, rank:s3.tab==="p"?r.rankP:r.rankZ}; }); } }catch(e){}
+    // RS: the latest run of EVERY universe (R1000, R2000…) — a name is looked up in whichever universe holds it
+    const X={rs:{},rsN:0,rsTab:"z",rsUni:{},rsLeft:[],rsReason:"",mo:{},moUni:{},ef:null,ib:null};
+    try{ const s3=(window.RS2&&RS2.getStep3)?RS2.getStep3():null;
+      if(s3){ X.rsTab=s3.tab||"z"; X.rsUni=s3.byUni||{}; X.rsLeft=s3.left||[]; X.rsReason=s3.reason||"";
+        if(s3.rows&&s3.rows.length){ X.rsN=s3.rows.length;
+          s3.rows.forEach(r=>{ const k=bare(r.ticker), cand={total:s3.tab==="p"?r.totP:r.totZ, rank:s3.tab==="p"?r.rankP:r.rankZ, n:r.n||s3.rows.length, uni:r.uniCode||"", uniName:r.uniName||"", as_of:r.as_of||"", prevRank:r.prevRank||null, isNew:!!r.isNew};
+            const cur=X.rs[k]; if(!cur||String(cand.as_of)>String(cur.as_of)) X.rs[k]=cand; }); } } }catch(e){}
     try{ if(window.MO&&MO.runs&&MO.rankFor){ const byU={}; MO.runs().forEach(r=>{ if(!byU[r.uniId]||byU[r.uniId].as_of<r.as_of) byU[r.uniId]=r; });
-      Object.values(byU).forEach(run=>{ const rk=MO.rankFor(run.id); if(!rk) return; const n=rk.rows.filter(x=>x.rank).length; rk.rows.forEach(x=>{ if(x.rank&&!X.mo[x.t]) X.mo[x.t]={rank:x.rank,n,score:x.score,uni:run.uniName,as_of:run.as_of}; }); }); } }catch(e){}
+      Object.values(byU).forEach(run=>{ const rk=MO.rankFor(run.id); if(!rk) return; const n=rk.rows.filter(x=>x.rank).length, code=String(run.code||run.uniName||"").toUpperCase().replace(/[^A-Z0-9]/g,""); X.moUni[code]={as_of:run.as_of,n,name:run.uniName};
+        rk.rows.forEach(x=>{ if(x.rank&&!X.mo[x.t]) X.mo[x.t]={rank:x.rank,n,score:x.score,uni:run.uniName,code,as_of:run.as_of,bucket:x.bucket||null,stretch:(x.stretch==null?null:x.stretch)}; }); }); } }catch(e){}
     X.ef=(window.EF&&EF.heldBy)?EF.heldBy:null; X.ib=(window.IB&&IB.symInfo)?IB.symInfo:null;
     return X;
   }
 
   /* ---------- model ---------- */
   function build(){
-    const today=todayISO(), X=xrefIndex(); BY={};
+    const today=todayISO(), X=xrefIndex(); BY={}; LASTX=X;
     MODEL=STOCKS.map(s=>{
       const sym=s.symbol, d=ROWS[sym]||LAST[sym]||null, pv=PREV[sym]||null;
       const m={sym,s,d,inLatest:!!ROWS[sym],active:s.active!==false,notes:s.notes||"",tags:Array.isArray(s.tags)?s.tags:[],x:{}};
@@ -5684,6 +5752,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
           rating:(d.rating||"")!==(pv.rating||"")?{from:pv.rating,to:d.rating,dir:(rateClass(d.rating)||{n:0}).n-(rateClass(pv.rating)||{n:0}).n}:null,
           earn:(d.earn||"")!==(pv.earn||"")?{from:pv.earn,to:d.earn}:null, lights:m.ls-pL, isNew:false}; } else m.diff={isNew:true}; }
       m.x={rs:X.rs[sym]||null, rsN:X.rsN, rsTab:X.rsTab, mo:X.mo[sym]||null};
+      m.x.idx=(m.x.rs&&m.x.rs.uni)||(m.x.mo&&m.x.mo.code)||null;          // which universe (R1000 / R2000) the name belongs to
       try{ m.x.etf=X.ef?X.ef(sym):null; }catch(e){ m.x.etf=null; }
       try{ m.x.ib=X.ib?X.ib(sym):null; }catch(e){ m.x.ib=null; }
       return m;
@@ -5703,7 +5772,9 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       case "diverge": return m.st.agree==="diverge";
       case "changed": return !!(m.diff&&(m.diff.isNew||m.diff.rating||m.diff.earn||(m.diff.tgt!=null&&Math.abs(m.diff.tgt)>=3)||(m.diff.lights&&m.diff.lights!==0)));
       case "owned": return !!(m.x.ib&&m.x.ib.pos);
-      default: if(filt.startsWith("r:")){ const want=filt.slice(2); return (m.st.rc?m.st.rc.l:"—")===want; } return true;
+      case "rsmove": return !!(m.x.rs&&m.x.rs.prevRank&&Math.abs(m.x.rs.prevRank-m.x.rs.rank)>=10);
+      default: if(filt.startsWith("r:")){ const want=filt.slice(2); return (m.st.rc?m.st.rc.l:"—")===want; }
+               if(filt.startsWith("u:")) return m.x.idx===filt.slice(2); return true;
     }
   }
   function listRows(){
@@ -5713,7 +5784,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       if(s==="sym") return m.sym; if(s==="earnDays") return m.earnDays==null?1e9:m.earnDays; if(s==="px") return d.px; if(s==="tgt") return d.tgt; if(s==="up") return m.st.up;
       if(s==="rating") return m.st.rc?m.st.rc.n:-9; if(s==="trat") return m.st.tc?m.st.tc.n:-9; if(s==="ls") return m.ls; if(s==="atr") return m.post.atrDist; if(s==="rsi") return d.rsi;
       if(s==="p1w") return d.p1w; if(s==="p1m") return d.p1m; if(s==="p6m") return d.p6m; if(s==="dpx") return m.diff?m.diff.px:null;
-      if(s==="rs") return m.x.rs?m.x.rs.rank:null; if(s==="mo") return m.x.mo?m.x.mo.rank:null; if(s==="etf") return m.x.etf?m.x.etf.filter(e=>e.held).length:0; if(s==="ib") return m.x.ib&&m.x.ib.pos?m.x.ib.pos.value:(m.x.ib?0:null);
+      if(s==="rs") return m.x.rs?m.x.rs.rank:null; if(s==="mo") return m.x.mo?m.x.mo.rank:null; if(s==="idx") return m.x.idx||""; if(s==="etf") return m.x.etf?m.x.etf.filter(e=>e.held).length:0; if(s==="ib") return m.x.ib&&m.x.ib.pos?m.x.ib.pos.value:(m.x.ib?0:null);
       if(s==="hi") return m.post.hiDist; return null; };
     rows.sort((a,b)=>{ let x=key(a), y=key(b); const dir=sortBy.d==="asc"?1:-1;
       if(typeof x==="string"||typeof y==="string") return String(x||"").localeCompare(String(y||""))*dir;
@@ -5794,10 +5865,24 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       +tile("Avg Street upside",avgUp==null?"—":sgn(avgUp)+"%",above+" already above target")+tile("Strong buy / Buy",sb+" / "+buy,Math.round((sb+buy)/A.length*100)+"% of list","","sb")
       +tile("5+ lights",l5,"of "+A.length,"","l5")+tile("Above 20 EMA",a20,Math.round(a20/A.length*100)+"%","","above20")+tile("Stacked EMAs",stk,"","","stacked")+tile("Near 52w high",near,"within 5%","","near")
       +tile("Street ≠ tape",div,"rating vs TV technical",div?"alert":"","diverge")+(owned?tile("In IBKR now",owned,"","","owned"):"");
+    const byIdx={}; A.forEach(m=>{ if(m.x.idx) byIdx[m.x.idx]=(byIdx[m.x.idx]||0)+1; });
+    Object.keys(byIdx).sort().forEach(c=>{ const u=LASTX.rsUni[c]||LASTX.moUni[c]; k.innerHTML+=tile(c,byIdx[c],u&&u.as_of?"run of "+dfmt(u.as_of):"","","u:"+c); });
+    const noIdx=A.length-Object.values(byIdx).reduce((a,b)=>a+b,0); if(Object.keys(byIdx).length&&noIdx) k.innerHTML+=tile("Not in any run",noIdx,"no RS / momentum universe","","");
+  }
+  function rsChangeBoxes(cur,box,t){   // movements inside the RS Score runs (latest vs previous run of each universe)
+    const left={}; (LASTX.rsLeft||[]).forEach(l=>{ left[bare(l.ticker)]=l; });
+    const anyPrev=Object.values(LASTX.rsUni||{}).some(u=>u.prev_as_of); if(!anyPrev) return "";
+    const mv=cur.filter(m=>m.x.rs&&m.x.rs.prevRank&&Math.abs(m.x.rs.prevRank-m.x.rs.rank)>=10).sort((a,b)=>Math.abs(b.x.rs.prevRank-b.x.rs.rank)-Math.abs(a.x.rs.prevRank-a.x.rs.rank));
+    const nw=cur.filter(m=>m.x.rs&&m.x.rs.isNew), lf=cur.filter(m=>!m.x.rs&&left[m.sym]);
+    const uniTxt=Object.entries(LASTX.rsUni).filter(([c,u])=>u.prev_as_of).map(([c,u])=>c+" "+dfmt(u.prev_as_of)+" → "+dfmt(u.as_of)).join(" · ");
+    return box("RS rank moved ≥ 10 ("+mv.length+') <span class="or-dim" style="text-transform:none;letter-spacing:0">'+esc(uniTxt)+'</span>',mv.map(m=>t(m.sym)+' <span class="'+(m.x.rs.prevRank>m.x.rs.rank?'or-up':'or-dn')+'">'+(m.x.rs.prevRank>m.x.rs.rank?'▲':'▼')+Math.abs(m.x.rs.prevRank-m.x.rs.rank)+'</span> #'+m.x.rs.prevRank+' → #'+m.x.rs.rank+' <span class="or-dim">'+esc(m.x.rs.uni)+'</span>'))
+      +box("Entered / left the RS run ("+(nw.length+lf.length)+")",nw.map(m=>t(m.sym)+' <span class="or-up">in</span> #'+m.x.rs.rank+' <span class="or-dim">'+esc(m.x.rs.uni)+'</span>').concat(lf.map(m=>t(m.sym)+' <span class="or-dn">out</span> <span class="or-dim">was #'+left[m.sym].rank+' '+esc(left[m.sym].uniCode)+'</span>')));
   }
   function renderChanges(){
     const el=$("orChanges"), sub=$("orChangesSub"); if(!L){ el.innerHTML='<div class="or-empty">Nothing yet.</div>'; sub.textContent=""; return; }
-    if(!P){ el.innerHTML='<div class="or-empty">Only one upload so far — the next one will show what moved.</div>'; sub.textContent="first upload"; return; }
+    const tt=s=>'<span class="t" onclick="OR.card(\''+esc(s)+'\')">'+esc(s)+'</span>';
+    const bx=(h,items,empty)=>'<div class="or-chgbox"><h5>'+h+'</h5>'+(items.length?items.join("<br>"):'<span class="or-dim">'+(empty||"none")+'</span>')+'</div>';
+    if(!P){ const rsb=rsChangeBoxes(MODEL.filter(m=>m.inLatest),bx,tt); el.innerHTML='<div class="or-empty">Only one upload so far — the next one will show what moved.</div>'+(rsb?'<div class="or-chg">'+rsb+'</div>':''); sub.textContent="first upload"; return; }
     const cur=MODEL.filter(m=>m.inLatest), prevSyms=Object.keys(PREV);
     const added=cur.filter(m=>m.diff&&m.diff.isNew), dropped=prevSyms.filter(s=>!ROWS[s]);
     const rUp=cur.filter(m=>m.diff&&m.diff.rating&&m.diff.rating.dir>0), rDn=cur.filter(m=>m.diff&&m.diff.rating&&m.diff.rating.dir<0);
@@ -5815,6 +5900,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       +box("Earnings date moved ("+eMv.length+")",eMv.map(m=>t(m.sym)+' '+dfmt(m.diff.earn.from)+' → '+dfmt(m.diff.earn.to)))
       +box("Lights changed ("+(lUp.length+lDn.length)+")",lUp.map(m=>t(m.sym)+' <span class="or-up">+'+m.diff.lights+'</span> → '+m.ls+'/'+m.lm).concat(lDn.map(m=>t(m.sym)+' <span class="or-dn">'+m.diff.lights+'</span> → '+m.ls+'/'+m.lm)))
       +box("Price moved ≥ 10% ("+pBig.length+")",pBig.map(m=>t(m.sym)+' <span style="color:'+col(m.diff.px)+'">'+sgn(m.diff.px)+'%</span>'))
+      +rsChangeBoxes(cur,box,t)
       +'</div>';
   }
   function chip(m){ const c=m.st.rc?m.st.rc.c:"or-x";
@@ -5871,13 +5957,16 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     el.innerHTML=h;
   }
   function ladder(m){ return '<span class="or-ll" title="'+esc(m.L.map(l=>(l.pass===true?"✓":l.pass===false?"✗":"○")+" "+l.name+" — "+l.val).join("\n"))+'">'+m.L.map(l=>'<i class="'+(l.pass===true?"y":l.pass===false?"n":"u")+'"></i>').join("")+'</span>'; }
-  const FILTERS=[["all","All"],["soon7","Reporting ≤7d"],["soon14","≤14d"],["sb","Strong buy"],["l5","5+ lights"],["above20","Above 20 EMA"],["stacked","Stacked"],["near","Near 52w high"],["diverge","Street ≠ tape"],["changed","Changed"],["owned","In IBKR"]];
+  const FILTERS=[["all","All"],["soon7","Reporting ≤7d"],["soon14","≤14d"],["sb","Strong buy"],["l5","5+ lights"],["above20","Above 20 EMA"],["stacked","Stacked"],["near","Near 52w high"],["diverge","Street ≠ tape"],["changed","Changed"],["rsmove","RS moved ≥10"],["owned","In IBKR"]];
   function renderTable(){
-    const el=$("orTable"); $("orChips").innerHTML=FILTERS.map(([k,l])=>'<span class="or-fc'+(filt===k?' on':'')+'" onclick="OR.filter(\''+k+'\')">'+l+'</span>').join("")+(filt.startsWith("r:")?'<span class="or-fc on" onclick="OR.filter(\'all\')">'+esc(filt.slice(2))+' ×</span>':'');
+    const el=$("orTable");
+    const codes=[...new Set(MODEL.filter(m=>m.d&&(showOff||m.active)).map(m=>m.x.idx).filter(Boolean))].sort();     // one chip per universe present (R1000, R2000…)
+    const F=FILTERS.slice(0,1).concat(codes.map(c=>["u:"+c,c])).concat(FILTERS.slice(1));
+    $("orChips").innerHTML=F.map(([k,l])=>'<span class="or-fc'+(filt===k?' on':'')+'" onclick="OR.filter(\''+k+'\')">'+l+'</span>').join("")+(filt.startsWith("r:")?'<span class="or-fc on" onclick="OR.filter(\'all\')">'+esc(filt.slice(2))+' ×</span>':'');
     if(!L){ el.innerHTML='<div class="or-empty">Upload your Orange List export to begin.</div>'; $("orListSub").textContent=""; return; }
     const rows=listRows(); $("orListSub").textContent=rows.length+" shown";
     if(!rows.length){ el.innerHTML='<div class="or-empty">No name matches this filter.</div>'; return; }
-    const H=[["sym","Ticker","l"],["earnDays","Earnings","l"],["px","Price"],["tgt","Target"],["up","Upside"],["rating","Rating","l"],["trat","TV tech","l"],["ls","Lights","l"],["post","Posture","l"],["atr","→20 EMA"],["rsi","RSI"],["hi","52w hi"],["p1w","1W"],["p1m","1M"],["p6m","6M"],["dpx","Δ price"],["rs","RS"],["mo","Mom"],["etf","ETFs"],["ib","IBKR","l"],["nt","",""],["x","",""]];
+    const H=[["sym","Ticker","l"],["idx","Index","l"],["earnDays","Earnings","l"],["px","Price"],["tgt","Target"],["up","Upside"],["rating","Rating","l"],["trat","TV tech","l"],["ls","Lights","l"],["post","Posture","l"],["atr","→20 EMA"],["rsi","RSI"],["hi","52w hi"],["p1w","1W"],["p1m","1M"],["p6m","6M"],["dpx","Δ price"],["rs","RS"],["mo","Mom"],["etf","ETFs"],["ib","IBKR","l"],["nt","",""],["x","",""]];
     const s=sortBy;
     let h='<table class="or-t"><thead><tr><th title="ticked = in your latest file (or re-ticked by you)">✓</th>'+H.map(([k,t,a])=>'<th class="'+(a||"")+'" '+(k==="post"||k==="nt"||k==="x"?'':'onclick="OR.sort(\''+k+'\')"')+'>'+t+(s.c===k?'<span style="font-size:9px"> '+(s.d==="asc"?"▲":"▼")+'</span>':'')+'</th>').join("")+'</tr></thead><tbody>';
     rows.forEach(m=>{ const d=m.d, st=m.st, po=m.post, x=m.x;
@@ -5888,6 +5977,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       h+='<tr class="'+(m.active?'':'off')+'">'
         +'<td><span class="or-ck'+(m.active?'':' off')+'" onclick="OR.tick(\''+esc(m.sym)+'\','+(m.active?'false':'true')+')" title="'+(m.active?'ticked — click to untick':'unticked (not in the latest file) — click to tick')+'">'+(m.active?'✓':'○')+'</span></td>'
         +'<td class="l"><span class="or-tk" onclick="OR.card(\''+esc(m.sym)+'\')">'+esc(m.sym)+'</span>'+(m.tags.length?' '+m.tags.map(t=>'<span class="or-tag gr">'+esc(t)+'</span>').join(''):'')+'<span class="or-nm">'+esc(d.n||"")+(d.sec?' · '+esc(d.sec):'')+'</span></td>'
+        +'<td class="l">'+(x.idx?'<span class="or-tag p" title="'+esc(x.rs?('in the '+(x.rs.uniName||x.rs.uni)+' RS run of '+x.rs.as_of):('in the '+(x.mo?x.mo.uni:'')+' momentum snapshot of '+(x.mo?x.mo.as_of:'')))+'">'+esc(x.idx)+'</span>':'<span class="or-dim" title="not in any RS or momentum run">—</span>')+'</td>'
         +'<td class="l">'+ed+'</td><td>'+money(d.px)+'</td><td>'+money(d.tgt)+'</td><td style="color:'+col(st.up)+'">'+(st.up==null?'—':sgn(st.up)+'%')+'</td>'
         +'<td class="l">'+(st.rc?'<span class="or-tag '+st.rc.c+'">'+st.rc.l+'</span>':'<span class="or-dim">—</span>')+'</td>'
         +'<td class="l">'+(st.tc?'<span class="or-tag '+st.tc.c+'">'+st.tc.l+'</span>':'<span class="or-dim">—</span>')+(st.agree==="diverge"?' <span class="or-tag o" title="analyst rating and TradingView technical rating point opposite ways">≠</span>':'')+'</td>'
@@ -5896,8 +5986,8 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
         +'<td style="color:'+col(po.atrDist)+'">'+(po.atrDist==null?'—':sgn(po.atrDist)+' ATR')+'</td><td>'+(d.rsi==null?'—':Math.round(d.rsi))+'</td><td style="color:'+(po.hiDist!=null&&po.hiDist>=-5?'var(--green)':'var(--text2)')+'">'+(po.hiDist==null?'—':sgn(po.hiDist)+'%')+'</td>'
         +'<td style="color:'+col(d.p1w)+'">'+sgn(d.p1w)+'%</td><td style="color:'+col(d.p1m)+'">'+sgn(d.p1m)+'%</td><td style="color:'+col(d.p6m)+'">'+sgn(d.p6m)+'%</td>'
         +'<td>'+dif+'</td>'
-        +'<td>'+(x.rs?'<span title="RS Step 3 total '+f1(x.rs.total)+' · rank '+x.rs.rank+' of '+x.rsN+'">'+x.rs.rank+'<span class="or-dim">/'+x.rsN+'</span></span>':'<span class="or-dim">—</span>')+'</td>'
-        +'<td>'+(x.mo?'<span title="Momentum rank '+x.mo.rank+' of '+x.mo.n+' in '+esc(x.mo.uni)+' ('+x.mo.as_of+') · score '+f2(x.mo.score)+'">'+x.mo.rank+'<span class="or-dim">/'+x.mo.n+'</span></span>':'<span class="or-dim">—</span>')+'</td>'
+        +'<td>'+(x.rs?'<span title="RS '+f1(x.rs.total)+' · #'+x.rs.rank+' of '+x.rs.n+' · '+esc(x.rs.uniName||x.rs.uni)+' run '+esc(x.rs.as_of)+(x.rs.prevRank?' · was #'+x.rs.prevRank+' in the previous run':x.rs.isNew?' · new in this run':'')+'">'+x.rs.rank+'<span class="or-dim">/'+x.rs.n+'</span>'+(x.rs.prevRank&&x.rs.prevRank!==x.rs.rank?' <span class="'+(x.rs.prevRank>x.rs.rank?'or-up':'or-dn')+'" style="font-size:10px">'+(x.rs.prevRank>x.rs.rank?'▲':'▼')+Math.abs(x.rs.prevRank-x.rs.rank)+'</span>':x.rs.isNew?' <span class="or-tag b">NEW</span>':'')+'</span>':'<span class="or-dim" title="'+esc(LASTX.rsReason||"not in any RS run")+'">—</span>')+'</td>'
+        +'<td>'+(x.mo?'<span title="Momentum rank '+x.mo.rank+' of '+x.mo.n+' in '+esc(x.mo.uni)+' ('+x.mo.as_of+') · score '+f2(x.mo.score)+(x.mo.bucket?' · '+x.mo.bucket+' vs 20 EMA':'')+'">'+x.mo.rank+'<span class="or-dim">/'+x.mo.n+'</span></span>':'<span class="or-dim">—</span>')+'</td>'
         +'<td>'+etfTxt+'</td><td class="l">'+ib+'</td>'
         +'<td><span class="or-nt'+(m.notes?' has':'')+'" title="'+esc(m.notes||"add a note")+'" onclick="OR.card(\''+esc(m.sym)+'\')">✎</span></td>'
         +'<td><span class="or-x" title="Delete this name" onclick="OR.del(\''+esc(m.sym)+'\')">✕</span></td></tr>'; });
@@ -5936,7 +6026,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     // row 3: cross refs + history
     const etfs=x.etf||[];
     h+='<div class="or-box"><h5>From the other tabs</h5>'+kv([
-      ["RS Score (Step 3)",x.rs?'rank <b>'+x.rs.rank+'</b> of '+x.rsN+' · total '+f1(x.rs.total)+(x.rsTab==="p"?" (percentile)":" (z)"):'<span class="or-dim">not in the RS list</span>'],
+      ["RS Score (Step 3)",x.rs?'RS <b>'+f1(x.rs.total)+'</b> · #'+x.rs.rank+' of '+x.rs.n+' · <span class="or-tag p">'+esc(x.rs.uni)+'</span> run of '+dfmtY(x.rs.as_of)+(x.rs.prevRank?' · <span style="color:'+(x.rs.prevRank>x.rs.rank?'var(--green)':'var(--red)')+'">was #'+x.rs.prevRank+'</span>':x.rs.isNew?' · <span class="or-tag b">NEW</span>':'')+(x.rsTab==="p"?' <span class="or-dim">(percentile)</span>':' <span class="or-dim">(z)</span>'):'<span class="or-dim">'+esc(LASTX.rsReason?("no RS data — "+LASTX.rsReason):"not in any RS run")+'</span>'],
       ["Momentum",x.mo?'rank <b>'+x.mo.rank+'</b> of '+x.mo.n+' · score '+f2(x.mo.score)+' <span class="or-dim">('+esc(x.mo.uni)+' '+x.mo.as_of+')</span>':'<span class="or-dim">not in a momentum universe</span>'],
       ["Tracked ETFs",etfs.length?etfs.map(e=>'<span title="'+esc(e.name)+'">'+esc(e.etf)+'</span> '+(e.held?e.w.toFixed(2)+'%':'<span class="or-dn">exited</span>')+(e.pw!=null&&e.held?' <span style="color:'+col(e.w-e.pw)+'">('+sgn(e.w-e.pw,2)+')</span>':e.pw==null&&e.held&&e.hasPrev?' <span class="or-up">(new)</span>':'')).join(" · "):'<span class="or-dim">not held by any tracked ETF</span>'],
       ["IBKR",x.ib?((x.ib.pos?'<b>holding '+x.ib.pos.qty+' sh</b> · value '+money(x.ib.pos.value)+' · unrealized <span style="color:'+col(x.ib.pos.unreal)+'">'+(x.ib.pos.unreal>=0?'+$':'-$')+Math.abs(x.ib.pos.unreal).toFixed(2)+'</span>':'no open position')+(x.ib.closed?' · '+x.ib.closed+' closed trade'+(x.ib.closed!==1?'s':'')+', net <span style="color:'+col(x.ib.net)+'">'+(x.ib.net>=0?'+':'-')+'$'+Math.abs(x.ib.net).toFixed(2)+'</span> ('+x.ib.wins+' wins)'+(x.ib.last?' · last '+dfmtY(x.ib.last):''):'')+(x.ib.lt?' · <span class="or-tag gr">long-term</span>':'')):'<span class="or-dim">never traded</span>']])+'</div>';
@@ -5954,7 +6044,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   function closeCard(){ $("orCard").classList.remove("show"); cardSym=null; }
   function exportView(){
     const rows=listRows(); if(!rows.length){ toast("Nothing to export","error"); return; }
-    const txt="###ORANGE_"+(filt==="all"?"ALL":filt.replace(/[^A-Za-z0-9]/g,"").toUpperCase())+"\n"+rows.map(m=>(m.d.ex?m.d.ex+":":"")+m.sym).join(",")+"\n";
+    const txt="###ORANGE_"+(filt==="all"?"ALL":filt.startsWith("u:")?filt.slice(2):filt.replace(/[^A-Za-z0-9]/g,"").toUpperCase())+"\n"+rows.map(m=>(m.d.ex?m.d.ex+":":"")+m.sym).join(",")+"\n";
     const b=new Blob([txt],{type:"text/plain"}); const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="orange_"+(filt==="all"?"all":filt.replace(/[^A-Za-z0-9]/g,"_"))+"_"+rows.length+".txt"; a.click(); toast("Exported "+rows.length+" names","success");
   }
 
@@ -5986,7 +6076,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   }
   window.OR={ init, load, card:openCard, close:closeCard, tick:setActive, del:delStock, delUpload, saveNotes,
     filter:f=>{ filt=f; renderTable(); const sec=$("orSecList"); if(sec&&!sec.open) sec.open=true; },
-    sort:c=>{ if(sortBy.c===c) sortBy.d=sortBy.d==="asc"?"desc":"asc"; else sortBy={c,d:(c==="sym"||c==="earnDays"||c==="rs"||c==="mo")?"asc":"desc"}; renderTable(); },
+    sort:c=>{ if(sortBy.c===c) sortBy.d=sortBy.d==="asc"?"desc":"asc"; else sortBy={c,d:(c==="sym"||c==="earnDays"||c==="rs"||c==="mo"||c==="idx")?"asc":"desc"}; renderTable(); },
     tog:el=>{ try{ localStorage.setItem(el.id,el.open?"1":"0"); }catch(e){} if(el.id==="orSecStreet"&&el.open) renderStreet(); },
     onRS:rebuild, onMO:rebuild, onEF:rebuild, onIB:rebuild };
 })();
