@@ -1913,6 +1913,7 @@ tr.flt-row .flt2{display:flex;gap:3px}
             <div class="mo-dim" style="font-size:10.5px" id="moRankSub">Z(6M÷vol) + Z(12M÷vol), averaged</div>
           </div>
 
+          <div class="mo-runs" id="moRuns"></div>
           <div class="mo-kpi" id="moKpi"></div>
 
           <div class="mo-bar">
@@ -1929,10 +1930,28 @@ tr.flt-row .flt2{display:flex;gap:3px}
             <label title="At most this many names from one industry in Export top N — the rest are skipped and the next-ranked names fill in. 0 = off.">Max / industry <input type="number" id="moIndCap" min="0" max="50" step="1" value="5" style="width:58px"></label>
             <label title="Flags rows whose price × 30-day average volume falls below this. 0 = off.">Min turnover $M <input type="number" id="moTurn" min="0" step="1" value="0"></label>
             <label title="Hide stocks with fewer fundamental lights than this. Applies to the table AND to Export top N. Ranks are not renumbered - they still show each stock's place in the full pool.">Min F <select id="moMinF" class="mo-sel"><option value="0">Any</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></label>
+            <label title="Smooth = climb ÷ wobble: the average of the 6-month and 12-month gain divided by the 1-month volatility — the steepness of the line from the map's corner to the dot. Empty = off.">Smooth ≥ <input type="number" id="moSmMin" step="1" placeholder="—" style="width:58px"></label>
+            <label title="Wobble = TradingView's 1-month volatility as the score uses it (floored at the universe's 10th percentile; 3-upload average when Smooth vol is on). Empty = off.">Wobble ≤ <input type="number" id="moVolMax" step="0.1" placeholder="—" style="width:58px"> %</label>
+            <label title="Climb = average of the 6-month and 12-month gain. Empty = off.">Climb ≥ <input type="number" id="moClMin" step="1" placeholder="—" style="width:58px"> %</label>
+            <div class="mo-seg multi" id="moPost" title="Posture against the 20-day EMA (price − EMA 20, in ATR 14). Click to switch a posture off; all four on = no filter. Names without EMA/ATR columns are kept only when all four are on.">
+              <button data-p="READY" class="on">READY</button><button data-p="NEAR" class="on">NEAR</button><button data-p="WAIT" class="on">WAIT</button><button data-p="BELOW" class="on">BELOW</button></div>
             <div style="margin-left:auto;display:flex;gap:7px">
               <button class="btn btn-ghost btn-sm" id="moMoves">Export entries / exits</button>
               <button class="btn btn-gold btn-sm" id="moExport">Export top N →TV</button>
             </div>
+          </div>
+
+          <div class="mo-map" id="moMapBox" style="display:none">
+            <div class="mo-ph" style="margin-bottom:6px;flex-wrap:wrap;gap:8px">
+              <div class="mo-pt">SMOOTH MAP · <span id="moMapTitle" style="color:var(--text2);font-weight:500"></span></div>
+              <div class="mo-dim" style="font-size:10.5px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+                <span id="moMapLegend"></span>
+                <span class="mo-sw"><div class="mo-tg" id="moTgFit"></div><span title="Scale the axes to the names that pass the filters instead of the whole upload">Fit to filtered</span></span>
+                <span class="mo-sw"><div class="mo-tg on" id="moTgLbl"></div><span>Labels</span></span>
+              </div>
+            </div>
+            <div style="position:relative;height:380px"><canvas id="moMap"></canvas></div>
+            <div class="mo-note" style="margin-top:6px" id="moMapNote">Every dot is one name of this upload. <b>Up</b> = climbed more (average of the 6-month and 12-month gain). <b>Right</b> = wobbled more (1-month volatility, as the score uses it). The score is the <b>steepness</b> of the line from the bottom-left corner to the dot — the dotted rays mark this upload's median and top-10% steepness, the gold ray your <b>Smooth ≥</b> threshold. Colours follow every filter on the bar live: gold = in the export list (Top N after the industry cap), green = passes all filters, grey = filtered out. Click a dot to open its story in the table. In 12-1 / 6-1 mode the gold set follows that ranking, so you can see where those picks sit on the smooth plane.</div>
           </div>
 
           <div style="overflow:auto;max-height:56vh;border:1px solid var(--border);border-radius:8px" id="moTable"></div>
@@ -1947,7 +1966,9 @@ tr.flt-row .flt2{display:flex;gap:3px}
             (all seven lights &mdash; see the guide below); leverage and conversion lights are
             suppressed for financials. This is a coarse pre-filter — the real seven-light check is IVA Pro on the chart.
             <b>→20</b> = price distance from the 20-day EMA in ATR(14): <b>READY</b> within 1 ATR, NEAR 1–2 ATR, <b>WAIT</b> more than 2 ATR above, BELOW more than 1 ATR under.
-            <b>Earn</b> = trading sessions to the next report (tagged inside 5). <b>RS</b> = Step 3 total and rank in the same universe's latest RS Score run.
+            <b>Earn</b> = trading sessions to the next report (tagged inside 5). <b>RS</b> = Step 3 total and rank in the same universe's RS Score run nearest to the upload's date (the latest run for the latest upload).
+            <b>Uploads</b>: the chips above the tiles open any saved upload — table, tiles, map and export all follow it, so no chart is lost when the next file arrives.
+            <b>Smooth ≥ · Wobble ≤ · Climb ≥ · posture chips</b> are extra filters on top of Min F and RS survivors; they apply to the table, the tiles, the export and the map together (a name must pass all of them).
             <b>Export top N</b> applies the industry cap and writes READY / NEAR / WAIT / EARNINGS sections into one TradingView file.
           </div>
         </div>
@@ -4119,15 +4140,30 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     UNIS.forEach(u=>{ const list=runsOf(u.id); if(!list.length) return; const t=rsRankTable(u.id,list[0].id); if(t&&t.rows[k]&&(!best||String(t.as_of)>String(best.as_of))) best={...t.rows[k],n:t.n,as_of:t.as_of,uni:t.code}; });
     return best;
   }
-  function universeResult(codeOrName){
-    const k=slug(codeOrName); if(!k) return null;
-    const u=UNIS.find(x=>slug(x.code)===k)||UNIS.find(x=>slug(x.name)===k); if(!u) return null;
-    const list=runsOf(u.id); if(!list.length) return {code:u.code,name:u.name,as_of:null,n:0,rows:{},reason:"no run saved"};
-    readSettings(); const c=(list[0].id===curSnap&&S.RAW.length)?{M3:S.M3}:computeFor(u.id,list[0].id,false);
-    if(!c||!c.M3.length) return {code:u.code,name:u.name,as_of:list[0].as_of,n:0,rows:{},reason:"benchmark not loaded"};
-    const rows={}; c.M3.forEach(m=>{ rows[slug(m.ticker.split(":").pop())]={total:tab3==="p"?m.totP:m.totZ,rank:tab3==="p"?m.rankP:m.rankZ,z:m.totZ,p:m.totP}; });
-    return {code:u.code,name:u.name,as_of:list[0].as_of,n:c.M3.length,rows,tab:tab3};
+  function uniByKey(codeOrName){ const k=slug(codeOrName); if(!k) return null; return UNIS.find(x=>slug(x.code)===k)||UNIS.find(x=>slug(x.name)===k)||null; }
+  function nearestRun(u,asOf){      // the saved run closest to a date (ties → the earlier one); the latest when no date is given
+    const list=runsOf(u.id); if(!list.length) return null; if(!asOf) return list[0];
+    const t=new Date(asOf).getTime(); if(isNaN(t)) return list[0];
+    let best=null,bd=Infinity; list.forEach(sn=>{ const d=Math.abs(new Date(sn.as_of).getTime()-t); if(d<bd||(d===bd&&best&&sn.as_of<best.as_of)){ bd=d; best=sn; } }); return best;
   }
+  function universeResult(codeOrName,asOf){
+    const u=uniByKey(codeOrName); if(!u) return null;
+    const list=runsOf(u.id); if(!list.length) return {code:u.code,name:u.name,as_of:null,n:0,rows:{},reason:"no run saved"};
+    const run=nearestRun(u,asOf)||list[0]; readSettings();
+    const rows={}; let n=0, src="live";
+    if(run.id===curSnap&&S.RAW.length&&S.M3.length){ S.M3.forEach(m=>{ rows[slug(m.ticker.split(":").pop())]={total:tab3==="p"?m.totP:m.totZ,rank:tab3==="p"?m.rankP:m.rankZ,z:m.totZ,p:m.totP}; }); n=S.M3.length; }
+    else {
+      const body=BODY[run.id];
+      if(!body) return {code:u.code,name:u.name,as_of:run.as_of,n:0,rows:{},reason:"run not loaded",needs:run.id};
+      const c=computeFor(u.id,run.id,false);
+      if(c&&c.M3.length){ c.M3.forEach(m=>{ rows[slug(m.ticker.split(":").pop())]={total:tab3==="p"?m.totP:m.totZ,rank:tab3==="p"?m.rankP:m.rankZ,z:m.totZ,p:m.totP}; }); n=c.M3.length; src="computed"; }
+      else if(body.result&&body.result.rows&&body.result.rows.length){      // the Step 3 table stored with the run, exactly as it was seen
+        const useP=(body.result.tab||tab3)==="p"; body.result.rows.forEach(r=>{ rows[slug(String(r.t).split(":").pop())]={total:useP?r.p:r.z,rank:useP?r.rp:r.rz,z:r.z,p:r.p}; }); n=body.result.rows.length; src="stored";
+      } else return {code:u.code,name:u.name,as_of:run.as_of,n:0,rows:{},reason:"benchmark not loaded"};
+    }
+    return {code:u.code,name:u.name,as_of:run.as_of,n,rows,tab:tab3,src,runId:run.id};
+  }
+  async function ensureRun(codeOrName,asOf){ const u=uniByKey(codeOrName); if(!u) return false; const run=nearestRun(u,asOf); if(!run) return false; await ensureBody(run.id); return true; }
 
   /* ---------- init (lazy, on first tab open) ---------- */
   function init(){
@@ -4167,7 +4203,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   /* public surface — same names the other tabs already use, plus the universe calls */
   window.RS={ ensureInit:init, getState:()=>({RAW:S.RAW,MAP:S.MAP,MODEL:S.MODEL,WEIGHTS,CAP,TFS,activeTab:tab1,weighted:w1,universe:curUni,run:curSnap}), onChange:null,
     pick, open:id=>selectSnap(id), delUni, delSnap };
-  window.RS2={ ensureInit:init, getStep3, universeResult, rsRank, universes:()=>UNIS.map(u=>({id:u.id,name:u.name,code:u.code,benchmark:u.benchmark,runs:runsOf(u.id).length,latest:(runsOf(u.id)[0]||{}).as_of||null})) };
+  window.RS2={ ensureInit:init, getStep3, universeResult, ensureRun, rsRank, universes:()=>UNIS.map(u=>({id:u.id,name:u.name,code:u.code,benchmark:u.benchmark,runs:runsOf(u.id).length,latest:(runsOf(u.id)[0]||{}).as_of||null})) };
 })();
 </script>
 <script>
@@ -5214,6 +5250,17 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 #page-mom .mo-seg{display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden}
 #page-mom .mo-seg button{background:var(--bg3);border:0;color:var(--text2);padding:5px 11px;font-size:11.5px;cursor:pointer;font-weight:600}
 #page-mom .mo-seg button.on{background:var(--accent);color:var(--bg)}
+#page-mom .mo-seg.multi button.on{background:rgba(232,184,75,.18);color:var(--text);box-shadow:inset 0 -2px 0 var(--accent)}
+#page-mom .mo-runs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 8px}
+#page-mom .mo-runs .lbl{font-size:10.5px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-right:2px}
+#page-mom .mo-run{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:3px 10px;font-size:11px;color:var(--text2);cursor:pointer;line-height:1.3}
+#page-mom .mo-run:hover{border-color:var(--text3)}
+#page-mom .mo-run.on{border-color:var(--accent);color:var(--text);background:rgba(232,184,75,.12)}
+#page-mom .mo-run b{color:var(--text);font-weight:600}
+#page-mom .mo-map{border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:10px 0;background:var(--bg2)}
+#page-mom .mo-ml{display:inline-flex;align-items:center;gap:5px;margin-right:10px;white-space:nowrap}
+#page-mom .mo-ml i{display:inline-block;width:9px;height:9px;border-radius:50%}
+#page-mom .mo-bar input::placeholder{color:var(--text3)}
 </style>
 
 <script>
@@ -5224,8 +5271,20 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   let UNIS=[], SNAPS=[], curUni=null, inited=false, stampMissing=false;
   let use3M=false, volSmooth=true, sortBy={c:"rank",d:"asc"}, topN=30, minTurn=0, minF=0;
   let rankMode="stdv", rsOnly=false, rsMin=50, indCap=5;          // ranking mode · RS-survivor filter · industry cap for the export
+  let curSnapId=null;                                              // the upload on screen (null = the latest of the universe)
+  let smMin=null, volMax=null, clMin=null, postSet=new Set();      // the map filters: climb ÷ wobble, wobble cap, climb floor, postures switched OFF
+  let mapFit=false, mapLabels=true, mapChart=null, mapState=null, rsPending=new Set();
+  const F2_KEY="mo_f2";
+  function saveF2(){ try{ localStorage.setItem(F2_KEY,JSON.stringify({smMin,volMax,clMin,post:[...postSet],mapFit,mapLabels})); }catch(e){} }
+  function loadF2(){ try{ const o=JSON.parse(localStorage.getItem(F2_KEY)||"{}")||{}; smMin=o.smMin==null?null:+o.smMin; volMax=o.volMax==null?null:+o.volMax; clMin=o.clMin==null?null:+o.clMin;
+      postSet=new Set(Array.isArray(o.post)?o.post:[]); mapFit=!!o.mapFit; mapLabels=o.mapLabels!==false; }catch(e){} }
   const passF=r=>minF===0||(r.fscore||0)>=minF;
   const passRS=r=>!rsOnly||!!(r.rs&&r.rs.total>=rsMin);
+  const passSm=r=>(smMin==null||(r.smooth!=null&&r.smooth>=smMin))&&(volMax==null||(r._vol!=null&&r._vol<=volMax))&&(clMin==null||(r.climb!=null&&r.climb>=clMin));
+  const passPost=r=>!postSet.size||(!!r.bucket&&!postSet.has(r.bucket));
+  const passAll=r=>passF(r)&&passRS(r)&&passSm(r)&&passPost(r);
+  function activeFilters(){ const a=[]; if(minF>0)a.push("Min F "+minF); if(rsOnly)a.push("RS ≥ "+rsMin); if(smMin!=null)a.push("Smooth ≥ "+smMin); if(volMax!=null)a.push("Wobble ≤ "+volMax+"%"); if(clMin!=null)a.push("Climb ≥ "+clMin+"%");
+    if(postSet.size)a.push("posture: "+["READY","NEAR","WAIT","BELOW"].filter(p=>!postSet.has(p)).join("/")); if(minTurn>0)a.push("turnover ≥ $"+minTurn+"M"); return a; }
   const EARN_WIN=5;
   const todayISO=()=>{ const d=new Date(), p=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); };
   function bizDays(a,b){          // weekdays strictly after a, up to and including b (negative when b is earlier)
@@ -5234,9 +5293,12 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     while(((sign>0&&x<y)||(sign<0&&x>y))&&guard++<800){ x.setDate(x.getDate()+sign); const w=x.getDay(); if(w!==0&&w!==6) n+=sign; }
     return n;
   }
-  function rsFor(uid){            // this universe's latest RS Score run (matched by code, then by name)
+  function rsFor(uid,asOf){       // this universe's RS Score run nearest to the upload's date (matched by code, then by name); latest when no date is given
     const u=UNIS.find(x=>x.id===uid); if(!u||!window.RS2||!RS2.universeResult) return null;
-    try{ return RS2.universeResult(u.code||u.name)||RS2.universeResult(u.name)||null; }catch(e){ return null; }
+    let r=null; try{ r=RS2.universeResult(u.code||u.name,asOf)||RS2.universeResult(u.name,asOf)||null; }catch(e){ return null; }
+    if(r&&r.needs&&RS2.ensureRun&&!rsPending.has(r.needs)){        // that run's table is not in memory yet: fetch it once, then rebuild
+      rsPending.add(r.needs); RS2.ensureRun(u.code||u.name,asOf).then(()=>{ if(curUni===uid) build(); }).catch(()=>{}); }
+    return r;
   }
   let MODEL={rows:[],churn:null,secTop:[],prev:null};
 
@@ -5391,7 +5453,9 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       r.volSus=(vFloor!==null&&r.volRaw!==null&&r.volRaw!==undefined&&r.volRaw<vFloor*0.5);
     });
     // ratios computed AFTER the floor, so the floor actually binds
-    rows.forEach(r=>{ r._ra6=ra(r.p6m,r._vol); r._ra12=ra(r.p1y,r._vol); r._ra3=ra(r.p3m,r._vol); });
+    rows.forEach(r=>{ r._ra6=ra(r.p6m,r._vol); r._ra12=ra(r.p1y,r._vol); r._ra3=ra(r.p3m,r._vol);
+      r.climb=(r.p6m!=null&&r.p1y!=null)?(r.p6m+r.p1y)/2:null;                     // the map's y: average of the 6M and 12M gain
+      r.smooth=(r.climb!=null&&r._vol!=null&&r._vol>0)?r.climb/r._vol:null; });    // the map's steepness: climb ÷ wobble (the raw ratio behind the Z)
     const z6=zmaker(rows.map(r=>r._ra6)), z12=zmaker(rows.map(r=>r._ra12)), z3=zmaker(rows.map(r=>r._ra3));
     // winsorize at +/-3 sd, the standard index-provider treatment
     const CLIP=3, clip=z=>z===null||z===undefined?null:Math.max(-CLIP,Math.min(CLIP,z));
@@ -5454,9 +5518,10 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     if(!uid){render();return;}
     const list=snapsFor(uid);
     if(!list.length){render();return;}
-    const idx=list.length-1;
+    let idx=list.length-1; if(curSnapId!=null){ const k=list.findIndex(x=>x.id===curSnapId); if(k>=0) idx=k; else curSnapId=null; }
+    MODEL.list=list; MODEL.idx=idx;
     const opts={use3M,smooth:volSmooth,mode:rankMode};
-    const rsu=rsFor(uid); MODEL.rsu=rsu;
+    const rsu=rsFor(uid,list[idx].as_of); MODEL.rsu=rsu;
     const cur=rankSnapshot(list,idx,opts);
     const back=k=>(idx-k>=0)?rankSnapshot(list,idx-k,opts):null;
     const p1=back(1), p3=back(3), p6=back(6);
@@ -5483,7 +5548,14 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     MODEL.secTop=Object.entries(bys).sort((a,b)=>b[1]-a[1]).slice(0,4)
       .map(([s,n])=>({s,n,pct:topRows.length?n/topRows.length*100:0}));
     MODEL.rows=cur; MODEL.dropped=dropped; MODEL.prev=p1; MODEL.snap=list[idx]; MODEL.count=list.length; MODEL.rsu=rsu;
-    render();
+    renderRuns(); render();
+  }
+  function renderRuns(){            // one chip per saved upload of this universe, newest first; the one on screen is lit
+    const el=$("moRuns"); if(!el) return; const list=MODEL.list||[];
+    if(list.length<1){ el.innerHTML=""; return; }
+    const cur=MODEL.idx; const items=list.map((sn,i)=>({sn,i})).reverse().slice(0,14);
+    el.innerHTML='<span class="lbl">Upload</span>'+items.map(({sn,i})=>'<span class="mo-run'+(i===cur?" on":"")+'" title="'+esc(sn.filename||"")+' · '+(sn.n_rows||0)+' rows'+(i===list.length-1?" · latest":"")+'" onclick="MO.pickSnap('+sn.id+')"><b>'+esc(sn.as_of)+'</b> <span class="mo-dim">'+(sn.n_rows||0)+'</span></span>').join("")
+      +(list.length>14?'<span class="mo-dim" style="font-size:10.5px">+ '+(list.length-14)+' older in the left pane</span>':"");
   }
 
   /* ---------- data layer ---------- */
@@ -5517,7 +5589,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   async function delSnap(id,ev){
     ev.stopPropagation();
     if(!confirm("Delete this snapshot?"))return;
-    try{ await sb(T_SNAP+"?id=eq."+id,"DELETE"); await load(); toast("Snapshot deleted","success"); }
+    try{ await sb(T_SNAP+"?id=eq."+id,"DELETE"); if(curSnapId===id) curSnapId=null; await load(); toast("Snapshot deleted","success"); }
     catch(e){ toast("Delete failed: "+e.message,"error"); }
   }
   async function saveSnap(rows,fname,asOf){
@@ -5526,6 +5598,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       const rec={universe_id:curUni,as_of:asOf,filename:fname,n_rows:rows.length,rows:rows,uploaded_at:new Date().toISOString()};
       try{ await sb(T_SNAP,"POST",rec); stampMissing=false; }
       catch(e1){ if(/uploaded_at/i.test(String(e1.message||e1))){ delete rec.uploaded_at; stampMissing=true; await sb(T_SNAP,"POST",rec); } else throw e1; }
+      curSnapId=null;
       await load();
       toast("Imported "+rows.length+" rows","success");
     }catch(e){ $("moErr").textContent="Save failed: "+e.message; toast("Save failed","error"); }
@@ -5563,7 +5636,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download=fname; a.click();
   }
   function pickTop(){   // ranked, filtered, industry cap applied — the list the export and the KPI tiles use
-    const ranked=(MODEL.rows||[]).filter(r=>r.rank&&!r.thin&&passF(r)&&passRS(r)).sort((a,b)=>a.rank-b.rank);
+    const ranked=(MODEL.rows||[]).filter(r=>r.rank&&!r.thin&&passAll(r)).sort((a,b)=>a.rank-b.rank);
     const by={}, pick=[], skipped=[];
     for(const r of ranked){ if(pick.length>=topN) break; const k=(r.ind||r.sec||"—"); if(indCap>0&&(by[k]||0)>=indCap){ skipped.push(r); continue; } by[k]=(by[k]||0)+1; pick.push(r); }
     return {pick,skipped};
@@ -5571,7 +5644,8 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   function exportTop(){
     const {pick,skipped}=pickTop();
     if(!pick.length){toast("Nothing passes the current filters","error");return;}
-    const code=uniCode(), tag=(minF>0?"_F"+minF:"")+(rsOnly?"_RS":"")+(rankMode!=="stdv"?"_"+rankMode.toUpperCase():"");
+    const code=uniCode(), tag=(minF>0?"_F"+minF:"")+(rsOnly?"_RS"+rsMin:"")+(smMin!=null?"_SM"+smMin:"")+(volMax!=null?"_W"+volMax:"")+(clMin!=null?"_C"+clMin:"")
+      +(postSet.size?"_P"+["READY","NEAR","WAIT","BELOW"].filter(p=>!postSet.has(p)).map(p=>p[0]).join(""):"")+(rankMode!=="stdv"?"_"+rankMode.toUpperCase():"")+(MODEL.snap&&MODEL.idx!==(MODEL.list||[]).length-1?"_"+String(MODEL.snap.as_of).replace(/-/g,""):"");
     let t="";
     if(pick.some(r=>r.stretch!=null)){
       // one file, several TradingView sections: where each name sits against its 20 EMA, earnings names kept apart
@@ -5735,7 +5809,8 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     }
     $("moDrop2").style.display="block";
     $("moRankSub").textContent = rankMode==="stdv"?"Z(6M÷vol) + Z(12M÷vol), averaged":rankMode==="m121"?"12-1 momentum: (1+1Y) ÷ (1+1M) − 1, z-scored":"6-1 momentum: (1+6M) ÷ (1+1M) − 1, z-scored";
-    let rows=MODEL.rows.filter(r=>passF(r)&&passRS(r));
+    let rows=MODEL.rows.filter(passAll);
+    renderMap();
     if(!rows.length){ el.innerHTML='<div class="mo-empty">'+(rsOnly&&!(MODEL.rsu&&MODEL.rsu.n)?'No RS Score run found for this universe — save one in the RS Score tab (same code, e.g. R1000), or switch “RS survivors only” off.':rsOnly?'No name of this snapshot has an RS total of '+rsMin+' or more. Lower the threshold or switch the filter off.':'No stock has '+minF+' or more lights. Lower <b>Min F</b>, or add the extra columns to your screener export.')+'</div>'; return; }
     const s=sortBy;
     rows.sort((a,b)=>{
@@ -5779,7 +5854,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
         const cc=/^p1|^p3|^p6/.test(c.k)?col(v):"var(--text)";
         return '<td style="color:'+cc+'">'+txt+'</td>';
       }).join("");
-      let tr='<tr>'+tds+'</tr>';
+      let tr='<tr data-t="'+esc(r.t)+'">'+tds+'</tr>';
       if(openStory===r.t) tr+='<tr class="mo-srow"><td colspan="'+COLS.length+'">'+storyHtml(r)+'</td></tr>';
       return tr;
     }).join("")+'</tbody>';
@@ -5793,9 +5868,10 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     h+='<div class="mo-k">Vol basis<b>'+((volSmooth&&m.count>=3)?"3-upload avg":"raw 1M")+'</b></div>';
     const lit=m.rows.length?Math.max(...m.rows.map(r=>r.fmax||0)):0;
     h+='<div class="mo-k'+(lit<7?" alert":"")+'" title="How many of the 7 screener lights your CSV columns can score">Lights active<b>'+lit+' / 7</b></div>';
-    if(minF>0)h+='<div class="mo-k">Min F '+minF+'<b>'+m.rows.filter(passF).length+' shown</b></div>';
+    { const act=activeFilters(), np=m.rows.filter(r=>r.rank&&passAll(r)).length;
+      h+='<div class="mo-k" title="Ranked names that pass every active filter together (the table, the export and the map\'s green and gold dots)">Pass all filters<b>'+np+' / '+m.rows.filter(r=>r.rank).length+'</b><span class="mo-dim" style="display:block">'+(act.length?esc(act.join(" · ")):"none active")+'</span></div>'; }
     if(m.rsu&&m.rsu.n){ const surv=m.rows.filter(r=>r.rs&&r.rs.total>=rsMin).length;
-      h+='<div class="mo-k" title="Names of this snapshot that are in the latest RS Score run of the same universe with a Step 3 total of '+rsMin+' or more">RS survivors ≥ '+rsMin+(rsOnly?' (on)':'')+'<b>'+surv+' / '+m.rows.length+'</b><span class="mo-dim" style="display:block">'+esc(m.rsu.code||m.rsu.name||"")+' run '+esc(m.rsu.as_of||"")+'</span></div>'; }
+      h+='<div class="mo-k" title="Names of this upload that are in the RS Score run of the same universe nearest to the upload\'s date, with a Step 3 total of '+rsMin+' or more">RS survivors ≥ '+rsMin+(rsOnly?' (on)':'')+'<b>'+surv+' / '+m.rows.length+'</b><span class="mo-dim" style="display:block">'+esc(m.rsu.code||m.rsu.name||"")+' run '+esc(m.rsu.as_of||"")+(m.rsu.src&&m.rsu.src!=="live"?" · "+esc(m.rsu.src):"")+'</span></div>'; }
     else if(rsOnly) h+='<div class="mo-k alert">RS survivors<b>no RS run</b><span class="mo-dim" style="display:block">save one for this universe in the RS Score tab</span></div>';
     const tp=pickTop(); if(tp.pick.some(r=>r.stretch!=null)){ const rd=tp.pick.filter(r=>r.bucket==="READY"&&!r.earnSoon).length, wt=tp.pick.filter(r=>r.bucket==="WAIT"&&!r.earnSoon).length, es=tp.pick.filter(r=>r.earnSoon).length;
       h+='<div class="mo-k" title="In the export list: READY = within 1 ATR of the 20 EMA · WAIT = more than 2 ATR above it · EARN = reports within 5 sessions">Export '+tp.pick.length+' · ready / wait / earn<b>'+rd+' / '+wt+' / '+es+'</b></div>'; }
@@ -5811,6 +5887,56 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       h+='<div class="mo-k'+(top.pct>40?" alert":"")+'">Top sector in top '+topN+'<b>'+esc(top.s.slice(0,20))+' '+top.pct.toFixed(0)+'%</b></div>';
     }
     return h;
+  }
+
+  /* ---------- the Smooth map: climb (y) vs wobble (x); steepness = the score ---------- */
+  function renderMap(){
+    const box=$("moMapBox"); if(!box) return;
+    const has=MODEL.rows&&MODEL.rows.length;
+    if(!has){ box.style.display="none"; if(mapChart){ try{mapChart.destroy();}catch(e){} mapChart=null; } mapState=null; return; }
+    box.style.display="block";
+    $("moMapTitle").textContent=(MODEL.snap?MODEL.snap.as_of:"")+" · "+uniCode()+(MODEL.idx!==(MODEL.list||[]).length-1?" · older upload":"");
+    const pts=(MODEL.rows||[]).filter(r=>r.climb!=null&&r._vol!=null&&r._vol>0);
+    const pick=new Set(pickTop().pick.map(r=>r.t));
+    const data=pts.map(r=>({x:r._vol,y:r.climb,r,pass:!!r.rank&&!r.thin&&passAll(r),top:pick.has(r.t)}));
+    const sm=pts.filter(r=>r.smooth!=null&&r.rank).map(r=>r.smooth).sort((a,b)=>a-b);
+    const q=p=>sm.length?sm[Math.min(sm.length-1,Math.floor(p*(sm.length-1)))]:null;
+    const rays=[{v:q(.5),l:"median",c:"rgba(154,163,184,.5)",dash:[3,5],w:1},{v:q(.9),l:"top 10%",c:"rgba(154,163,184,.8)",dash:[3,5],w:1}];
+    if(smMin!=null) rays.push({v:smMin,l:"Smooth ≥ "+smMin,c:"#e8b84b",dash:[6,4],w:1.5});
+    mapState={n:data.length,pass:data.filter(d=>d.pass).length,top:data.filter(d=>d.top).length,median:q(.5),top10:q(.9),asOf:MODEL.snap?MODEL.snap.as_of:null,drawn:false};
+    $("moMapLegend").innerHTML='<span class="mo-ml"><i style="background:rgba(232,184,75,.95)"></i>export list '+mapState.top+'</span><span class="mo-ml"><i style="background:rgba(61,214,140,.85)"></i>pass all filters '+mapState.pass+'</span><span class="mo-ml"><i style="background:rgba(154,163,184,.4)"></i>filtered out '+(mapState.n-mapState.pass)+'</span>';
+    if(typeof Chart==="undefined"){ $("moMapNote").textContent="Waiting for the chart library…"; setTimeout(renderMap,500); return; }
+    if(!data.length){ if(mapChart){ try{mapChart.destroy();}catch(e){} mapChart=null; } return; }
+    const base=mapFit?data.filter(d=>d.pass):data, src=base.length?base:data;
+    const xs=src.map(d=>d.x), ys=src.map(d=>d.y);
+    const ymin=Math.min(0,Math.min(...ys)), ymax=Math.max(...ys), yw=(ymax-ymin)||1, xmax=Math.max(...xs)||1;
+    const x0=0, x1=xmax*1.08, y0=ymin<0?ymin-yw*.06:0, y1=ymax+yw*.08;
+    const rayPlugin={id:"moRays",
+      beforeDatasetsDraw(c){ const {ctx,chartArea:a,scales:{x,y}}=c; ctx.save(); ctx.beginPath(); ctx.rect(a.left,a.top,a.right-a.left,a.bottom-a.top); ctx.clip();
+        const zy=y.getPixelForValue(0); ctx.strokeStyle="rgba(154,163,184,.35)"; ctx.setLineDash([2,4]); ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(a.left,zy); ctx.lineTo(a.right,zy); ctx.stroke();
+        const px0=x.getPixelForValue(0), py0=y.getPixelForValue(0); let lastLy=null;
+        rays.slice().sort((p,q)=>(p.v||0)-(q.v||0)).forEach(R=>{ if(R.v==null) return; let xe=x.max, ye=R.v*xe; if(ye>y.max){ ye=y.max; xe=R.v?ye/R.v:xe; }
+          const px1=x.getPixelForValue(xe), py1=y.getPixelForValue(ye);
+          ctx.strokeStyle=R.c; ctx.setLineDash(R.dash); ctx.lineWidth=R.w; ctx.beginPath(); ctx.moveTo(px0,py0); ctx.lineTo(px1,py1); ctx.stroke();
+          let ly=Math.max(py1,a.top+12)-5; if(lastLy!=null&&Math.abs(ly-lastLy)<12) ly=lastLy-12; lastLy=ly;     // staggered when two rays coincide
+          ctx.fillStyle=R.c; ctx.font="bold 10px Barlow, sans-serif"; ctx.textAlign="right"; ctx.setLineDash([]);
+          ctx.fillText(R.l+" "+(Math.round(R.v*10)/10),Math.min(px1,a.right-4)-4,ly); });
+        ctx.restore(); },
+      afterDatasetsDraw(c){ mapState.drawn=true; if(!mapLabels) return; const meta=c.getDatasetMeta(0); const {ctx}=c; ctx.save(); ctx.font="bold 10px Barlow, sans-serif"; ctx.fillStyle="#e8b84b"; ctx.textAlign="left";
+        meta.data.forEach((pt,i)=>{ const d=data[i]; if(d&&d.top) ctx.fillText(d.r.t,pt.x+8,pt.y-7); }); ctx.restore(); }};
+    const col=d=>d.top?"rgba(232,184,75,.95)":d.pass?"rgba(61,214,140,.85)":"rgba(154,163,184,.3)";
+    if(mapChart){ try{mapChart.destroy();}catch(e){} mapChart=null; }
+    mapChart=new Chart($("moMap").getContext("2d"),{type:"scatter",data:{datasets:[{data,backgroundColor:data.map(col),borderColor:data.map(d=>d.top?"#fff":"rgba(13,15,18,.8)"),borderWidth:data.map(d=>d.top?1.5:1),pointRadius:data.map(d=>d.top?7:d.pass?5.5:3.5),pointHoverRadius:9}]},
+      options:{responsive:true,maintainAspectRatio:false,animation:false,parsing:false,onClick:(e,els)=>{ if(els.length){ const d=data[els[0].index]; if(d) MO.story(d.r.t,true); } },
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{ const d=data[c.dataIndex], r=d.r;
+          return [r.t+" · "+(r.n||"").slice(0,26), "climb "+pct(r.climb)+" (6M "+pct(r.p6m)+" · 12M "+pct(r.p1y)+")",
+                  "wobble "+r._vol.toFixed(2)+"%"+(r.volRaw!=null&&Math.abs(r.volRaw-r._vol)>1e-9?" (raw "+r.volRaw.toFixed(2)+")":""),
+                  "smooth "+(r.smooth==null?"—":r.smooth.toFixed(1))+" · Z "+(r.score==null?"—":r.score.toFixed(2))+" · rank "+(r.rank||"—"),
+                  "RS "+(r.rs?r.rs.total.toFixed(0)+" #"+r.rs.rank:"—")+" · "+(r.bucket||"no EMA data")+(r.earnSoon?" · EARN "+r.earnD+"s":""),
+                  d.top?"★ in the export list":d.pass?"passes every filter":"filtered out"]; }}}},
+        scales:{x:{min:x0,max:x1,title:{display:true,text:"wobble · 1-month volatility as the score uses it (avg daily swing, % of price)"+((volSmooth&&MODEL.count>=3)?" · 3-upload average":""),color:"#9aa3b8"},ticks:{color:"#9aa3b8",includeBounds:false,callback:v=>(Math.round(v*100)/100)+"%"},grid:{color:"rgba(45,52,69,.5)"}},
+                y:{min:y0,max:y1,title:{display:true,text:"climb · average of the 6-month and 12-month gain, %",color:"#9aa3b8"},ticks:{color:"#9aa3b8",includeBounds:false,callback:v=>(Math.round(v*10)/10)+"%"},grid:{color:"rgba(45,52,69,.5)"}}}},
+      plugins:[rayPlugin]});
   }
 
   /* ---------- wiring ---------- */
@@ -5838,6 +5964,13 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     $("moTgRS").onclick=function(){ rsOnly=!rsOnly; this.classList.toggle("on",rsOnly); build(); if(window.OR&&OR.onMO)OR.onMO(); };
     $("moRsMin").onchange=function(){ rsMin=parseFloat(this.value); if(isNaN(rsMin)) rsMin=50; build(); };
     $("moIndCap").onchange=function(){ indCap=parseInt(this.value)||0; render(); };
+    loadF2();
+    const numIn=(id,get,set)=>{ const el=$(id); el.value=get()==null?"":get(); el.addEventListener("input",()=>{ const v=parseFloat(el.value); set(isNaN(v)?null:v); saveF2(); render(); if(window.OR&&OR.onMO)OR.onMO(); }); };
+    numIn("moSmMin",()=>smMin,v=>smMin=v); numIn("moVolMax",()=>volMax,v=>volMax=v); numIn("moClMin",()=>clMin,v=>clMin=v);
+    $("moPost").querySelectorAll("button").forEach(b=>{ b.classList.toggle("on",!postSet.has(b.dataset.p));
+      b.onclick=()=>{ if(postSet.has(b.dataset.p)) postSet.delete(b.dataset.p); else postSet.add(b.dataset.p); b.classList.toggle("on",!postSet.has(b.dataset.p)); saveF2(); render(); if(window.OR&&OR.onMO)OR.onMO(); }; });
+    $("moTgFit").classList.toggle("on",mapFit); $("moTgFit").onclick=function(){ mapFit=!mapFit; this.classList.toggle("on",mapFit); saveF2(); renderMap(); };
+    $("moTgLbl").classList.toggle("on",mapLabels); $("moTgLbl").onclick=function(){ mapLabels=!mapLabels; this.classList.toggle("on",mapLabels); saveF2(); renderMap(); };
     $("moRankBy").querySelectorAll("button").forEach(b=>b.onclick=()=>{ rankMode=b.dataset.m; $("moRankBy").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); build(); if(window.OR&&OR.onMO)OR.onMO(); });
     $("moTgV").classList.toggle("on",volSmooth);
     load();
@@ -5851,18 +5984,20 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   function rankFor(id){
     const sn=SNAPS.find(x=>x.id===id); if(!sn) return null;
     const list=snapsFor(sn.universe_id), idx=list.findIndex(x=>x.id===id); if(idx<0) return null;
-    const rsu=rsFor(sn.universe_id);
+    const rsu=rsFor(sn.universe_id,sn.as_of);
     const rows=rankSnapshot(list,idx,{use3M,smooth:volSmooth,mode:rankMode})||[]; rows.forEach(r=>enrich(r,rsu));
     return { rows, uni:UNIS.find(x=>x.id===sn.universe_id)||null, snap:{id:sn.id,as_of:sn.as_of,uploaded_at:sn.uploaded_at||sn.created_at||null,n:sn.n_rows||0},
-             rs:rsu, filters:{minF,minTurn,use3M,volSmooth,rankMode,rsOnly,rsMin}, pass:r=>!!r.rank&&!r.thin&&passF(r)&&passRS(r) };
+             rs:rsu, filters:{minF,minTurn,use3M,volSmooth,rankMode,rsOnly,rsMin,smMin,volMax,clMin,postOff:[...postSet]}, pass:r=>!!r.rank&&!r.thin&&passAll(r) };
   }
   window.MO={
     ensureInit:init, runs, rankFor, current:()=>curUni, stampMissing:()=>stampMissing,
     onRS:()=>{ if(inited&&curUni) build(); },          // the RS Score tab recomputed: refresh the RS column / survivor filter
-    pick:id=>{curUni=id;renderUnis();build();},
+    pick:id=>{curUni=id;curSnapId=null;renderUnis();build();},
+    pickSnap:id=>{ curSnapId=id; const sn=SNAPS.find(x=>x.id===id); if(sn&&sn.universe_id!==curUni){ curUni=sn.universe_id; renderUnis(); } build(); if(window.OR&&OR.onMO)OR.onMO(); },
+    map:()=>mapState, filters:()=>({smMin,volMax,clMin,postOff:[...postSet],rsOnly,rsMin,minF,topN,indCap,mapFit,mapLabels}),
     delUni, delSnap,
     sort:c=>{ if(sortBy.c===c)sortBy.d=sortBy.d==="asc"?"desc":"asc"; else sortBy={c:c,d:(c==="rank"||c==="t"||c==="n"||c==="sec")?"asc":"desc"}; render(); },
-    story:t=>{ openStory = (openStory===t) ? null : t; render(); }
+    story:(t,open)=>{ openStory = (openStory===t&&!open) ? null : t; render(); if(open){ const tr=document.querySelector('#moTable tr[data-t="'+String(t).replace(/"/g,'')+'"]'); if(tr) tr.scrollIntoView({block:"center",behavior:"smooth"}); } }
   };
 })();
 </script>
