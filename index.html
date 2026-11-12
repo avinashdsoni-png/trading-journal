@@ -884,6 +884,28 @@ td {
 #page-rs .rs-tag.gr{background:rgba(154,163,184,.14);color:var(--text2)}
 #page-rs .rs-err{color:var(--red);font-size:12px;margin-top:8px}
 #page-rs .rs-err:empty{display:none}
+/* ── Sluice ── */
+#page-sluice #page-mom .mo-wrap{grid-template-columns:1fr}
+#page-sluice .sl-jump{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 14px}
+#page-sluice .sl-jump a{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);border:1px solid var(--border);border-radius:14px;padding:4px 11px;text-decoration:none;background:var(--bg3)}
+#page-sluice .sl-jump a:hover{color:var(--accent);border-color:var(--accent)}
+#page-sluice .sl-drops .rs-card{margin-bottom:16px}
+#page-sluice .sl-runs{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:12px;align-items:center}
+#page-sluice .sl-runs:empty{display:none}
+#page-sluice .sl-runs .lbl{font-size:10.5px;color:var(--text3);letter-spacing:.06em;text-transform:uppercase}
+#page-sluice .sl-runs .sl-cur{font-size:13px;color:var(--text);font-weight:700;margin-right:4px}
+#page-sluice .sl-runs input[type=range]{width:220px;accent-color:var(--accent);margin:0 6px}
+#page-sluice .sl-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--text3);margin-left:1px;vertical-align:middle}
+#page-sluice .sl-dot.rs{background:#4da3ff}
+#page-sluice .sl-dot.mo{background:#c084fc}
+#page-sluice .rs-tag.sh{background:rgba(229,72,77,.18);color:#ff8a8a}
+#page-sluice .rs-tag.lg{background:rgba(61,214,140,.14);color:var(--green)}
+#page-sluice .sl-side{font-size:11px;color:var(--text2);margin-top:4px}
+#page-mom .mo-evc .mo-bar select{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:3px 5px;color:var(--text);font-size:12px}
+#page-mom .mo-evc .mo-bar input[type=number]{width:56px}
+#page-mom .mo-evcq{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:10.5px;color:var(--text3);margin:2px 0 6px}
+#page-mom .mo-evcq b{color:var(--text2);font-weight:600}
+#page-mom .mo-lane{font-size:10px;color:var(--text2);white-space:nowrap}
 </style>
 
 <style>
@@ -1286,8 +1308,7 @@ tr.flt-row .flt2{display:flex;gap:3px}
       <button class="nav-btn" onclick="showPage(&#39;analysis&#39;,this)">📊 Analysis</button>
       <button class="nav-btn" onclick="showPage(&#39;funds&#39;,this)">💰 Funds</button>
       <button class="nav-btn" onclick="showPage(&#39;plan&#39;,this)">📐 Trading Plan</button>
-      <button class="nav-btn" onclick="showPage(&#39;rs&#39;,this); if(window.RS) RS.ensureInit(); if(window.RS2) RS2.ensureInit();">📈 RS Score</button>
-      <button class="nav-btn" onclick="showPage(&#39;mom&#39;,this); if(window.MO) MO.ensureInit();">🚀 Momentum</button>
+      <button class="nav-btn" onclick="showPage(&#39;sluice&#39;,this); if(window.RS) RS.ensureInit(); if(window.RS2) RS2.ensureInit(); if(window.MO) MO.ensureInit(); if(window.SL) SL.init();">⛏️ Sluice</button>
       <button class="nav-btn" onclick="showPage(&#39;orange&#39;,this); if(window.OR) OR.init();">🟠 Orange</button>
       <button class="nav-btn" onclick="showPage(&#39;dd&#39;,this); if(window.DD) DD.init();">🔬 Deep Dive</button>
       <button class="nav-btn" onclick="showPage(&#39;etf&#39;,this); if(window.EF) EF.ensureInit();">🧭 ETF Flow</button>
@@ -1581,42 +1602,79 @@ tr.flt-row .flt2{display:flex;gap:3px}
   </div>
 
   <!-- ══ RS SCORE PAGE ══ -->
-  <div class="page" id="page-rs">
+  <div class="page" id="page-sluice">
+  <div id="page-rs">
     <div class="section">
       <div class="section-header">
-        <div class="section-title">RELATIVE <span>STRENGTH</span></div>
+        <div class="section-title">SLUICE <span>RS &rarr; MOMENTUM &rarr; EVC</span></div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <span class="rs-note" id="rsSaveState" style="margin:0"></span>
-          <button class="btn btn-gold btn-sm" id="rsAddUni">+ Universe</button>
+          <button class="rs-ghost" id="slReload" style="padding:6px 10px;font-size:12px" title="Reload both stores from the cloud">&#8635; Reload</button>
+          <button class="btn btn-gold btn-sm" id="slAddUni">+ Universe</button>
         </div>
       </div>
-      <p class="rs-sub">Composite relative-strength ranking across six timeframes &middot; Z-Score (soft-capped) and Percentile &middot; one saved run per universe per date (rs_snapshots) &mdash; the Orange cockpit reads the latest run of every universe</p>
+      <p class="rs-sub">A sluice box: the gravel washes through, the gold stays at the riffles. One screener export per universe per week feeds all three riffles &mdash; <b>1 &middot; RS Score</b> (Step 1 among peers, Step 3 combined with the index), <b>2 &middot; Momentum</b> (smooth &middot; 12-1 &middot; 6-1) and <b>3 &middot; EVC rungs</b>. The index performance file feeds Step 2 silently. Every universe has a side: a <b>long</b> universe reads the ladder upwards, a <b>short</b> one reads it upside down.</p>
+      <div class="sl-jump"><a href="#slStage1">1 &middot; RS Score</a><a href="#slStage2">2 &middot; Momentum</a><a href="#slStage3">3 &middot; EVC rungs</a><span class="rs-note" id="slHint" style="margin:0 0 0 auto"></span></div>
 
-      <!-- universes + saved runs -->
-      <div class="rs-card">
-        <div class="rs-unibar" id="rsUnis"><div class="rs-note">Loading universes&hellip;</div></div>
-        <div class="rs-snaps" id="rsSnaps"></div>
+      <div class="rs-card" id="slTop">
+        <div class="rs-unibar" id="slUnis"><div class="rs-note" style="margin:0">Loading universes&hellip;</div></div>
+        <div class="sl-runs" id="slRuns"></div>
         <div class="rs-err" id="rsErr"></div>
+        <div style="display:none"><div class="rs-unibar" id="rsUnis"></div><div class="rs-snaps" id="rsSnaps"></div><button id="rsAddUni"></button><button id="moAddUni"></button></div>
       </div>
 
+      <div class="rs-row sl-drops">
+        <div class="rs-col rs-card">
+          <div id="slDrop" class="rs-drop">
+            <div style="font-size:15px;font-weight:600">&#9312; Drop this universe&rsquo;s screener export here</div>
+            <div style="font-size:12px;margin-top:4px">US Bullish Main Stocks Screener with the index set to this universe &middot; CSV or Excel &middot; saved as the run of its date for RS <i>and</i> Momentum &middot; same date = replaced</div>
+          </div>
+          <div id="slStatus" class="rs-status"></div>
+        </div>
+        <div class="rs-col rs-card">
+        <div class="rs-row">
+          <div class="rs-col">
+            <div id="rs2Drop" class="rs-drop">
+              <div style="font-size:15px;font-weight:600">&#9313; Drop the <b>index performance</b> file here</div>
+              <div style="font-size:12px;margin-top:4px">The Performance screener on your Benchmarks watchlist &mdash; one file holding QQQ, IWM, SPY&hellip; &middot; each universe picks its own symbol &middot; feeds Step 2 silently</div>
+              <input id="rs2File" type="file" accept=".csv,.xlsx,.xls" style="display:none">
+            </div>
+            <div id="rs2Status" class="rs-status">Open this tab to load the latest benchmark file&hellip;</div>
+            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <button class="rs-ghost" id="rs2Reload">&#8635; Reload from cloud</button>
+              <span class="rs-note" id="rs2CloudState" style="margin:0"></span>
+            </div>
+          </div>
+          <div class="rs-col">
+            <label>Index for <span id="rs2UniName">this universe</span> (Step 2 measures every name against it)</label>
+            <input id="rs2Ticker" type="text" value="QQQ" placeholder="QQQ">
+            <div class="rs-note">Stored with the universe (QQQ for Russell 1000, IWM for Russell 2000). Change it and the run is re-measured against the new symbol.</div>
+            <div id="rs2Vals" class="rs-note" style="margin-top:10px"></div>
+          </div>
+        </div>
+        <div id="rs2Fresh" class="rs2-fresh"></div>
+        </div>
+      </div>
+
+      <a id="slStage1"></a>
       <div class="rs2-steptag">STEP 1 · PEER RANKING <span>each stock vs every other stock in the same universe</span></div>
 
       <div class="rs-card">
         <div class="rs-row">
           <div class="rs-col">
-            <div id="rsDrop" class="rs-drop">
+            <div style="display:none"><div id="rsDrop" class="rs-drop">
               <div style="font-size:15px;font-weight:600">Drop this universe&rsquo;s screener export here, or click to choose</div>
               <div style="font-size:12px;margin-top:4px">Funnel R1000 / Funnel R2000 CSV or Excel &middot; saved as a run under the selected universe &middot; same date = replaced</div>
-              <input id="rsFile" type="file" accept=".csv,.xlsx,.xls" style="display:none">
+              <input id="rsFile" type="file" accept=".csv,.xlsx,.xls" style="display:none"></div>
             </div>
             <div id="rsStatus" class="rs-status">Open this tab to load the latest run&hellip;</div>
             <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-              <button class="rs-ghost" id="rsReload">&#8635; Reload from cloud</button>
+              <button class="rs-ghost" id="rsReload" style="padding:5px 10px;font-size:12px">&#8635; Reload RS runs</button>
               <span class="rs-note" id="rsCloudState" style="margin:0"></span>
             </div>
           </div>
           <div class="rs-col">
-            <details open>
+            <details>
               <summary>Column mapping</summary>
               <div id="rsMapping" style="margin-top:10px"><div class="rs-note">Load a file to map columns.</div></div>
             </details>
@@ -1625,7 +1683,8 @@ tr.flt-row .flt2{display:flex;gap:3px}
       </div>
 
       <div class="rs-card">
-        <details open>
+        <details>
+          <summary>RS settings &mdash; weights &middot; Z cap &middot; $ floor &middot; Step 2 / Step 3 weights</summary>
           <summary>Weights &amp; settings</summary>
           <div style="margin-top:12px">
             <div class="rs-note" style="margin-bottom:8px">Set any weight to <b>0</b> to drop that timeframe &mdash; its cells show &ldquo;&mdash;&rdquo;. Keep the remaining weights summing to 100.</div>
@@ -1647,6 +1706,30 @@ tr.flt-row .flt2{display:flex;gap:3px}
                 <button class="rs-btn" id="rsRecalc">Recalculate</button>
               </div>
             </div>
+          </div>
+          <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:10px">
+          <summary>Weights for Step 2</summary>
+          <div style="margin-top:12px">
+            <label class="rs2-chk"><input type="checkbox" id="rs2Override"> Use different weights for Step 2</label>
+            <div class="rs-note">Off = inherit the Step 1 weights above, so both steps stay in sync.</div>
+            <div id="rs2WWrap" style="display:none;margin-top:10px">
+              <div class="rs-wgrid" id="rs2Weights"></div>
+              <div class="rs-wsum" id="rs2Wsum"></div>
+              <button class="rs-ghost" id="rs2ResetW" style="margin-top:8px">Reset to Step 1 weights</button>
+            </div>
+          </div>
+          </div>
+          <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:10px">
+          <summary>Weights for Step 3</summary>
+          <div style="margin-top:12px">
+            <label class="rs2-chk"><input type="checkbox" id="rs3Override"> Use different weights for Step 3</label>
+            <div class="rs-note">Off = inherit the Step 1 weights.</div>
+            <div id="rs3WWrap" style="display:none;margin-top:10px">
+              <div class="rs-wgrid" id="rs3Weights"></div>
+              <div class="rs-wsum" id="rs3Wsum"></div>
+              <button class="rs-ghost" id="rs3ResetW" style="margin-top:8px">Reset to Step 1 weights</button>
+            </div>
+          </div>
           </div>
         </details>
       </div>
@@ -1677,47 +1760,9 @@ tr.flt-row .flt2{display:flex;gap:3px}
         <div class="rs-note" id="rsExportNote"></div>
       </div>
 
-      <!-- ══════════════ STEP 2 ══════════════ -->
+
+      <div id="slStep2Hidden" style="display:none">
       <div class="rs2-steptag rs2-s2">STEP 2 · INDEX-RELATIVE <span>each stock vs its universe&rsquo;s benchmark &mdash; 50 means it matched the benchmark exactly</span></div>
-
-      <div class="rs-card">
-        <div class="rs-row">
-          <div class="rs-col">
-            <div id="rs2Drop" class="rs-drop">
-              <div style="font-size:15px;font-weight:600">Drop the <b>Benchmarks</b> export here, or click to choose</div>
-              <div style="font-size:12px;margin-top:4px">One file holding QQQ, IWM, SPY&hellip; (TradingView screener on the Benchmarks watchlist) &middot; each universe picks its own symbol from it</div>
-              <input id="rs2File" type="file" accept=".csv,.xlsx,.xls" style="display:none">
-            </div>
-            <div id="rs2Status" class="rs-status">Open this tab to load the latest benchmark file&hellip;</div>
-            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-              <button class="rs-ghost" id="rs2Reload">&#8635; Reload from cloud</button>
-              <span class="rs-note" id="rs2CloudState" style="margin:0"></span>
-            </div>
-          </div>
-          <div class="rs-col">
-            <label>Benchmark symbol for <span id="rs2UniName">this universe</span></label>
-            <input id="rs2Ticker" type="text" value="QQQ" placeholder="QQQ">
-            <div class="rs-note">Stored with the universe (QQQ for Russell 1000, IWM for Russell 2000). Change it and the run is re-measured against the new symbol.</div>
-            <div id="rs2Vals" class="rs-note" style="margin-top:10px"></div>
-          </div>
-        </div>
-        <div id="rs2Fresh" class="rs2-fresh"></div>
-      </div>
-
-      <div class="rs-card">
-        <details>
-          <summary>Weights for Step 2</summary>
-          <div style="margin-top:12px">
-            <label class="rs2-chk"><input type="checkbox" id="rs2Override"> Use different weights for Step 2</label>
-            <div class="rs-note">Off = inherit the Step 1 weights above, so both steps stay in sync.</div>
-            <div id="rs2WWrap" style="display:none;margin-top:10px">
-              <div class="rs-wgrid" id="rs2Weights"></div>
-              <div class="rs-wsum" id="rs2Wsum"></div>
-              <button class="rs-ghost" id="rs2ResetW" style="margin-top:8px">Reset to Step 1 weights</button>
-            </div>
-          </div>
-        </details>
-      </div>
 
       <div class="rs-tabs">
         <div class="rs-tab active" data-rs2tab="z">Z-Score vs Index</div>
@@ -1745,8 +1790,9 @@ tr.flt-row .flt2{display:flex;gap:3px}
         <div class="rs-note" id="rs2ExportNote"></div>
       </div>
 
-      <!-- ══════════════ STEP 3 ══════════════ -->
-      <div class="rs2-steptag rs2-s3">STEP 3 · COMBINED <span>Step 1 and Step 2 merged into one ranking &mdash; nothing to upload &middot; stored with the run for the Orange and Momentum tabs</span></div>
+      </div>
+
+      <div class="rs2-steptag rs2-s3">STEP 3 · COMBINED <span>Step 1 (vs peers) merged with Step 2 (vs the index, computed from the file at the top) &mdash; stored with the run; the Momentum stage and the Orange tab read it</span></div>
 
       <div class="rs-card">
         <label>How should the two steps be combined?</label>
@@ -1762,20 +1808,6 @@ tr.flt-row .flt2{display:flex;gap:3px}
         <div id="rs3Explain" class="rs2-explain"></div>
       </div>
 
-      <div class="rs-card">
-        <details>
-          <summary>Weights for Step 3</summary>
-          <div style="margin-top:12px">
-            <label class="rs2-chk"><input type="checkbox" id="rs3Override"> Use different weights for Step 3</label>
-            <div class="rs-note">Off = inherit the Step 1 weights.</div>
-            <div id="rs3WWrap" style="display:none;margin-top:10px">
-              <div class="rs-wgrid" id="rs3Weights"></div>
-              <div class="rs-wsum" id="rs3Wsum"></div>
-              <button class="rs-ghost" id="rs3ResetW" style="margin-top:8px">Reset to Step 1 weights</button>
-            </div>
-          </div>
-        </details>
-      </div>
 
       <div class="rs-tabs">
         <div class="rs-tab active" data-rs3tab="z">Z-Score (combined)</div>
@@ -1802,12 +1834,197 @@ tr.flt-row .flt2{display:flex;gap:3px}
           </table>
         </div>
         <div class="rs-note" id="rs3ExportNote"></div>
-        <div class="rs-note"><b>&Delta; prev</b> = rank change against this universe&rsquo;s previous run (&#9650; = improved). <b>EARN</b> = reports within the next 5 trading sessions (needs the <i>Upcoming earnings date</i> column). The Orange and Momentum tabs read the <b>latest run of every universe</b> with the settings on this page.</div>
+        <div class="rs-note"><b>&Delta; prev</b> = rank change against this universe&rsquo;s previous run (&#9650; = improved). <b>EARN</b> = reports within the next 5 trading sessions (needs the <i>Upcoming earnings date</i> column). The Momentum stage below and the Orange tab read the <b>latest run of every universe</b> with these settings.</div>
       </div>
     </div>
   </div>
 
+  <div id="page-mom">
+    <div class="section" style="margin-top:18px">
+      <a id="slStage2"></a>
+      <div class="mo-err" id="moErr"></div>
+      <div class="mo-wrap">
+        <!-- LEFT : universes + snapshots -->
+        <div class="mo-pane" style="display:none">
+          <div class="mo-ph"><div class="mo-pt">UNIVERSES</div></div>
+          <div id="moUnis"></div>
+          <div class="mo-drop" id="moDrop" style="margin-top:12px">
+            Drop TradingView CSV here<br><span class="mo-dim" style="font-size:10.5px">or click to browse</span>
+          </div>
+          <div class="mo-note">
+            Drop the <b>same Funnel export</b> you gave the RS Score tab (Funnel R1000 → Russell 1000, Funnel R2000 → Russell 2000);
+            extra columns are ignored. Score each universe separately — z-scores are relative to the pool they are computed in.
+          </div>
+        </div>
 
+        <!-- RIGHT : ranking -->
+        <div class="mo-pane">
+          <div class="mo-ph">
+            <div class="mo-pt">STAGE 2 · MOMENTUM</div>
+            <div class="mo-dim" style="font-size:10.5px" id="moRankSub">Z(6M÷vol) + Z(12M÷vol), averaged</div>
+          </div>
+
+          <div class="mo-runs" id="moRuns" style="display:none"></div>
+          <div class="mo-kpi" id="moKpi"></div>
+
+          <div class="mo-bar">
+            <div class="mo-sw"><div class="mo-tg" id="moTg3"></div>
+              <span title="Adds Z(3M÷vol) at half weight. Off by default — the momentum premium is strongest at 6-12 months.">Include 3M</span></div>
+            <div class="mo-sw"><div class="mo-tg" id="moTgV"></div>
+              <span title="Averages volatility across the last 3 uploads so one earnings gap cannot distort the denominator. Needs 3+ snapshots.">Smooth vol</span></div>
+            <div class="mo-seg" id="moRankBy" title="How the list is ranked. STDV = smoothness, Z(6M÷vol) + Z(12M÷vol). 12-1 = one-year return skipping the latest month. 6-1 = six-month return skipping the latest month.">
+              <button data-m="stdv" class="on">STDV</button><button data-m="m121">12-1</button><button data-m="m61">6-1</button></div>
+            <div class="mo-sw"><div class="mo-tg" id="moTgRS"></div>
+              <span title="Keeps only names whose Step 3 total in this universe's RS run (the run nearest to this upload's date) is at or above the threshold.">RS survivors only</span></div>
+            <label title="Step 3 total needed to count as an RS survivor. 50 = matched the benchmark.">RS ≥ <input type="number" id="moRsMin" min="0" max="100" step="1" value="50" style="width:58px"></label>
+            <label>Top N <input type="number" id="moTopN" min="5" max="200" value="30"></label>
+            <label title="At most this many names from one industry in Export top N — the rest are skipped and the next-ranked names fill in. 0 = off.">Max / industry <input type="number" id="moIndCap" min="0" max="50" step="1" value="5" style="width:58px"></label>
+            <label title="Flags rows whose price × 30-day average volume falls below this. 0 = off.">Min turnover $M <input type="number" id="moTurn" min="0" step="1" value="0"></label>
+            <label title="Hide stocks with fewer fundamental lights than this. Applies to the table AND to Export top N. Ranks are not renumbered - they still show each stock's place in the full pool.">Min F <select id="moMinF" class="mo-sel"><option value="0">Any</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></label>
+            <label title="Smooth = climb ÷ wobble: the average of the 6-month and 12-month gain divided by the 1-month volatility — the steepness of the line from the map's corner to the dot. Empty = off.">Smooth ≥ <input type="number" id="moSmMin" step="1" placeholder="—" style="width:58px"></label>
+            <label title="Wobble = TradingView's 1-month volatility as the score uses it (floored at the universe's 10th percentile; 3-upload average when Smooth vol is on). Empty = off.">Wobble ≤ <input type="number" id="moVolMax" step="0.1" placeholder="—" style="width:58px"> %</label>
+            <label title="Climb = average of the 6-month and 12-month gain. Empty = off.">Climb ≥ <input type="number" id="moClMin" step="1" placeholder="—" style="width:58px"> %</label>
+            <div class="mo-seg multi" id="moPost" title="Posture against the 20-day EMA (price − EMA 20, in ATR 14). Click to switch a posture off; all four on = no filter. Names without EMA/ATR columns are kept only when all four are on.">
+              <button data-p="READY" class="on">READY</button><button data-p="NEAR" class="on">NEAR</button><button data-p="WAIT" class="on">WAIT</button><button data-p="BELOW" class="on">BELOW</button></div>
+            <div style="margin-left:auto;display:flex;gap:7px">
+              <button class="btn btn-ghost btn-sm" id="moMoves">Export entries / exits</button>
+              <button class="btn btn-gold btn-sm" id="moExport">Export top N →TV</button>
+            </div>
+          </div>
+
+          <div class="mo-map" id="moMapBox" style="display:none">
+            <div class="mo-ph" style="margin-bottom:6px;flex-wrap:wrap;gap:8px">
+              <div class="mo-pt">SMOOTH MAP · <span id="moMapTitle" style="color:var(--text2);font-weight:500"></span></div>
+              <div class="mo-dim" style="font-size:10.5px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+                <span id="moMapLegend"></span>
+                <span class="mo-sw"><div class="mo-tg" id="moTgFit"></div><span title="Scale the axes to the names that pass the filters instead of the whole upload">Fit to filtered</span></span>
+                <span class="mo-sw"><div class="mo-tg on" id="moTgLbl"></div><span>Labels</span></span>
+              </div>
+            </div>
+            <div style="position:relative;height:380px"><canvas id="moMap"></canvas></div>
+            <div class="mo-note" style="margin-top:6px" id="moMapNote">Every dot is one name of this upload. <b>Up</b> = climbed more (average of the 6-month and 12-month gain). <b>Right</b> = wobbled more (1-month volatility, as the score uses it). The score is the <b>steepness</b> of the line from the bottom-left corner to the dot — the dotted rays mark this upload's median and top-10% steepness, the gold ray your <b>Smooth ≥</b> threshold. Colours follow every filter on the bar live: gold = in the export list (Top N after the industry cap), green = passes all filters, grey = filtered out. Click a dot to open its story in the table. In 12-1 / 6-1 mode the gold set follows that ranking, so you can see where those picks sit on the smooth plane.</div>
+          </div>
+
+          <div style="overflow:auto;max-height:56vh;border:1px solid var(--border);border-radius:8px" id="moTable"></div>
+
+
+          <div class="mo-drop" id="moDrop2" style="display:none"></div>
+
+          <div class="mo-note">
+            <b>Δ 1 / 3 / 6</b> = rank change vs 1, 3 and 6 uploads ago — ▲ means the rank improved.
+            <b>NEW</b> = not in the previous snapshot. <b>F</b> = quick fundamental flags from the CSV
+            (all seven lights &mdash; see the guide below); leverage and conversion lights are
+            suppressed for financials. This is a coarse pre-filter — the real seven-light check is IVA Pro on the chart.
+            <b>→20</b> = price distance from the 20-day EMA in ATR(14): <b>READY</b> within 1 ATR, NEAR 1–2 ATR, <b>WAIT</b> more than 2 ATR above, BELOW more than 1 ATR under.
+            <b>Earn</b> = trading sessions to the next report (tagged inside 5). <b>RS</b> = Step 3 total and rank in this universe's RS run nearest to the upload's date (the latest run for the latest upload). In a <b>short</b> universe every scale reads upside down: RS 100 = weakest, climb becomes fall, READY is measured under the 20.
+            <b>Uploads</b>: the run strip at the top of the page opens any saved upload — RS tables, tiles, map, rungs and exports all follow it, so no chart is lost when the next file arrives.
+            <b>Smooth ≥ · Wobble ≤ · Climb ≥ · posture chips</b> are extra filters on top of Min F and RS survivors; they apply to the table, the tiles, the export and the map together (a name must pass all of them).
+            <b>Export top N</b> applies the industry cap and writes READY / NEAR / WAIT / EARNINGS sections into one TradingView file.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" style="margin-top:14px">
+      <a id="slStage3"></a>
+          <details class="mo-evc" id="moEvcBox" open>
+            <summary>STAGE 3 · EVC rungs <span class="mo-dim" id="moEvcSub"></span></summary>
+            <div class="mo-bar" id="moEvcBar">
+              <div class="mo-seg multi" id="moEvcLoc" title="EVC location on V (1D) for this universe's side. Click to switch a location off; all on = no filter."></div>
+              <label class="mo-sw" title="Context: the weekly 10 vs 20 agrees with this universe's side (10 > 20 for long, 10 < 20 for short)"><div class="mo-tg" id="moEvcC"></div><span>C ✓ only</span></label>
+              <label class="mo-sw" title="Price past all five averages with 10 vs 20 right on V and on W — the ideal"><div class="mo-tg" id="moEvcAll"></div><span id="moEvcAllLbl">Above all MAs</span></label>
+              <label class="mo-sw" title="10 and 20 EMAs moving the universe's way since the previous upload, on V and on W (needs two uploads with the columns)"><div class="mo-tg" id="moEvcSlope"></div><span>Slopes with</span></label>
+              <label class="mo-sw" title="Entry timeframe: the hourly 10 vs 20 agrees (needs the EMA 10 and 20 · 1 hour columns)"><div class="mo-tg" id="moEvcE"></div><span>E ✓ only</span></label>
+              <label class="mo-sw" title="Leave out names reporting within 5 sessions (no entry on the day)"><div class="mo-tg" id="moEvcEarn"></div><span>Skip earnings ≤5</span></label>
+              <label title="Alignment count: price past 5, 10, 20, 50, 100 · 10 vs 20 on V · 10 vs 20 on W (7 checks)">Align ≥ <select id="moEvcAlign"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></label>
+              <label title="Stack tidiness: of the 10 EMA pairs (5·10·20·50·100), how many sit in this side's order — 10 = a perfect stack">Stack ≥ <select id="moEvcStack"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label>
+              <label title="10–20 gap in ATR(14), in this side's direction — the chart's x-axis. Empty = off.">Gap ≥ <input type="number" id="moEvcGapMin" step="0.1" placeholder="—"></label>
+              <label title="Upper bound of the 10–20 gap in ATR (a wide gap = a mature cycle). Empty = off.">Gap ≤ <input type="number" id="moEvcGapMax" step="0.1" placeholder="—"></label>
+              <label title="EXTENDED when price is more than this many ATR(14) past the 10 EMA on V">10 MA ≤ <input type="number" id="moEvcExt10" step="0.25"> ATR</label>
+              <label title="EXTENDED when price is more than this many ATR(14) past the 5 EMA on V">5 MA ≤ <input type="number" id="moEvcExt5" step="0.25"> ATR</label>
+              <div class="mo-seg" id="moEvcUnits" title="Distances in the table: % of price or ATR(14) units"><button data-u="pct" class="on">%</button><button data-u="atr">ATR</button></div>
+              <label title="How many earlier uploads every dot drags behind it (solid bead = in that upload's export list under today's settings, hollow = in the file only)">Tails <select id="moEvcTails"><option value="0">off</option><option value="1">1</option><option value="3">3</option><option value="6">6</option><option value="99">all</option></select></label>
+              <label class="mo-sw" title="Names that were in an export list within the last six uploads but are missing from this file — faded, at their last known place"><div class="mo-tg" id="moEvcGhost"></div><span>Ghosts</span></label>
+              <label class="mo-sw" title="Ticker labels on the dots that pass the filters"><div class="mo-tg" id="moEvcLbl"></div><span>Labels</span></label>
+              <div style="margin-left:auto;display:flex;gap:7px"><button class="btn btn-gold btn-sm" id="moEvcExport" title="TradingView watchlist file, one section per EVC location">Export EVC →TV</button></div>
+            </div>
+            <div class="mo-evclg" id="moEvcLegend"></div>
+            <div class="mo-evcq" id="moEvcQuad"></div>
+            <div style="position:relative;height:540px"><canvas id="moEvcChart"></canvas></div>
+            <div style="overflow:auto;max-height:52vh;border:1px solid var(--border);border-radius:8px;margin-top:8px" id="moEvcTable"></div>
+            <div class="mo-note" style="margin-top:6px" id="moEvcNote"><b>The rungs.</b> Every dot is one name of the momentum export list above (Top N after the industry cap), read through your EVC rules from the same export. <b>Up / down</b> = the rung price stands on: climb from the 100 — 100 → 50 → 20 → 10 → 5 — and the first average not cleared is where you stand (inside a lane the height is price&rsquo;s share of the way from the lower to the upper average; in the top lane it is ATRs past the 5, pinned at the EXTENDED line). Names under the 100 climb the same ladder downwards, so a short universe lives in the lower half. <b>Left / right</b> = the 10–20 gap &divide; ATR on V: left of zero the 10 is under the 20 (OFF for a long), right of it the cycle is validated and widening. <b>Filled</b> dot = tidy stack (&ge; 9 of the 10 EMA pairs in order), <b>hollow</b> = messy; a <b>white ring</b> = the weekly 10 vs 20 disagrees with this side; a <b>tick</b> above the dot = the hourly 10 vs 20 agrees (E). Colour = location: RIDING &middot; MMB (the pause under the 5) &middot; PULLBACK (to the 10) &middot; ACCMB (back past the 20 after a flush in the last three uploads) &middot; FLUSH (at or past the 20, not validated) &middot; EXTENDED (beyond the ATR limits — never enter) &middot; OFF (10 on the wrong side of the 20) &middot; BROKEN (past the 50 the wrong way); a short universe says DISMB and SQUEEZE instead of ACCMB and FLUSH. <b>Tails</b> = the memory: each dot drags its path through the stored uploads (solid bead = in that week&rsquo;s export list under today&rsquo;s settings, hollow = in the file but not in the list; a break = not in the file). <b>Ghosts</b> = names from recent lists missing from this upload, faded at their last place. Click a dot to light its whole path and open its story. Columns the export needs: EMA 5 &middot; 10 &middot; 20 &middot; 50 &middot; 100 (1 day), EMA 10 &middot; 20 (1 week), ATR 14 (1 day); EMA 10 &middot; 20 (1 hour) for the E tick.</div>
+          </details>
+
+    </div>
+
+    <div class="section" style="margin-top:14px">
+      <details class="mo-guide">
+        <summary>What the seven lights mean &mdash; in plain words</summary>
+        <div class="mo-lg">
+          <div class="mo-lc"><b><i>1</i> Return on capital</b>
+            Plant one dollar in this business. How many cents grow back every year?
+            <span class="g">Green: more than 15 cents.</span> Below 8 cents the business is quietly eating money.
+            This is the single best test of whether a company is any good.</div>
+
+          <div class="mo-lc"><b><i>2</i> Growth</b>
+            Are sales getting bigger?
+            <span class="g">Green: more than 10% a year.</span>
+            Nothing else can grow for long if this does not. A shrinking top line means the company is
+            losing customers, whatever else the numbers say.</div>
+
+          <div class="mo-lc"><b><i>3</i> Debt</b>
+            If every dollar of operating profit went straight to the bank, how many years to be debt-free?
+            <span class="g">Green: under 2 years.</span>
+            Over 4 years and the bank, not you, decides what happens in a bad year. This is the number that
+            separates the companies that survive a crash from the ones that never come back.</div>
+
+          <div class="mo-lc"><b><i>4</i> Cash conversion</b>
+            The company says it made a profit. Did the money actually turn up in the bank?
+            <span class="g">Green: more than 80 cents of every reported dollar.</span>
+            Below 60 cents, for two years running, usually means the profit exists on paper only.
+            One honest exception: a company spending heavily to build something new will look bad here
+            on purpose &mdash; check what the spending is for before judging it.</div>
+
+          <div class="mo-lc"><b><i>5</i> Gross margin</b>
+            Out of every dollar a customer pays, how much is left after making the thing?
+            The level barely matters &mdash; software keeps 80 cents, a grocer keeps 25, and both can be fine.
+            <span class="g">Green: the number is holding steady or rising.</span>
+            Falling means competitors are taking the pricing power away, and that shows up here long before
+            it shows up in the profit.</div>
+
+          <div class="mo-lc"><b><i>6</i> Share count</b>
+            You own a slice of a pizza. Is the pizza being cut into more slices?
+            <span class="g">Green: the number of slices is flat or falling.</span>
+            If management keeps cutting new slices, your piece shrinks every year even while the company
+            grows. Quietly, this can eat half your return over a decade.</div>
+
+          <div class="mo-lc"><b><i>7</i> Price &mdash; did earnings or mood drive it?</b>
+            A stock goes up for two reasons: the business earned more, or people simply decided to pay more
+            for the same earnings.
+            <span class="g">Green: the earnings did the work.</span>
+            Red means the price outran the profits, so you are paying more per dollar of earnings than a
+            year ago. Not automatically bad &mdash; but the rise was mood, and mood can reverse overnight.</div>
+        </div>
+
+        <div class="mo-lnote">
+          <b>Reading the dots.</b> Three states, and the difference matters.
+          A <b>solid</b> dot passed. A <b>dull</b> dot failed. A <b>hollow</b> dot could not be judged at all,
+          because your CSV has no column for it. So <i>4/4 of 7</i> does not mean a perfect company &mdash; it
+          means four lights passed and three were never tested. Add the missing columns and those hollow dots
+          start giving real answers. Hover any row to see exactly which light did what.
+          <br><br>
+          <b>Banks are different.</b> Borrowing is what a bank sells, so lights 3 and 4 are switched off for
+          them automatically. Judge a bank on lights 1, 2, 6 and 7 only.
+          <br><br>
+          <b>Light 7 is not the same test IVA Pro runs.</b> On the chart, IVA Pro asks whether the stock is
+          cheaper than its own three-year average &mdash; it can see three years of history. Here there is only
+          today's snapshot, so this light asks the closest honest question a snapshot can answer: over the last
+          year, did profits or mood move the price? Use this one to sort the list; use IVA Pro before you buy.
+        </div>
+      </details>
+    </div>
+  </div>
+  </div>
 
   <!-- ══ ETF FLOW PAGE ══ -->
   <div class="page" id="page-etf">
@@ -1882,190 +2099,6 @@ tr.flt-row .flt2{display:flex;gap:3px}
 
 
   <!-- ══ MOMENTUM PAGE ══ -->
-  <div class="page" id="page-mom">
-    <div class="section">
-      <div class="section-header">
-        <div class="section-title">MOMENTUM <span>RANK</span></div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <button class="btn btn-gold btn-sm" id="moAddUni">+ Universe</button>
-        </div>
-      </div>
-      <div class="mo-err" id="moErr"></div>
-
-      <div class="mo-wrap">
-        <!-- LEFT : universes + snapshots -->
-        <div class="mo-pane">
-          <div class="mo-ph"><div class="mo-pt">UNIVERSES</div></div>
-          <div id="moUnis"></div>
-          <div class="mo-drop" id="moDrop" style="margin-top:12px">
-            Drop TradingView CSV here<br><span class="mo-dim" style="font-size:10.5px">or click to browse</span>
-          </div>
-          <div class="mo-note">
-            Drop the <b>same Funnel export</b> you gave the RS Score tab (Funnel R1000 → Russell 1000, Funnel R2000 → Russell 2000);
-            extra columns are ignored. Score each universe separately — z-scores are relative to the pool they are computed in.
-          </div>
-        </div>
-
-        <!-- RIGHT : ranking -->
-        <div class="mo-pane">
-          <div class="mo-ph">
-            <div class="mo-pt">RANKING</div>
-            <div class="mo-dim" style="font-size:10.5px" id="moRankSub">Z(6M÷vol) + Z(12M÷vol), averaged</div>
-          </div>
-
-          <div class="mo-runs" id="moRuns"></div>
-          <div class="mo-kpi" id="moKpi"></div>
-
-          <div class="mo-bar">
-            <div class="mo-sw"><div class="mo-tg" id="moTg3"></div>
-              <span title="Adds Z(3M÷vol) at half weight. Off by default — the momentum premium is strongest at 6-12 months.">Include 3M</span></div>
-            <div class="mo-sw"><div class="mo-tg" id="moTgV"></div>
-              <span title="Averages volatility across the last 3 uploads so one earnings gap cannot distort the denominator. Needs 3+ snapshots.">Smooth vol</span></div>
-            <div class="mo-seg" id="moRankBy" title="How the list is ranked. STDV = smoothness, Z(6M÷vol) + Z(12M÷vol). 12-1 = one-year return skipping the latest month. 6-1 = six-month return skipping the latest month.">
-              <button data-m="stdv" class="on">STDV</button><button data-m="m121">12-1</button><button data-m="m61">6-1</button></div>
-            <div class="mo-sw"><div class="mo-tg" id="moTgRS"></div>
-              <span title="Keeps only names that are in this universe's latest RS Score run (Step 3) with a total at or above the threshold. Needs a saved RS run for a universe with the same code (R1000, R2000…).">RS survivors only</span></div>
-            <label title="Step 3 total needed to count as an RS survivor. 50 = matched the benchmark.">RS ≥ <input type="number" id="moRsMin" min="0" max="100" step="1" value="50" style="width:58px"></label>
-            <label>Top N <input type="number" id="moTopN" min="5" max="200" value="30"></label>
-            <label title="At most this many names from one industry in Export top N — the rest are skipped and the next-ranked names fill in. 0 = off.">Max / industry <input type="number" id="moIndCap" min="0" max="50" step="1" value="5" style="width:58px"></label>
-            <label title="Flags rows whose price × 30-day average volume falls below this. 0 = off.">Min turnover $M <input type="number" id="moTurn" min="0" step="1" value="0"></label>
-            <label title="Hide stocks with fewer fundamental lights than this. Applies to the table AND to Export top N. Ranks are not renumbered - they still show each stock's place in the full pool.">Min F <select id="moMinF" class="mo-sel"><option value="0">Any</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></label>
-            <label title="Smooth = climb ÷ wobble: the average of the 6-month and 12-month gain divided by the 1-month volatility — the steepness of the line from the map's corner to the dot. Empty = off.">Smooth ≥ <input type="number" id="moSmMin" step="1" placeholder="—" style="width:58px"></label>
-            <label title="Wobble = TradingView's 1-month volatility as the score uses it (floored at the universe's 10th percentile; 3-upload average when Smooth vol is on). Empty = off.">Wobble ≤ <input type="number" id="moVolMax" step="0.1" placeholder="—" style="width:58px"> %</label>
-            <label title="Climb = average of the 6-month and 12-month gain. Empty = off.">Climb ≥ <input type="number" id="moClMin" step="1" placeholder="—" style="width:58px"> %</label>
-            <div class="mo-seg multi" id="moPost" title="Posture against the 20-day EMA (price − EMA 20, in ATR 14). Click to switch a posture off; all four on = no filter. Names without EMA/ATR columns are kept only when all four are on.">
-              <button data-p="READY" class="on">READY</button><button data-p="NEAR" class="on">NEAR</button><button data-p="WAIT" class="on">WAIT</button><button data-p="BELOW" class="on">BELOW</button></div>
-            <div style="margin-left:auto;display:flex;gap:7px">
-              <button class="btn btn-ghost btn-sm" id="moMoves">Export entries / exits</button>
-              <button class="btn btn-gold btn-sm" id="moExport">Export top N →TV</button>
-            </div>
-          </div>
-
-          <div class="mo-map" id="moMapBox" style="display:none">
-            <div class="mo-ph" style="margin-bottom:6px;flex-wrap:wrap;gap:8px">
-              <div class="mo-pt">SMOOTH MAP · <span id="moMapTitle" style="color:var(--text2);font-weight:500"></span></div>
-              <div class="mo-dim" style="font-size:10.5px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-                <span id="moMapLegend"></span>
-                <span class="mo-sw"><div class="mo-tg" id="moTgFit"></div><span title="Scale the axes to the names that pass the filters instead of the whole upload">Fit to filtered</span></span>
-                <span class="mo-sw"><div class="mo-tg on" id="moTgLbl"></div><span>Labels</span></span>
-              </div>
-            </div>
-            <div style="position:relative;height:380px"><canvas id="moMap"></canvas></div>
-            <div class="mo-note" style="margin-top:6px" id="moMapNote">Every dot is one name of this upload. <b>Up</b> = climbed more (average of the 6-month and 12-month gain). <b>Right</b> = wobbled more (1-month volatility, as the score uses it). The score is the <b>steepness</b> of the line from the bottom-left corner to the dot — the dotted rays mark this upload's median and top-10% steepness, the gold ray your <b>Smooth ≥</b> threshold. Colours follow every filter on the bar live: gold = in the export list (Top N after the industry cap), green = passes all filters, grey = filtered out. Click a dot to open its story in the table. In 12-1 / 6-1 mode the gold set follows that ranking, so you can see where those picks sit on the smooth plane.</div>
-          </div>
-
-          <div style="overflow:auto;max-height:56vh;border:1px solid var(--border);border-radius:8px" id="moTable"></div>
-
-          <details class="mo-evc" id="moEvcBox" open>
-            <summary>EVC structure <span class="mo-dim" id="moEvcSub"></span></summary>
-            <div class="mo-bar" id="moEvcBar">
-              <div class="mo-seg multi" id="moEvcLoc" title="EVC location on V (1D). Click to switch a location off; all on = no filter."></div>
-              <label class="mo-sw" title="Context: 10 EMA above the 20 EMA on the weekly (your C)"><div class="mo-tg" id="moEvcC"></div><span>C ✓ only</span></label>
-              <label class="mo-sw" title="Price above the 5 · 10 · 20 (V) and the 10 · 20 (W) — the ideal"><div class="mo-tg" id="moEvcAll"></div><span>Above all MAs</span></label>
-              <label class="mo-sw" title="10 and 20 EMAs higher than in the previous upload on both V and W (needs two uploads with the columns)"><div class="mo-tg" id="moEvcSlope"></div><span>Slopes up</span></label>
-              <label class="mo-sw" title="Leave out names reporting within 5 sessions (no entry on the day)"><div class="mo-tg" id="moEvcEarn"></div><span>Skip earnings ≤5</span></label>
-              <label title="Alignment count: price above 5, 10, 20, 50, 100 · 10 > 20 on V · 10 > 20 on W (7 checks)">Align ≥ <select id="moEvcAlign"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></label>
-              <label title="EXTENDED when price is more than this many ATR(14) above the 10 EMA on V">10 MA ≤ <input type="number" id="moEvcExt10" step="0.25" style="width:52px"> ATR</label>
-              <label title="EXTENDED when price is more than this many ATR(14) above the 5 EMA on V">5 MA ≤ <input type="number" id="moEvcExt5" step="0.25" style="width:52px"> ATR</label>
-              <div class="mo-seg" id="moEvcUnits" title="Distances in % of price or in ATR(14) units"><button data-u="pct" class="on">%</button><button data-u="atr">ATR</button></div>
-              <div class="mo-seg" id="moEvcView"><button data-v="ladder" class="on" title="One line per stock across the five MAs">Ladder</button><button data-v="scatter" title="V against C: distance from the 10 (V) against the distance from the 50 (W10)">Scatter</button><button data-v="move" title="Each stock across every stored upload">Movement</button></div>
-              <select id="moEvcMetric" title="What the movement chart plots"><option value="d20">% above the 20 (V)</option><option value="d10">% above the 10 (V)</option><option value="d50">% above the 50 (W10)</option><option value="align">Alignment 0–7</option><option value="gap">10–20 gap (ATR)</option></select>
-              <div style="margin-left:auto;display:flex;gap:7px"><button class="mo-btn" id="moEvcExport" title="TradingView watchlist file, one section per EVC location">Export EVC →TV</button></div>
-            </div>
-            <div class="mo-evclg" id="moEvcLegend"></div>
-            <div style="position:relative;height:400px"><canvas id="moEvcChart"></canvas></div>
-            <div style="overflow:auto;max-height:52vh;border:1px solid var(--border);border-radius:8px;margin-top:8px" id="moEvcTable"></div>
-            <div class="mo-note" style="margin-top:6px">The names here are the momentum export list above (Top N after the industry cap), read through your EVC rules from the same export. <b>C</b> = 10 EMA > 20 EMA on the weekly, with ↑↓ against the previous upload. <b>V</b> = 10 > 20 on the daily, price above the 50 (the 10 W stands in when the export has no EMA 50 1D), slopes the same way. <b>Location</b> on V: RIDING = above the 5, inside the ATR limits · MMB = pulled back under the 5, above the 10 (the pause) · PULLBACK = under the 10, above the 20 · FLUSH = at or under the 20, not validated · ACCMB = closed back above the 20 after a flush in the last three uploads · EXTENDED = beyond the ATR limits (never enter) · OFF = 10 under the 20 on V · BROKEN = under the 50. <b>Align</b> counts price above 5 · 10 · 20 · 50 · 100 and 10 > 20 on V and W. <b>Gap</b> = (10 − 20) ÷ ATR on V, with its share of the largest gap seen in the stored uploads of this run of 10 > 20 (your profit rule: under 25% the cycle is fading). <b>Movement</b> draws every stored upload a name appears in — solid dots where it was in that upload's export list under today's settings, hollow where it was in the file but not in the list, gaps where it was missing. Columns the export needs: EMA 5 · 10 · 20 · 50 (1 day), EMA 10 · 20 (1 week), ATR 14 (1 day); optional EMA 100 (1 day) and EMA 10 · 20 (1 hour) for the E line.</div>
-          </details>
-
-          <div class="mo-drop" id="moDrop2" style="margin-top:10px;display:none;padding:10px">
-            Drop next month's CSV here to add a snapshot
-          </div>
-
-          <div class="mo-note">
-            <b>Δ 1 / 3 / 6</b> = rank change vs 1, 3 and 6 uploads ago — ▲ means the rank improved.
-            <b>NEW</b> = not in the previous snapshot. <b>F</b> = quick fundamental flags from the CSV
-            (all seven lights &mdash; see the guide below); leverage and conversion lights are
-            suppressed for financials. This is a coarse pre-filter — the real seven-light check is IVA Pro on the chart.
-            <b>→20</b> = price distance from the 20-day EMA in ATR(14): <b>READY</b> within 1 ATR, NEAR 1–2 ATR, <b>WAIT</b> more than 2 ATR above, BELOW more than 1 ATR under.
-            <b>Earn</b> = trading sessions to the next report (tagged inside 5). <b>RS</b> = Step 3 total and rank in the same universe's RS Score run nearest to the upload's date (the latest run for the latest upload).
-            <b>Uploads</b>: the chips above the tiles open any saved upload — table, tiles, map and export all follow it, so no chart is lost when the next file arrives.
-            <b>Smooth ≥ · Wobble ≤ · Climb ≥ · posture chips</b> are extra filters on top of Min F and RS survivors; they apply to the table, the tiles, the export and the map together (a name must pass all of them).
-            <b>Export top N</b> applies the industry cap and writes READY / NEAR / WAIT / EARNINGS sections into one TradingView file.
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section" style="margin-top:14px">
-      <details class="mo-guide">
-        <summary>What the seven lights mean &mdash; in plain words</summary>
-        <div class="mo-lg">
-          <div class="mo-lc"><b><i>1</i> Return on capital</b>
-            Plant one dollar in this business. How many cents grow back every year?
-            <span class="g">Green: more than 15 cents.</span> Below 8 cents the business is quietly eating money.
-            This is the single best test of whether a company is any good.</div>
-
-          <div class="mo-lc"><b><i>2</i> Growth</b>
-            Are sales getting bigger?
-            <span class="g">Green: more than 10% a year.</span>
-            Nothing else can grow for long if this does not. A shrinking top line means the company is
-            losing customers, whatever else the numbers say.</div>
-
-          <div class="mo-lc"><b><i>3</i> Debt</b>
-            If every dollar of operating profit went straight to the bank, how many years to be debt-free?
-            <span class="g">Green: under 2 years.</span>
-            Over 4 years and the bank, not you, decides what happens in a bad year. This is the number that
-            separates the companies that survive a crash from the ones that never come back.</div>
-
-          <div class="mo-lc"><b><i>4</i> Cash conversion</b>
-            The company says it made a profit. Did the money actually turn up in the bank?
-            <span class="g">Green: more than 80 cents of every reported dollar.</span>
-            Below 60 cents, for two years running, usually means the profit exists on paper only.
-            One honest exception: a company spending heavily to build something new will look bad here
-            on purpose &mdash; check what the spending is for before judging it.</div>
-
-          <div class="mo-lc"><b><i>5</i> Gross margin</b>
-            Out of every dollar a customer pays, how much is left after making the thing?
-            The level barely matters &mdash; software keeps 80 cents, a grocer keeps 25, and both can be fine.
-            <span class="g">Green: the number is holding steady or rising.</span>
-            Falling means competitors are taking the pricing power away, and that shows up here long before
-            it shows up in the profit.</div>
-
-          <div class="mo-lc"><b><i>6</i> Share count</b>
-            You own a slice of a pizza. Is the pizza being cut into more slices?
-            <span class="g">Green: the number of slices is flat or falling.</span>
-            If management keeps cutting new slices, your piece shrinks every year even while the company
-            grows. Quietly, this can eat half your return over a decade.</div>
-
-          <div class="mo-lc"><b><i>7</i> Price &mdash; did earnings or mood drive it?</b>
-            A stock goes up for two reasons: the business earned more, or people simply decided to pay more
-            for the same earnings.
-            <span class="g">Green: the earnings did the work.</span>
-            Red means the price outran the profits, so you are paying more per dollar of earnings than a
-            year ago. Not automatically bad &mdash; but the rise was mood, and mood can reverse overnight.</div>
-        </div>
-
-        <div class="mo-lnote">
-          <b>Reading the dots.</b> Three states, and the difference matters.
-          A <b>solid</b> dot passed. A <b>dull</b> dot failed. A <b>hollow</b> dot could not be judged at all,
-          because your CSV has no column for it. So <i>4/4 of 7</i> does not mean a perfect company &mdash; it
-          means four lights passed and three were never tested. Add the missing columns and those hollow dots
-          start giving real answers. Hover any row to see exactly which light did what.
-          <br><br>
-          <b>Banks are different.</b> Borrowing is what a bank sells, so lights 3 and 4 are switched off for
-          them automatically. Judge a bank on lights 1, 2, 6 and 7 only.
-          <br><br>
-          <b>Light 7 is not the same test IVA Pro runs.</b> On the chart, IVA Pro asks whether the stock is
-          cheaper than its own three-year average &mdash; it can see three years of history. Here there is only
-          today's snapshot, so this light asks the closest honest question a snapshot can answer: over the last
-          year, did profits or mood move the price? Use this one to sort the list; use IVA Pro before you buy.
-        </div>
-      </details>
-    </div>
-
-  </div>
-
   <!-- ══ ORANGE PAGE ══ -->
   <div class="page" id="page-orange">
     <div class="section">
@@ -2110,7 +2143,7 @@ tr.flt-row .flt2{display:flex;gap:3px}
           <div class="or-chartbar">
             <label>Y axis <select id="orScY" class="or-sel">
               <option value="p6m">6-month performance %</option><option value="p1y">1-year performance %</option><option value="p1m">1-month performance %</option>
-              <option value="rs">RS Step 3 total (RS Score tab)</option><option value="mo">Momentum rank (Momentum tab)</option></select></label>
+              <option value="rs">RS Step 3 total (Sluice · stage 1)</option><option value="mo">Momentum rank (Sluice · stage 2)</option></select></label>
             <span class="or-dim">x = Street upside % (1-year target vs price) &middot; colour = analyst rating &middot; click a dot for the card</span>
           </div>
           <div style="height:330px;position:relative"><canvas id="orScatter"></canvas></div>
@@ -2131,10 +2164,10 @@ tr.flt-row .flt2{display:flex;gap:3px}
       </div>
       <div class="or-tw" id="orTable"></div>
       <div class="or-note">
-        <b>Lights</b> are the same seven tests as the Momentum tab (solid = pass, dull = fail, hollow = no column) &mdash; open the card for the stacked view with values and plain-English explanations.
+        <b>Lights</b> are the same seven tests as the Sluice tab&rsquo;s momentum stage (solid = pass, dull = fail, hollow = no column) &mdash; open the card for the stacked view with values and plain-English explanations.
         <b>&rarr;20 EMA</b> is the distance from the 20-day EMA in ATR(14) units, the same reading as your EVC indicator.
         <b>&Delta;</b> compares with the previous upload. <b>Index</b> = the universe whose RS run (or momentum snapshot) holds the name.
-        <b>RS</b> = rank in the latest RS Score run of that universe, &#9650;&#9660; against the universe&rsquo;s previous run; hover for the score and date. <b>Mom</b> / <b>ETFs</b> / <b>IBKR</b> come from the other tabs &mdash; open those tabs once if they show &ldquo;&mdash;&rdquo;.
+        <b>RS</b> = rank in the latest RS run of that universe (Sluice tab), &#9650;&#9660; against the universe&rsquo;s previous run; hover for the score and date. <b>Mom</b> / <b>ETFs</b> / <b>IBKR</b> come from the other tabs &mdash; open those tabs once if they show &ldquo;&mdash;&rdquo;.
       </div>
     </details>
 
@@ -3593,6 +3626,9 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   let tab2="z", w2=true, sort2={col:"total",dir:"desc"};
   let tab3="z", w3=true, sort3={col:"total",dir:"desc"};
   let saveTimer=null, lastSaved={id:null,key:""}, CACHE={}, benchTimer=null;
+  let LS_SIDE={}; try{ LS_SIDE=JSON.parse(localStorage.getItem("sl_side")||"{}")||{}; }catch(e){}
+  const sideOf=u=>{ if(!u) return "long"; const v=String(u.side||LS_SIDE[slug(u.code||u.name)]||"long").toLowerCase(); return v==="short"?"short":"long"; };
+  function rememberSide(code,side){ LS_SIDE[slug(code)]=side; try{ localStorage.setItem("sl_side",JSON.stringify(LS_SIDE)); }catch(e){} }
   function blank(){ return {HEADERS:[],RAW:[],MAP:{},MODEL:[],M2:[],M3:[],IDX:null,bInfo:null,dropped:0,prevRank:{}}; }
 
   /* ---------- helpers ---------- */
@@ -3678,7 +3714,8 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   /* ---------- the maths (pure: no DOM, no network) ---------- */
   function normW(w){const sum=TFS.reduce((s,t)=>s+(parseFloat(w[t])||0),0)||1;const o={};TFS.forEach(t=>o[t]=(parseFloat(w[t])||0)/sum*100);return o;}
   function rank(M,key,rk){const idx=M.map((r,i)=>i).sort((x,y)=>M[y][key]-M[x][key]);idx.forEach((mi,pos)=>M[mi][rk]=pos+1);}
-  function step1(RAW,MAP,W,cap,floorM,today){
+  function step1(RAW,MAP,W,cap,floorM,today,side){
+    const flip=side==="short";                 // short universe: 100 = the weakest name of the pool
     const keep=[]; let dropped=0;
     RAW.forEach(r=>{ const px=MAP.price?num(r[MAP.price]):null, av=MAP.avol?num(r[MAP.avol]):null; const dv=(px!=null&&av!=null)?px*av:null;
       if(floorM>0&&dv!=null&&dv<floorM*1e6) dropped++; else keep.push({r,dv,px}); });
@@ -3693,6 +3730,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       for(const tf of TFS){ const st=stats[tf]; const raw=st.has?num(r[MAP[tf]]):null; let s01=0.5;
         if(raw!==null&&st.sd>0){ const z=(raw-st.m)/st.sd, zc=cap*Math.tanh(z/cap); s01=(zc+cap)/(2*cap); }
         let pc=50; if(raw!==null&&st.sorted.length){ let below=0,equal=0; for(const v of st.sorted){ if(v<raw)below++; else if(v===raw)equal++; } pc=(below+0.5*equal)/st.sorted.length*100; }
+        if(flip){ s01=1-s01; pc=100-pc; }
         cells[tf]={raw,s01,zDisp:s01*100,p:pc}; totZ+=Wn[tf]*s01; totP+=Wn[tf]*(pc/100); }
       let earn=MAP.earn?String(r[MAP.earn]||"").trim():""; earn=/^\d{4}-\d{2}-\d{2}/.test(earn)?earn.slice(0,10):"";
       const earnDays=earn?bizDays(today,earn):null;
@@ -3701,7 +3739,8 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     rank(MODEL,"totZ","rankZ"); rank(MODEL,"totP","rankP");
     return {MODEL,dropped,stats};
   }
-  function step2(MODEL,IDX,W,cap){
+  function step2(MODEL,IDX,W,cap,side){
+    const flip=side==="short";
     const sd={}, spreads={};
     for(const tf of TFS){ const vals=MODEL.map(m=>m.cells[tf].raw).filter(v=>v!==null); sd[tf]=vals.length>1?stdev(vals):0; spreads[tf]=[];
       if(IDX[tf]===null||IDX[tf]===undefined) continue; vals.forEach(v=>spreads[tf].push(v-IDX[tf])); spreads[tf].sort((a,b)=>a-b); }
@@ -3709,10 +3748,11 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     const M2=MODEL.map(m=>{ const cells={}; let totZ=0,totP=0,beatW=0,beatDen=0;
       for(const tf of TFS){ const raw=m.cells[tf].raw, q=IDX[tf];
         if(raw===null||q===null||q===undefined||!(sd[tf]>0)){ cells[tf]={sp:null,s01:null,p:null}; continue; }
-        const sp=raw-q, z=sp/sd[tf], zc=cap*Math.tanh(z/cap), s01=(zc+cap)/(2*cap);
+        const sp=raw-q, z=sp/sd[tf], zc=cap*Math.tanh(z/cap), s01r=(zc+cap)/(2*cap);
         let below=0,equal=0; const arr=spreads[tf]; for(const v of arr){ if(v<sp)below++; else if(v===sp)equal++; }
-        const p=arr.length?(below+0.5*equal)/arr.length*100:50;
-        cells[tf]={sp,s01,p}; totZ+=Wn[tf]*s01; totP+=Wn[tf]*(p/100); beatW+=Wn[tf]*(sp>0?1:sp<0?0:0.5); beatDen+=Wn[tf]; }
+        const pr=arr.length?(below+0.5*equal)/arr.length*100:50;
+        const s01=flip?1-s01r:s01r, p=flip?100-pr:pr;
+        cells[tf]={sp,s01,p}; totZ+=Wn[tf]*s01; totP+=Wn[tf]*(p/100); beatW+=Wn[tf]*(flip?(sp<0?1:sp>0?0:0.5):(sp>0?1:sp<0?0:0.5)); beatDen+=Wn[tf]; }
       return {ticker:m.ticker,exportSym:m.exportSym,earnSoon:m.earnSoon,earnDays:m.earnDays,cells,totZ,totP,beat:beatDen?beatW/beatDen*100:null}; });
     rank(M2,"totZ","rankZ"); rank(M2,"totP","rankP"); return M2;
   }
@@ -3763,29 +3803,30 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     const key=uid+"|"+snapId+"|"+(allowStale?1:0); if(CACHE[key]!==undefined) return CACHE[key];
     const uni=uniOf(uid), snap=snapOf(snapId), body=BODY[snapId];
     if(!uni||!snap||!body||!body.rows||body.rows.length<2) return (CACHE[key]=null);
-    const {H,RAW}=toRows(body.rows), MAP=autodetect(H);
-    const r1=step1(RAW,MAP,WEIGHTS,CAP,minDV,todayISO());
+    const {H,RAW}=toRows(body.rows), MAP=autodetect(H), side=sideOf(uni);
+    const r1=step1(RAW,MAP,WEIGHTS,CAP,minDV,todayISO(),side);
     const b=benchFor(uni,snap,allowStale);
     if(b&&b.vals&&b.src==="file") persistBench(snap,b,false);
-    const M2=(b&&b.vals&&r1.MODEL.length)?step2(r1.MODEL,b.vals,wFor(2),CAP):[];
+    const M2=(b&&b.vals&&r1.MODEL.length)?step2(r1.MODEL,b.vals,wFor(2),CAP,side):[];
     const M3=M2.length?step3(r1.MODEL,M2,wFor(3),mode3(),blend3()):[];
-    return (CACHE[key]={uni,snap,MAP,MODEL:r1.MODEL,M2,M3,bench:b&&b.vals?b:null,bInfo:b,dropped:r1.dropped});
+    return (CACHE[key]={uni,snap,MAP,MODEL:r1.MODEL,M2,M3,bench:b&&b.vals?b:null,bInfo:b,dropped:r1.dropped,side});
   }
 
   /* ---------- the run on screen ---------- */
   function recompute(){
     readSettings(); CACHE={};
     const uni=uniOf(curUni), snap=snapOf(curSnap);
-    if(S.RAW.length){ const r1=step1(S.RAW,S.MAP,WEIGHTS,CAP,minDV,todayISO()); S.MODEL=r1.MODEL; S.dropped=r1.dropped; } else { S.MODEL=[]; S.dropped=0; }
+    if(S.RAW.length){ const r1=step1(S.RAW,S.MAP,WEIGHTS,CAP,minDV,todayISO(),sideOf(uni)); S.MODEL=r1.MODEL; S.dropped=r1.dropped; } else { S.MODEL=[]; S.dropped=0; }
     const b=benchFor(uni,snap,overrideStale); S.bInfo=b; S.IDX=(b&&b.vals)?b:null;
     if(S.IDX&&snap&&b.src==="file") persistBench(snap,b,overrideStale);
-    S.M2=(S.MODEL.length&&S.IDX)?step2(S.MODEL,S.IDX.vals,wFor(2),CAP):[];
+    S.M2=(S.MODEL.length&&S.IDX)?step2(S.MODEL,S.IDX.vals,wFor(2),CAP,sideOf(uni)):[];
     S.M3=S.M2.length?step3(S.MODEL,S.M2,wFor(3),mode3(),blend3()):[];
     // rank change against the previous run of this universe
     S.prevRank={}; if(snap){ const list=runsOf(snap.universe_id), i=list.findIndex(x=>x.id===snap.id), prev=list[i+1]; if(prev&&BODY[prev.id]){ const c=computeFor(snap.universe_id,prev.id,false); if(c&&c.M3.length) c.M3.forEach(m=>S.prevRank[m.ticker]={z:m.rankZ,p:m.rankP}); } }
     render1(); render2(); render3(); renderBench(); renderStatus();
     scheduleResultSave();
     if(window.OR&&OR.onRS) OR.onRS(); if(window.MO&&MO.onRS) MO.onRS();
+    if(window.SL&&SL.onData) SL.onData("rs");
   }
   function ingestMatrix(matrix){ const {H,RAW}=toRows(matrix); S.HEADERS=H; S.RAW=RAW; S.MAP=autodetect(H); renderMapping(); recompute(); }
 
@@ -3827,6 +3868,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     $("rsCloudState").textContent=listErr?"":("Cloud: "+UNIS.length+" universe"+(UNIS.length===1?"":"s")+" · "+SNAPS.length+" saved run"+(SNAPS.length===1?"":"s"));
     const list=runsOf(curUni); const snap=(curSnap&&list.find(s=>s.id===curSnap))||list[0]||null;
     await selectSnap(snap?snap.id:null);
+    if(window.SL&&SL.onData) SL.onData("rs");
   }
   async function selectSnap(id){
     if(id) await ensureBody(id);
@@ -3867,13 +3909,23 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       await saveSnapshot(matrix,a[0].filename||"rs_dataset.csv",asOf);
     }catch(e){ setStatus("Import failed: "+esc(e.message),"err"); }
   }
+  async function createUni(name,code,bm,side){            // the `side` column is optional: without it the side lives in this browser
+    side=side==="short"?"short":"long"; const rec={name:String(name).trim(),code,benchmark:bm,sort:UNIS.length+1}; let out=null;
+    try{ out=await req(T_UNI,"POST",Object.assign({side},rec),"return=representation"); }
+    catch(e){ if(/side/i.test(String(e.message||e))) out=await req(T_UNI,"POST",rec,"return=representation"); else throw e; }
+    rememberSide(code,side);
+    curUni=out&&out[0]?out[0].id:null; curSnap=null; await loadAll(); return curUni;
+  }
   async function addUni(){
     const n=prompt("Universe name (e.g. Russell 1000):"); if(!n||!n.trim()) return;
     const code=(prompt("Short code for exports (e.g. R1000):","")||n).trim().toUpperCase().replace(/[^A-Z0-9]/g,"");
     const bm=(prompt("Benchmark symbol for Step 2 (QQQ, IWM, SPY…):","QQQ")||"").trim().toUpperCase();
-    try{ const out=await req(T_UNI,"POST",{name:n.trim(),code,benchmark:bm,sort:UNIS.length+1},"return=representation"); curUni=out&&out[0]?out[0].id:null; curSnap=null; await loadAll(); toast("Universe added","success"); }
+    try{ await createUni(n,code,bm,"long"); toast("Universe added","success"); }
     catch(e){ toast("Add failed: "+e.message,"error"); $("rsErr").textContent="Add failed: "+e.message; }
   }
+  async function delUniByCode(code){ const u=uniByKey(code); if(!u) return false; await req(T_UNI+"?id=eq."+u.id,"DELETE",undefined,"return=minimal"); if(curUni===u.id){ curUni=null; curSnap=null; } await loadAll(); return true; }
+  async function pickByCode(code){ const u=uniByKey(code); if(!u) return false; if(u.id!==curUni) await pick(u.id); return true; }
+  function runsByCode(code){ const u=uniByKey(code); return u?runsOf(u.id).map(r=>({id:r.id,as_of:r.as_of,n:r.n_rows||0,bench:!!(r.bench&&r.bench.symbol)})):[]; }
   async function delUni(id,ev){
     if(ev) ev.stopPropagation(); const u=uniOf(id), k=runsOf(id).length;
     if(!confirm("Delete \""+(u?u.name:"")+"\" and its "+k+" saved run(s)? This cannot be undone.")) return;
@@ -3944,7 +3996,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     if(!u){ setStatus(listErr?"Universes not loaded — see above.":"Add a universe to begin.",listErr?"err":"warn"); return; }
     if(!s){ setStatus("<b>"+esc(u.name)+"</b> has no saved run yet. Drop its screener export above"+(OLD?", or import the old dataset":"")+".","warn"); return; }
     const body=BODY[s.id]; if(body&&body.err){ setStatus("Could not read the run: "+esc(body.err),"err"); return; }
-    setStatus("<b>"+esc(u.name)+"</b> · run of <b>"+dfmt(s.as_of)+"</b> · "+S.MODEL.length+" names scored"+(S.dropped?" · <span style='color:var(--accent)'>"+S.dropped+" dropped below $"+minDV+"M/day</span>":"")+(s.filename?" · "+esc(s.filename):"")+(s.uploaded_at?" · uploaded "+new Date(s.uploaded_at).toLocaleString():""),"ok");
+    setStatus((sideOf(u)==="short"?'<span class="rs-tag sh" style="margin:0 6px 0 0">SHORT</span>every scale flipped — 100 = weakest · ':'')+"<b>"+esc(u.name)+"</b> · run of <b>"+dfmt(s.as_of)+"</b> · "+S.MODEL.length+" names scored"+(S.dropped?" · <span style='color:var(--accent)'>"+S.dropped+" dropped below $"+minDV+"M/day</span>":"")+(s.filename?" · "+esc(s.filename):"")+(s.uploaded_at?" · uploaded "+new Date(s.uploaded_at).toLocaleString():""),"ok");
   }
   function renderBench(){
     const u=uniOf(curUni), s=snapOf(curSnap), b=S.bInfo, el=$("rs2Fresh"), vals=$("rs2Vals");
@@ -4110,6 +4162,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     readSettings();
     const rows=[], byUni={}, left=[]; let reason="";
     UNIS.forEach(u=>{
+      if(sideOf(u)==="short") return;                                   // the Orange cockpit is long-only
       const list=runsOf(u.id); if(!list.length) return;
       const cur=(list[0].id===curSnap&&S.RAW.length)?{M3:S.M3,bInfo:S.bInfo}:computeFor(u.id,list[0].id,false);
       if(!cur||!cur.M3.length){ if(!reason) reason=(cur&&cur.bInfo&&cur.bInfo.stale)?"benchmark file is from another week for "+u.name:(cur&&!cur.bInfo)?"no benchmark file for "+u.name:(cur&&cur.bInfo&&cur.bInfo.missing)?"benchmark "+cur.bInfo.missing+" missing from the file":"run not loaded for "+u.name; return; }
@@ -4135,7 +4188,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   }
   function rsRank(sym){
     const k=slug(String(sym||"").split(":").pop()); if(!k) return null; let best=null; readSettings();
-    UNIS.forEach(u=>{ const list=runsOf(u.id); if(!list.length) return; const t=rsRankTable(u.id,list[0].id); if(t&&t.rows[k]&&(!best||String(t.as_of)>String(best.as_of))) best={...t.rows[k],n:t.n,as_of:t.as_of,uni:t.code}; });
+    UNIS.forEach(u=>{ if(sideOf(u)==="short") return; const list=runsOf(u.id); if(!list.length) return; const t=rsRankTable(u.id,list[0].id); if(t&&t.rows[k]&&(!best||String(t.as_of)>String(best.as_of))) best={...t.rows[k],n:t.n,as_of:t.as_of,uni:t.code}; });
     return best;
   }
   function uniByKey(codeOrName){ const k=slug(codeOrName); if(!k) return null; return UNIS.find(x=>slug(x.code)===k)||UNIS.find(x=>slug(x.name)===k)||null; }
@@ -4200,8 +4253,9 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
 
   /* public surface — same names the other tabs already use, plus the universe calls */
   window.RS={ ensureInit:init, getState:()=>({RAW:S.RAW,MAP:S.MAP,MODEL:S.MODEL,WEIGHTS,CAP,TFS,activeTab:tab1,weighted:w1,universe:curUni,run:curSnap}), onChange:null,
-    pick, open:id=>selectSnap(id), delUni, delSnap };
-  window.RS2={ ensureInit:init, getStep3, universeResult, ensureRun, rsRank, universes:()=>UNIS.map(u=>({id:u.id,name:u.name,code:u.code,benchmark:u.benchmark,runs:runsOf(u.id).length,latest:(runsOf(u.id)[0]||{}).as_of||null})) };
+    pick, open:id=>selectSnap(id), delUni, delSnap,
+    pickByCode, saveMatrix:saveSnapshot, createUni, delUniByCode, parseText:parseCSV, runsByCode, sideOf:code=>sideOf(uniByKey(code)), loaded:()=>inited&&(UNIS.length>0||!!listErr), reload:()=>{ BODY={}; CACHE={}; return loadAll(); } };
+  window.RS2={ ensureInit:init, getStep3, universeResult, ensureRun, rsRank, universes:()=>UNIS.map(u=>({id:u.id,name:u.name,code:u.code,benchmark:u.benchmark,side:sideOf(u),runs:runsOf(u.id).length,latest:(runsOf(u.id)[0]||{}).as_of||null})) };
 })();
 </script>
 <script>
@@ -5285,7 +5339,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   let curSnapId=null;                                              // the upload on screen (null = the latest of the universe)
   let smMin=null, volMax=null, clMin=null, postSet=new Set();      // the map filters: climb ÷ wobble, wobble cap, climb floor, postures switched OFF
   let mapFit=false, mapLabels=true, mapChart=null, mapState=null, rsPending=new Set();
-  /* EVC structure (Nov 2026) */
+  /* EVC structure (Nov 2026) · the rungs chart (12 Nov 2026) */
   const EVC_LOCS=["RIDING","MMB","PULLBACK","ACCMB","FLUSH","EXTENDED","OFF","BROKEN"];
   const EVC_COL={RIDING:"#3dd68c",MMB:"#e8b84b",PULLBACK:"#f5a623",ACCMB:"#4fc3f7",FLUSH:"#c084fc",EXTENDED:"#ff7b72",OFF:"#9aa3b8",BROKEN:"#e5484d"};
   const EVC_TXT={RIDING:"In motion above the 5 with 10 > 20: 1H trading — enter only through an accmb or mmb on E, while price stays above the 5 on V (after 5 > 10).",
@@ -5296,10 +5350,20 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     EXTENDED:"Too far from the averages: beyond the ATR limits from the 10 or the 5 — never enter here; wait for the next pause.",
     OFF:"10 under the 20 on V: the validation timeframe is not in context. Watch only.",
     BROKEN:"Under the 50: the structure is broken — out of the list until it rebuilds."};
-  let EVC={off:[],cOnly:false,allOnly:false,slopeOnly:false,earnSkip:false,minAlign:0,ext10:2,ext5:1,units:"pct",view:"ladder",metric:"d20"};
-  let evcChart=null, evcState=null, HX={}, PICKC={};
+  const EVC_TXT_S={RIDING:"Falling under the 5 with 10 < 20: 1H trading — enter only through a dismb or mmb on E, while price stays under the 5 on V (after 5 < 10).",
+    MMB:"The pause: bounced over the 5, held under the 10, 10 < 20. MMB validation on V — enter on E: dismb close to or right after 10 < 20 on E, or mmb at the validation of the Stage-1 low on E.",
+    PULLBACK:"A deep bounce to the 10 (a bounce to the 10 is a big one). Wait for the rejection and the turn back under the 5, then the E entry.",
+    FLUSH:"Squeezed to or over the 20 and not yet validated: no entry until it closes back under the 20 (dismb) — then look for the E entry.",
+    ACCMB:"Closed back under the 20 after the squeeze: supply validated on V (dismb). Enter on E at its next dismb / mmb.",
+    EXTENDED:"Too far from the averages: beyond the ATR limits under the 10 or the 5 — never enter here; wait for the next pause.",
+    OFF:"10 over the 20 on V: the validation timeframe is not in short context. Watch only.",
+    BROKEN:"Over the 50: the short structure is broken — out of the list until it rebuilds."};
+  const EVC_NAME_S={ACCMB:"DISMB",FLUSH:"SQUEEZE"};         // what a short universe calls the two mirrored locations
+  let EVC={off:[],cOnly:false,allOnly:false,slopeOnly:false,eOnly:false,earnSkip:false,minAlign:0,stackMin:0,gapMin:null,gapMax:null,ext10:2,ext5:1,units:"pct",tails:1,ghosts:true,labels:true};
+  let evcChart=null, evcState=null, HX={}, PICKC={}, evcFocus=null, evcChips=null, evcChipSide=null;
   function saveEvc(){ try{ localStorage.setItem("mo_evc",JSON.stringify(EVC)); }catch(e){} }
-  function loadEvc(){ try{ const o=JSON.parse(localStorage.getItem("mo_evc")||"null"); if(o&&typeof o==="object") EVC=Object.assign(EVC,o); }catch(e){} if(!Array.isArray(EVC.off)) EVC.off=[]; }
+  function loadEvc(){ try{ const o=JSON.parse(localStorage.getItem("mo_evc")||"null"); if(o&&typeof o==="object"){ delete o.view; delete o.metric; EVC=Object.assign(EVC,o); } }catch(e){}
+    if(!Array.isArray(EVC.off)) EVC.off=[]; EVC.tails=[0,1,3,6,99].includes(+EVC.tails)?+EVC.tails:1; if(!(EVC.ext10>0)) EVC.ext10=2; if(!(EVC.ext5>0)) EVC.ext5=1; }
   const F2_KEY="mo_f2";
   function saveF2(){ try{ localStorage.setItem(F2_KEY,JSON.stringify({smMin,volMax,clMin,post:[...postSet],mapFit,mapLabels})); }catch(e){} }
   function loadF2(){ try{ const o=JSON.parse(localStorage.getItem(F2_KEY)||"{}")||{}; smMin=o.smMin==null?null:+o.smMin; volMax=o.volMax==null?null:+o.volMax; clMin=o.clMin==null?null:+o.clMin;
@@ -5327,6 +5391,16 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     return r;
   }
   let MODEL={rows:[],churn:null,secTop:[],prev:null};
+  /* the side of a universe: the `side` column when the table has it, else the browser's memory (sl_side); default long */
+  let LS_SIDE={}; try{ LS_SIDE=JSON.parse(localStorage.getItem("sl_side")||"{}")||{}; }catch(e){}
+  const codeSlug=v=>String(v||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+  const sideOfU=u=>{ if(!u) return "long"; const v=String(u.side||LS_SIDE[codeSlug(u.code||u.name)]||"long").toLowerCase(); return v==="short"?"short":"long"; };
+  const uniSide=()=>sideOfU(UNIS.find(x=>x.id===curUni));
+  const SGN=()=>uniSide()==="short"?-1:1;
+  const locName=l=>(l&&uniSide()==="short"&&EVC_NAME_S[l])||l;
+  const locText=l=>uniSide()==="short"?(EVC_TXT_S[l]||""):(EVC_TXT[l]||"");
+  const bucketName=b=>(b==="BELOW"&&uniSide()==="short")?"ABOVE":b;
+  function rememberSide(code,side){ LS_SIDE[codeSlug(code)]=side; try{ localStorage.setItem("sl_side",JSON.stringify(LS_SIDE)); }catch(e){} }
 
   const $=id=>document.getElementById(id);
   const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -5467,6 +5541,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   }
   function rankSnapshot(list,idx,opts){
     const snap=list[idx]; if(!snap)return null;
+    const s=opts.side==="short"?-1:1, sg=v=>(v==null||!isFinite(v))?null:s*v;        // a short universe scores the fall, not the climb
     const rows=(snap.rows||[]).map(r=>Object.assign({},r));
     const vm=(opts.smooth&&idx>=2)?volMap(list,idx):null;
     rows.forEach(r=>{ r._vol=vm?(vm.map[r.t]!==undefined?vm.map[r.t]:r.vol):r.vol; });
@@ -5488,8 +5563,8 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       r.volSus=(vFloor!==null&&r.volRaw!==null&&r.volRaw!==undefined&&r.volRaw<vFloor*0.5);
     });
     // ratios computed AFTER the floor, so the floor actually binds
-    rows.forEach(r=>{ r._ra6=ra(r.p6m,r._vol); r._ra12=ra(r.p1y,r._vol); r._ra3=ra(r.p3m,r._vol);
-      r.climb=(r.p6m!=null&&r.p1y!=null)?(r.p6m+r.p1y)/2:null;                     // the map's y: average of the 6M and 12M gain
+    rows.forEach(r=>{ r._ra6=ra(sg(r.p6m),r._vol); r._ra12=ra(sg(r.p1y),r._vol); r._ra3=ra(sg(r.p3m),r._vol);
+      r.climb=(r.p6m!=null&&r.p1y!=null)?s*(r.p6m+r.p1y)/2:null;                   // the map's y: average of the 6M and 12M gain (the fall, for a short universe)
       r.smooth=(r.climb!=null&&r._vol!=null&&r._vol>0)?r.climb/r._vol:null; });    // the map's steepness: climb ÷ wobble (the raw ratio behind the Z)
     const z6=zmaker(rows.map(r=>r._ra6)), z12=zmaker(rows.map(r=>r._ra12)), z3=zmaker(rows.map(r=>r._ra3));
     // winsorize at +/-3 sd, the standard index-provider treatment
@@ -5497,7 +5572,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     if(opts.mode==="m121"||opts.mode==="m61"){
       // plain price momentum that skips the latest month (the classic 12-1 / 6-1), z-scored across the universe:
       //   12-1 = (1 + 1Y return) ÷ (1 + 1M return) − 1        6-1 = (1 + 6M return) ÷ (1 + 1M return) − 1
-      rows.forEach(r=>{ const a=opts.mode==="m121"?r.p1y:r.p6m; r._mom=(a!=null&&r.p1m!=null&&r.p1m>-100)?((1+a/100)/(1+r.p1m/100)-1)*100:null; });
+      rows.forEach(r=>{ const a=opts.mode==="m121"?r.p1y:r.p6m; r._mom=(a!=null&&r.p1m!=null&&r.p1m>-100)?s*((1+a/100)/(1+r.p1m/100)-1)*100:null; });
       const zm=zmaker(rows.map(r=>r._mom));
       rows.forEach(r=>{ r._z6=null; r._z12=null; r._z3=null; r.score=clip(zm(r._mom)); });
     } else rows.forEach(r=>{
@@ -5509,9 +5584,10 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     rows.filter(r=>r.score!==null).sort((x,y)=>y.score-x.score).forEach((r,i)=>r.rank=i+1);
     return rows;
   }
-  function enrich(r,rsu){   // turnover, stretch, earnings window, RS link, bank test and the seven lights — used by build() and by rankFor()
+  function enrich(r,rsu,s){ // turnover, stretch, earnings window, RS link, bank test and the seven lights — used by build() and by rankFor()
+    s=s||1;
     r.turn = (r.px!=null&&r.avol!=null)?r.px*r.avol:null;
-    r.stretch = (r.px!=null&&r.e20!=null&&r.atr!=null&&r.atr>0)?(r.px-r.e20)/r.atr:null;     // price → 20 EMA in ATR(14)
+    r.stretch = (r.px!=null&&r.e20!=null&&r.atr!=null&&r.atr>0)?s*(r.px-r.e20)/r.atr:null;   // price → 20 EMA in ATR(14), in the trade's direction
     r.bucket = r.stretch==null?null:r.stretch>2?"WAIT":r.stretch>1?"NEAR":r.stretch>=-1?"READY":"BELOW";
     r.earnD = r.earn?bizDays(todayISO(),r.earn):null;
     r.earnSoon = r.earnD!=null&&r.earnD>=0&&r.earnD<=EARN_WIN;
@@ -5554,8 +5630,8 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     const list=snapsFor(uid);
     if(!list.length){render();return;}
     let idx=list.length-1; if(curSnapId!=null){ const k=list.findIndex(x=>x.id===curSnapId); if(k>=0) idx=k; else curSnapId=null; }
-    MODEL.list=list; MODEL.idx=idx;
-    const opts={use3M,smooth:volSmooth,mode:rankMode};
+    MODEL.list=list; MODEL.idx=idx; MODEL.side=uniSide();
+    const opts={use3M,smooth:volSmooth,mode:rankMode,side:MODEL.side};
     const rsu=rsFor(uid,list[idx].as_of); MODEL.rsu=rsu;
     const cur=rankSnapshot(list,idx,opts);
     const back=k=>(idx-k>=0)?rankSnapshot(list,idx-k,opts):null;
@@ -5567,7 +5643,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       r.d3 = (r.rank&&R3[r.t])?R3[r.t]-r.rank:null;
       r.d6 = (r.rank&&R6[r.t])?R6[r.t]-r.rank:null;
       r.isNew = p1 ? !(r.t in R1) : false;
-      enrich(r,rsu);
+      enrich(r,rsu,SGN());
     });
     // dropped names (were ranked last time, absent now)
     const nowSet=new Set(cur.map(r=>r.t));
@@ -5585,65 +5661,100 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     MODEL.rows=cur; MODEL.dropped=dropped; MODEL.prev=p1; MODEL.snap=list[idx]; MODEL.count=list.length; MODEL.rsu=rsu;
     buildEvc(list,idx);
     renderRuns(); render();
+    if(window.SL&&SL.onData) SL.onData("mo");
   }
-  /* ---------- EVC structure: the read of one row ---------- */
-  function evcRead(r,prev,hx){
+  /* ---------- EVC structure: the ladder geometry (side-free) and the read of one row (side-aware: s = +1 long, −1 short) ---------- */
+  const seqOf=r=>[r.e100!=null?r.e100:r.e20w, r.e50!=null?r.e50:r.e10w, r.e20, r.e10, r.e5];        // slow → fast: the order of the climb from the 100
+  const LANE_UP=["on the 100","100 → 50","50 → 20","20 → 10","10 → 5","above the 5"];
+  const LANE_DN=["on the 100","100 → 50 (under)","50 → 20 (under)","20 → 10 (under)","10 → 5 (under)","below the 5"];
+  const laneText=(k,dir)=>dir>0?LANE_UP[k]:dir<0?LANE_DN[k]:"on the 100";
+  function geo(r){
+    // Where the dot sits: y > 0 above the 100 climbing up, y < 0 under it climbing down. Climb slow to fast and the first
+    // average not cleared is the rung; inside a lane the height is price's share of the way from the lower to the upper
+    // average (always between them, however the EMAs are ordered); in the top lane it is ATRs past the 5, pinned when EXTENDED.
+    const atr=(r.atr!=null&&r.atr>0)?r.atr:null, px=r.px, seq=seqOf(r);
+    const gx=(r.e10!=null&&r.e20!=null&&atr)?(r.e10-r.e20)/atr:null;                                    // x: the 10–20 gap in ATR, signed
+    const fast=[r.e5,r.e10,r.e20,seq[1],seq[0]]; let up=0,dn=0,np=0;                                      // stack tidiness: the 10 pairs, faster vs slower
+    for(let i=0;i<5;i++) for(let j=i+1;j<5;j++){ const a=fast[i], b=fast[j]; if(a==null||b==null) continue; np++; if(a>b) up++; else if(a<b) dn++; }
+    const o={gx,gy:null,k:0,dir:0,h:0,ext:false,tidyUp:np?up:null,tidyDn:np?dn:null,np};
+    if(px==null||seq[0]==null) return o;
+    const dir=px>seq[0]?1:px<seq[0]?-1:0; o.dir=dir; if(!dir){ o.gy=0; return o; }
+    let k=0; for(const v of seq){ if(v==null) break; if(dir*(px-v)>0) k++; else break; }
+    let h=0.5;
+    if(k<5){ const lo=seq[k-1], hi=seq[k]; if(lo!=null&&hi!=null){ const span=Math.abs(hi-lo); h=span>0?Math.min(1,Math.max(0.03,Math.abs(px-lo)/span)):0.5; } }
+    else { const a5=atr?dir*(px-seq[4])/atr:null, a10=atr?dir*(px-seq[3])/atr:null; const ext=(a10!=null&&a10>EVC.ext10)||(a5!=null&&a5>EVC.ext5);
+      h=ext?0.985:(a5==null?0.3:Math.min(0.9,Math.max(0.03,a5/EVC.ext5*0.88))); o.ext=ext; }
+    o.k=k; o.h=h; o.gy=dir*((k-1)+h); return o;
+  }
+  function evcRead(r,prev,hx,s){
+    s=s||1;
     const px=r.px, atr=(r.atr!=null&&r.atr>0)?r.atr:null;
     const e5=r.e5, e10=r.e10, e20=r.e20, e50=(r.e50!=null?r.e50:r.e10w), e100=(r.e100!=null?r.e100:r.e20w);
-    const pc=v=>(px!=null&&v!=null&&v>0)?(px/v-1)*100:null, at=v=>(px!=null&&v!=null&&atr)?(px-v)/atr:null;
+    const pc=v=>(px!=null&&v!=null&&v>0)?s*(px/v-1)*100:null, at=v=>(px!=null&&v!=null&&atr)?s*(px-v)/atr:null;        // distances in the trade's direction
     const o={d5:pc(e5),d10:pc(e10),d20:pc(e20),d50:pc(e50),d100:pc(e100),a5:at(e5),a10:at(e10),a20:at(e20),a50:at(e50),a100:at(e100),
-             src50:r.e50!=null?"50 (V)":r.e10w!=null?"10 (W)":null, src100:r.e100!=null?"100 (V)":r.e20w!=null?"20 (W)":null};
-    o.vUp=(e10!=null&&e20!=null)?e10>e20:null; o.cUp=(r.e10w!=null&&r.e20w!=null)?r.e10w>r.e20w:null; o.eUp=(r.e10h!=null&&r.e20h!=null)?r.e10h>r.e20h:null;
-    o.gap=(e10!=null&&e20!=null&&atr)?(e10-e20)/atr:null; o.gap510=(e5!=null&&e10!=null&&atr)?(e5-e10)/atr:null;
-    const sl=k=>(prev&&prev[k]!=null&&r[k]!=null&&prev[k]>0)?(r[k]/prev[k]-1)*100:null;
+             src50:r.e50!=null?"50 (V)":r.e10w!=null?"10 (W)":null, src100:r.e100!=null?"100 (V)":r.e20w!=null?"20 (W)":null, s};
+    const right=(a,b)=>(a!=null&&b!=null)?s*(a-b)>0:null;                                                // a on the right side of b for this universe
+    o.vUp=right(e10,e20); o.cUp=right(r.e10w,r.e20w); o.eUp=right(r.e10h,r.e20h);
+    o.gap=(e10!=null&&e20!=null&&atr)?s*(e10-e20)/atr:null; o.gap510=(e5!=null&&e10!=null&&atr)?s*(e5-e10)/atr:null;
+    const sl=k=>(prev&&prev[k]!=null&&r[k]!=null&&prev[k]>0)?s*(r[k]/prev[k]-1)*100:null;              // slope since the previous upload, in the trade's direction
     o.s10=sl("e10"); o.s20=sl("e20"); o.s10w=sl("e10w"); o.s20w=sl("e20w");
     o.vSlope=(o.s10!=null&&o.s20!=null)?(o.s10>0&&o.s20>0):null; o.cSlope=(o.s10w!=null&&o.s20w!=null)?(o.s10w>0&&o.s20w>0):null;
-    const parts=[[e5,"above 5"],[e10,"above 10"],[e20,"above 20"],[e50,"above "+(o.src50||"50")],[e100,"above "+(o.src100||"100")]].map(([v,nm])=>[nm,(px!=null&&v!=null)?px>v:null]).concat([["10 > 20 on V",o.vUp],["10 > 20 on W",o.cUp]]);
+    const past=s>0?"above ":"below ", vs=s>0?" > ":" < ";
+    const parts=[[e5,past+"5"],[e10,past+"10"],[e20,past+"20"],[e50,past+(o.src50||"50")],[e100,past+(o.src100||"100")]].map(([v,nm])=>[nm,right(px,v)]).concat([["10"+vs+"20 on V",o.vUp],["10"+vs+"20 on W",o.cUp]]);
     o.parts=parts; o.alignN=parts.filter(p=>p[1]===true).length; o.alignJ=parts.filter(p=>p[1]!=null).length;
     o.aboveAll=parts.slice(0,5).every(p=>p[1]===true);
     o.ext=(o.a10!=null&&o.a10>EVC.ext10)||(o.a5!=null&&o.a5>EVC.ext5);
-    // was it at or under the 20 in one of the last three uploads? (the flush that an accmb resolves)
-    let flushed=false; if(hx&&hx.length){ const prior=hx.filter(h=>h.i<(r._i!=null?r._i:Infinity)).slice(-3); flushed=prior.some(h=>h.px!=null&&h.e20!=null&&h.px<=h.e20); }
+    // was it at or past the 20 the wrong way in one of the last three uploads? (the flush that an accmb resolves — the squeeze that a dismb resolves)
+    let flushed=false; if(hx&&hx.length){ const prior=hx.filter(h=>h.i<(r._i!=null?r._i:Infinity)).slice(-3); flushed=prior.some(h=>h.px!=null&&h.e20!=null&&s*(h.px-h.e20)<=0); }
     o.flushedBefore=flushed;
     let loc=null;
     if(px==null||e20==null) loc=null;
-    else if(e50!=null&&px<e50) loc="BROKEN";
+    else if(e50!=null&&s*(px-e50)<0) loc="BROKEN";
     else if(o.vUp===false) loc="OFF";
-    else if(px<=e20) loc="FLUSH";
+    else if(s*(px-e20)<=0) loc="FLUSH";
     else if(o.ext) loc="EXTENDED";
     else if(flushed) loc="ACCMB";
-    else if(e10!=null&&px<=e10) loc="PULLBACK";
-    else if(e5!=null&&px<=e5) loc="MMB";
+    else if(e10!=null&&s*(px-e10)<=0) loc="PULLBACK";
+    else if(e5!=null&&s*(px-e5)<=0) loc="MMB";
     else loc="RIDING";
     o.loc=loc;
-    // the 10–20 gap against the largest gap of this run of 10 > 20 in the stored uploads
-    if(o.gap!=null&&hx&&hx.length){ let mx=o.gap; for(let k=hx.length-1;k>=0;k--){ const h=hx[k]; if(h.i>=(r._i!=null?r._i:Infinity)) continue; if(h.gap==null||h.gap<=0) break; mx=Math.max(mx,h.gap); } o.gapMax=mx; o.gapPct=mx>0?o.gap/mx*100:null; }
+    // the 10–20 gap against the largest gap of this run of validation in the stored uploads
+    if(o.gap!=null&&hx&&hx.length){ let mx=o.gap; for(let k=hx.length-1;k>=0;k--){ const h=hx[k]; if(h.i>=(r._i!=null?r._i:Infinity)) continue; const g=h.gx==null?null:s*h.gx; if(g==null||g<=0) break; mx=Math.max(mx,g); } o.gapMax=mx; o.gapPct=mx>0?o.gap/mx*100:null; }
+    const g=geo(r); o.gx=g.gx; o.gy=g.gy; o.k=g.k; o.dir=g.dir; o.laneH=g.h; o.lane=laneText(g.k,g.dir); o.tidyUp=g.tidyUp; o.tidyDn=g.tidyDn; o.np=g.np; o.tidy=s>0?g.tidyUp:g.tidyDn;
+    o.cAgainst=o.cUp===false;                                                                             // the weekly disagrees with this side
     return o;
   }
-  function hxRow(r,i,as_of){ const atr=(r.atr!=null&&r.atr>0)?r.atr:null, px=r.px, e50=(r.e50!=null?r.e50:r.e10w), e100=(r.e100!=null?r.e100:r.e20w);
+  function hxRow(r,i,as_of){ const px=r.px, e50=(r.e50!=null?r.e50:r.e10w), e100=(r.e100!=null?r.e100:r.e20w), g=geo(r);
     const pc=v=>(px!=null&&v!=null&&v>0)?(px/v-1)*100:null;
     const parts=[r.e5,r.e10,r.e20,e50,e100].map(v=>(px!=null&&v!=null)?px>v:null).concat([(r.e10!=null&&r.e20!=null)?r.e10>r.e20:null,(r.e10w!=null&&r.e20w!=null)?r.e10w>r.e20w:null]);
-    return {i,as_of,px,e20:r.e20,d5:pc(r.e5),d10:pc(r.e10),d20:pc(r.e20),d50:pc(e50),d100:pc(e100),gap:(r.e10!=null&&r.e20!=null&&atr)?(r.e10-r.e20)/atr:null,
+    return {i,as_of,px,e20:r.e20,d20:pc(r.e20),gx:g.gx,gy:g.gy,k:g.k,dir:g.dir,tidyUp:g.tidyUp,tidyDn:g.tidyDn,
             align:parts.filter(p=>p!=null).length>=5?parts.filter(p=>p===true).length:null, has:parts.filter(p=>p!=null).length}; }   // a count needs at least five of the seven checks
   function buildEvc(list,idx){        // the per-ticker memory across every stored upload of the universe, then the read of today's rows
-    HX={}; PICKC={};
+    HX={}; PICKC={}; const s=SGN();
     list.forEach((sn,i)=>{ (sn.rows||[]).forEach(r=>{ if(!r||!r.t) return; (HX[r.t]=HX[r.t]||[]).push(hxRow(r,i,sn.as_of)); }); });
     const prevRows={}; if(idx>0) (list[idx-1].rows||[]).forEach(r=>{ if(r&&r.t) prevRows[r.t]=r; });
-    (MODEL.rows||[]).forEach(r=>{ r._i=idx; r.evc=evcRead(r,prevRows[r.t]||null,HX[r.t]||[]); });
+    (MODEL.rows||[]).forEach(r=>{ r._i=idx; r.evc=evcRead(r,prevRows[r.t]||null,HX[r.t]||[],s); });
   }
   function pickFor(i){                 // the momentum export list of upload i under today's settings (cached per build)
     if(PICKC[i]) return PICKC[i];
     if(i===MODEL.idx) return PICKC[i]=new Set(pickTop().pick.map(r=>r.t));
-    const rows=rankSnapshot(MODEL.list,i,{use3M,smooth:volSmooth,mode:rankMode})||[]; const rsu=rsFor(curUni,MODEL.list[i].as_of); rows.forEach(r=>enrich(r,rsu));
+    const rows=rankSnapshot(MODEL.list,i,{use3M,smooth:volSmooth,mode:rankMode,side:uniSide()})||[]; const rsu=rsFor(curUni,MODEL.list[i].as_of); rows.forEach(r=>enrich(r,rsu,SGN()));
     const ranked=rows.filter(r=>r.rank&&!r.thin&&passAll(r)).sort((a,b)=>a.rank-b.rank); const by={}, pick=[];
     for(const r of ranked){ if(pick.length>=topN) break; const k=(r.ind||r.sec||"—"); if(indCap>0&&(by[k]||0)>=indCap) continue; by[k]=(by[k]||0)+1; pick.push(r); }
     return PICKC[i]=new Set(pick.map(r=>r.t));
   }
   const evcPass=r=>{ const e=r.evc; if(!e||!e.loc) return false; if(EVC.off.includes(e.loc)) return false; if(EVC.cOnly&&e.cUp!==true) return false; if(EVC.allOnly&&!e.aboveAll) return false;
-    if(EVC.slopeOnly&&!(e.vSlope===true&&e.cSlope===true)) return false; if(EVC.earnSkip&&r.earnSoon) return false; if(EVC.minAlign>0&&e.alignN<EVC.minAlign) return false; return true; };
+    if(EVC.slopeOnly&&!(e.vSlope===true&&e.cSlope===true)) return false; if(EVC.eOnly&&e.eUp!==true) return false; if(EVC.earnSkip&&r.earnSoon) return false; if(EVC.minAlign>0&&e.alignN<EVC.minAlign) return false;
+    if(EVC.stackMin>0&&!(e.tidy!=null&&e.tidy>=EVC.stackMin)) return false; if(EVC.gapMin!=null&&!(e.gap!=null&&e.gap>=EVC.gapMin)) return false; if(EVC.gapMax!=null&&!(e.gap!=null&&e.gap<=EVC.gapMax)) return false; return true; };
   function evcList(){ return pickTop().pick.filter(r=>r.evc); }                        // the momentum export list, with a read
   function evcRows(){ return evcList().filter(evcPass); }
-  function evcActive(){ const a=[]; if(EVC.off.length) a.push("loc: "+EVC_LOCS.filter(l=>!EVC.off.includes(l)).join("/")); if(EVC.cOnly) a.push("C ✓"); if(EVC.allOnly) a.push("above all MAs"); if(EVC.slopeOnly) a.push("slopes up"); if(EVC.earnSkip) a.push("no earnings ≤5"); if(EVC.minAlign>0) a.push("align ≥ "+EVC.minAlign); return a; }
+  function evcActive(){ const a=[]; if(EVC.off.length) a.push("loc: "+EVC_LOCS.filter(l=>!EVC.off.includes(l)).map(locName).join("/")); if(EVC.cOnly) a.push("C ✓"); if(EVC.allOnly) a.push(SGN()>0?"above all MAs":"below all MAs"); if(EVC.slopeOnly) a.push("slopes with"); if(EVC.eOnly) a.push("E ✓"); if(EVC.earnSkip) a.push("no earnings ≤5"); if(EVC.minAlign>0) a.push("align ≥ "+EVC.minAlign); if(EVC.stackMin>0) a.push("stack ≥ "+EVC.stackMin); if(EVC.gapMin!=null) a.push("gap ≥ "+EVC.gapMin); if(EVC.gapMax!=null) a.push("gap ≤ "+EVC.gapMax); return a; }
+  function ghostList(){               // names that were in an export list within the last six uploads and are not in this file — at their last known place
+    const list=MODEL.list||[], idx=MODEL.idx; if(!EVC.ghosts||idx==null||!list.length) return [];
+    const here=new Set((MODEL.rows||[]).map(r=>r.t)), out={};
+    for(let i=Math.max(0,idx-6);i<idx;i++){ pickFor(i).forEach(t=>{ if(here.has(t)||out[t]) return; const hx=(HX[t]||[]).filter(h=>h.i<idx&&h.gx!=null&&h.gy!=null); if(!hx.length) return; const h=hx[hx.length-1]; out[t]={t,x:h.gx,y:h.gy,as_of:h.as_of,i:h.i,k:h.k,dir:h.dir}; }); }
+    return Object.values(out);
+  }
   function renderRuns(){            // one chip per saved upload of this universe, newest first; the one on screen is lit
     const el=$("moRuns"); if(!el) return; const list=MODEL.list||[];
     if(list.length<1){ el.innerHTML=""; return; }
@@ -5666,13 +5777,25 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     if(curUni&&!UNIS.some(u=>u.id===curUni))curUni=UNIS.length?UNIS[0].id:null;
     renderUnis(); build();
     if(window.OR&&OR.onMO)OR.onMO();
+    if(window.SL&&SL.onData) SL.onData("mo");
+  }
+  const byCode=code=>{ const k=codeSlug(code); return UNIS.find(x=>codeSlug(x.code)===k)||UNIS.find(x=>codeSlug(x.name)===k)||null; };
+  async function createUni(name,code,side){               // the `side` column is optional: without it the side lives in this browser
+    side=side==="short"?"short":"long"; const rec={name:String(name).trim(),code:code,sort:UNIS.length+1};
+    try{ await sb(T_UNI,"POST",Object.assign({side},rec)); }
+    catch(e){ if(/side/i.test(String(e.message||e))) await sb(T_UNI,"POST",rec); else throw e; }
+    rememberSide(code,side); await load();
+    const u=byCode(code); if(u){ curUni=u.id; curSnapId=null; renderUnis(); build(); } return u?u.id:null;
   }
   async function addUni(){
     const n=prompt("Universe name (e.g. Nifty 200):"); if(!n||!n.trim())return;
     const code=(prompt("Short code for export headers (e.g. NIFTY200):","")||n).trim().toUpperCase().replace(/[^A-Z0-9]/g,"");
-    try{ await sb(T_UNI,"POST",{name:n.trim(),code:code,sort:UNIS.length+1}); await load(); toast("Universe added","success"); }
+    try{ await createUni(n,code,"long"); toast("Universe added","success"); }
     catch(e){ toast("Add failed: "+e.message,"error"); }
   }
+  async function delUniByCode(code){ const u=byCode(code); if(!u) return false; await sb(T_UNI+"?id=eq."+u.id,"DELETE"); if(curUni===u.id) curUni=null; await load(); return true; }
+  function pickByCode(code){ const u=byCode(code); if(!u) return false; if(u.id!==curUni){ curUni=u.id; curSnapId=null; renderUnis(); build(); } return true; }
+  function snapsByCode(code){ const u=byCode(code); return u?snapsFor(u.id).map(sn=>({id:sn.id,as_of:sn.as_of,n:sn.n_rows||0})):[]; }
   async function delUni(id,ev){
     ev.stopPropagation();
     const u=UNIS.find(x=>x.id===id); const k=snapsFor(id).length;
@@ -5746,7 +5869,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
       const sec=(name,arr)=>arr.length?"###MOMO_"+code+"_"+name+"\n"+arr.map(sym).join(",")+"\n\n":"";
       const soon=pick.filter(r=>r.earnSoon), rest=pick.filter(r=>!r.earnSoon);
       t=sec("READY_within_1ATR_of_20EMA",rest.filter(r=>r.bucket==="READY"))+sec("NEAR_1to2ATR",rest.filter(r=>r.bucket==="NEAR"))
-       +sec("WAIT_over_2ATR",rest.filter(r=>r.bucket==="WAIT"))+sec("BELOW_20EMA",rest.filter(r=>r.bucket==="BELOW"))
+       +sec("WAIT_over_2ATR",rest.filter(r=>r.bucket==="WAIT"))+sec(uniSide()==="short"?"ABOVE_20EMA":"BELOW_20EMA",rest.filter(r=>r.bucket==="BELOW"))
        +sec("NO_EMA_DATA",rest.filter(r=>r.stretch==null))+sec("EARNINGS_within_5_sessions",soon);
     } else t="###MOMO_"+code+"_TOP"+topN+tag+"\n"+pick.map(sym).join(",")+"\n";
     dl(t,"momentum_"+code.toLowerCase()+"_top"+topN+tag.toLowerCase()+".txt");
@@ -5897,12 +6020,10 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     $("moKpi").innerHTML = hasData ? kpis() : "";
     const el=$("moTable");
     if(!hasData){
-      el.innerHTML='<div class="mo-empty">'+(UNIS.length?"No snapshot yet for this universe. Drop a TradingView CSV export below.":"Add a universe to begin.")+'</div>';
-      $("moDrop2").style.display=UNIS.length?"block":"none";
+      el.innerHTML='<div class="mo-empty">'+(UNIS.length?"No upload yet for this universe. Drop its screener export in the box at the top of the page.":"Add a universe to begin.")+'</div>';
       return;
     }
-    $("moDrop2").style.display="block";
-    $("moRankSub").textContent = rankMode==="stdv"?"Z(6M÷vol) + Z(12M÷vol), averaged":rankMode==="m121"?"12-1 momentum: (1+1Y) ÷ (1+1M) − 1, z-scored":"6-1 momentum: (1+6M) ÷ (1+1M) − 1, z-scored";
+    $("moRankSub").textContent = (uniSide()==="short"?"SHORT universe · every scale flipped · ":"")+(rankMode==="stdv"?"Z(6M÷vol) + Z(12M÷vol), averaged":rankMode==="m121"?"12-1 momentum: (1+1Y) ÷ (1+1M) − 1, z-scored":"6-1 momentum: (1+6M) ÷ (1+1M) − 1, z-scored");
     let rows=MODEL.rows.filter(passAll);
     renderMap(); renderEvc();
     if(!rows.length){ el.innerHTML='<div class="mo-empty">'+(rsOnly&&!(MODEL.rsu&&MODEL.rsu.n)?'No RS Score run found for this universe — save one in the RS Score tab (same code, e.g. R1000), or switch “RS survivors only” off.':rsOnly?'No name of this snapshot has an RS total of '+rsMin+' or more. Lower the threshold or switch the filter off.':'No stock has '+minF+' or more lights. Lower <b>Min F</b>, or add the extra columns to your screener export.')+'</div>'; return; }
@@ -5928,7 +6049,7 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
         if(c.k==="d1")    return '<td>'+deltaCell(r.d1,r.isNew)+'</td>';
         if(c.k==="d3")    return '<td>'+deltaCell(r.d3,false)+'</td>';
         if(c.k==="d6")    return '<td>'+deltaCell(r.d6,false)+'</td>';
-        if(c.k==="stretch") return '<td style="color:'+(r.stretch==null?"var(--text3)":r.bucket==="READY"?"var(--green)":r.bucket==="WAIT"?"var(--orange)":"var(--text)")+'" title="price → 20 EMA in ATR(14)">'+(r.stretch==null?"—":(r.stretch>0?"+":"")+r.stretch.toFixed(1))+(r.bucket&&r.bucket!=="NEAR"?' <span class="mo-tag '+(r.bucket==="READY"?"mo-in":r.bucket==="WAIT"?"mo-warn":"mo-out")+'">'+r.bucket+'</span>':'')+'</td>';
+        if(c.k==="stretch") return '<td style="color:'+(r.stretch==null?"var(--text3)":r.bucket==="READY"?"var(--green)":r.bucket==="WAIT"?"var(--orange)":"var(--text)")+'" title="price → 20 EMA in ATR(14)">'+(r.stretch==null?"—":(r.stretch>0?"+":"")+r.stretch.toFixed(1))+(r.bucket&&r.bucket!=="NEAR"?' <span class="mo-tag '+(r.bucket==="READY"?"mo-in":r.bucket==="WAIT"?"mo-warn":"mo-out")+'">'+bucketName(r.bucket)+'</span>':'')+'</td>';
         if(c.k==="earnD") return '<td>'+(r.earnD==null?'<span class="mo-dim">—</span>':r.earnD<0?'<span class="mo-dim" title="'+esc(r.earn)+'">done</span>':'<span class="'+(r.earnSoon?'mo-tag mo-warn':'mo-dim')+'" title="'+esc(r.earn)+' · '+r.earnD+' trading session'+(r.earnD===1?'':'s')+'">'+(r.earnD===0?"today":r.earnD+"s")+'</span>')+'</td>';
         if(c.k==="rsT")   return '<td>'+(r.rs?'<span title="RS Step 3 total '+r.rs.total.toFixed(1)+' · rank '+r.rs.rank+(MODEL.rsu?' of '+MODEL.rsu.n+' · '+esc(MODEL.rsu.code||MODEL.rsu.name||"")+' run '+esc(MODEL.rsu.as_of||""):'')+'" style="color:'+(r.rs.total>=rsMin?"var(--green)":"var(--text2)")+'">'+r.rs.total.toFixed(0)+'<span class="mo-dim"> #'+r.rs.rank+'</span></span>':'<span class="mo-dim">—</span>')+'</td>';
         if(c.k==="fscore"){
@@ -5984,103 +6105,132 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   }
 
 
-  /* ---------- EVC structure: charts, table, export ---------- */
+  /* ---------- EVC structure: the rungs chart, the table, the export ---------- */
   const fmtD=(v,u)=>v==null?"—":(u==="atr"?(v>0?"+":"")+v.toFixed(1):(v>0?"+":"")+v.toFixed(1)+"%");
-  const locTag=l=>l?'<span class="mo-loc" style="background:'+EVC_COL[l]+'">'+l+'</span>':'<span class="mo-dim">—</span>';
+  const locTag=l=>l?'<span class="mo-loc" style="background:'+EVC_COL[l]+'">'+locName(l)+'</span>':'<span class="mo-dim">—</span>';
   const arrow=v=>v==null?'<span class="mo-dim">?</span>':v>0?'<span style="color:var(--green)">↑</span>':'<span style="color:var(--red)">↓</span>';
+  const arrowS=(v,s)=>{ if(v==null) return '<span class="mo-dim">?</span>'; const raw=(s||1)*v; if(raw===0) return '<span class="mo-dim">→</span>';     // glyph = the EMA's real direction, colour = agrees with this side
+    return '<span style="color:'+(v>0?"var(--green)":"var(--red)")+'" title="'+(raw>0?"rising":"falling")+(v>0?" — with this side":" — against this side")+'">'+(raw>0?"↑":"↓")+'</span>'; };
   const yn=v=>v==null?'<span class="mo-dim">?</span>':v?'<span style="color:var(--green)">✓</span>':'<span style="color:var(--red)">✗</span>';
   function renderEvc(){
     const box=$("moEvcBox"); if(!box) return;
-    const all=evcList(), rows=evcRows(); const sub=$("moEvcSub");
+    if(evcChips&&evcChipSide!==uniSide()){ evcChips(); evcChipSide=uniSide(); }            // the chips say DISMB / SQUEEZE in a short universe
+    const all=evcList(), rows=evcRows(), s=SGN(), sub=$("moEvcSub");
     const noCols=all.length&&!all.some(r=>r.e5!=null||r.e10!=null||r.e10w!=null);
-    sub.textContent=all.length?(rows.length+" of "+all.length+" momentum names"+(evcActive().length?" · "+evcActive().join(" · "):"")+(noCols?" · export has no EMA 5/10/W columns yet":"")):"no momentum list yet";
-    // legend with counts by location (of the whole momentum list) — the filter chips live in the bar
+    sub.textContent=all.length?(rows.length+" of "+all.length+" momentum names"+(s<0?" · SHORT universe, ladder read downwards":"")+(evcActive().length?" · "+evcActive().join(" · "):"")+(noCols?" · export has no EMA 5/10/W columns yet":"")+(MODEL.snap?" · run of "+MODEL.snap.as_of:"")):"no momentum list yet";
+    const allLbl=$("moEvcAllLbl"); if(allLbl) allLbl.textContent=s>0?"Above all MAs":"Below all MAs";
     const cnt={}; all.forEach(r=>{ const l=r.evc.loc||"?"; cnt[l]=(cnt[l]||0)+1; });
-    $("moEvcLegend").innerHTML=EVC_LOCS.filter(l=>cnt[l]).map(l=>'<span><i style="background:'+EVC_COL[l]+'"></i>'+l+' '+cnt[l]+(EVC.off.includes(l)?' <span class="mo-dim">(off)</span>':'')+'</span>').join("")+(cnt["?"]?'<span><i style="background:var(--border2)"></i>no read '+cnt["?"]+'</span>':'')
-      +'<span class="mo-dim" style="margin-left:auto">'+(EVC.view==="ladder"?"ladder: coloured = passes the EVC filters, faint = filtered out":EVC.view==="scatter"?"scatter: V (10) against C (50 ≈ 10 W)":"movement: solid = in that upload's export list, hollow = in the file only")+'</span>';
-    renderEvcChart(all,rows); renderEvcTable(rows,all.length);
-    evcState={n:all.length,pass:rows.length,locs:cnt,view:EVC.view,units:EVC.units,drawn:!!evcChart};
+    $("moEvcLegend").innerHTML=EVC_LOCS.filter(l=>cnt[l]).map(l=>'<span><i style="background:'+EVC_COL[l]+'"></i>'+locName(l)+' '+cnt[l]+(EVC.off.includes(l)?' <span class="mo-dim">(off)</span>':'')+'</span>').join("")+(cnt["?"]?'<span><i style="background:var(--border2)"></i>no read '+cnt["?"]+'</span>':'')
+      +'<span class="mo-dim" style="margin-left:auto">filled = tidy stack (≥ 9/10) · hollow = messy · white ring = weekly against · tick = E open · faint = filtered out · ◆ = ghost</span>';
+    const q={ur:0,ul:0,lr:0,ll:0,mid:0}; all.forEach(r=>{ const e=r.evc; if(e.gx==null||e.gy==null) return; if(e.gy===0||e.gx===0){ q.mid++; return; } q[(e.gy>0?"u":"l")+(e.gx>0?"r":"l")]++; });
+    const qe=$("moEvcQuad"); if(qe) qe.innerHTML=all.length?'<span><b>above the 100 · 10 &gt; 20</b> '+q.ur+'</span><span><b>above the 100 · 10 &lt; 20</b> '+q.ul+' <span class="mo-dim">(pullbacks, flushes)</span></span><span><b>under the 100 · 10 &gt; 20</b> '+q.lr+' <span class="mo-dim">(bounces)</span></span><span><b>under the 100 · 10 &lt; 20</b> '+q.ll+'</span>'+(q.mid?'<span>on a line '+q.mid+'</span>':''):'';
+    const ghosts=ghostList();
+    renderEvcChart(all,rows,ghosts); renderEvcTable(rows,all.length);
+    evcState={n:all.length,pass:rows.length,locs:cnt,quad:q,ghosts:ghosts.length,units:EVC.units,drawn:!!evcChart,side:uniSide(),focus:evcFocus};
   }
-  function renderEvcChart(all,rows){
+  function renderEvcChart(all,rows,ghosts){
     const cv=$("moEvcChart"); if(!cv) return;
     if(typeof Chart==="undefined"){ setTimeout(()=>renderEvc(),500); return; }
     if(evcChart){ try{evcChart.destroy();}catch(e){} evcChart=null; }
-    if(!all.length) return;
-    const u=EVC.units, pass=new Set(rows.map(r=>r.t));
-    const grid={color:"rgba(45,52,69,.5)"}, tick={color:"#9aa3b8"};
-    const zero={id:"evcZero",beforeDatasetsDraw(c){ const {ctx,chartArea:a,scales:{x,y}}=c; if(!y) return; ctx.save(); ctx.setLineDash([3,4]); ctx.lineWidth=1;
-        if(y.min<0&&y.max>0){ const zy=y.getPixelForValue(0); ctx.strokeStyle="rgba(154,163,184,.6)"; ctx.beginPath(); ctx.moveTo(a.left,zy); ctx.lineTo(a.right,zy); ctx.stroke(); }
-        if(EVC.view==="scatter"&&x&&x.min<0&&x.max>0){ const zx=x.getPixelForValue(0); ctx.strokeStyle="rgba(154,163,184,.6)"; ctx.beginPath(); ctx.moveTo(zx,a.top); ctx.lineTo(zx,a.bottom); ctx.stroke(); }
-        if(EVC.view==="scatter"&&u==="atr"&&y.max>EVC.ext10){ const ly=y.getPixelForValue(EVC.ext10); ctx.strokeStyle="#ff7b72"; ctx.setLineDash([6,4]); ctx.beginPath(); ctx.moveTo(a.left,ly); ctx.lineTo(a.right,ly); ctx.stroke(); ctx.fillStyle="#ff7b72"; ctx.font="bold 10px Barlow, sans-serif"; ctx.textAlign="right"; ctx.fillText(EVC.ext10+" ATR from the 10 — too far",a.right-6,ly-5); }
+    const pts=all.filter(r=>r.evc&&r.evc.gx!=null&&r.evc.gy!=null);
+    if(!pts.length&&!ghosts.length) return;
+    const pass=new Set(rows.map(r=>r.t)), u=EVC.units, idx=MODEL.idx, list=MODEL.list||[], L=EVC.tails|0;
+    // tails: the earlier positions of every passing name (the focused one in full)
+    const tails=[]; pts.forEach(r=>{ const on=pass.has(r.t), foc=evcFocus===r.t; if(!on&&!foc) return; const len=foc?99:L; if(!len) return;
+      const hx=(HX[r.t]||[]).filter(h=>h.i<idx&&h.i>=idx-len&&h.gx!=null&&h.gy!=null); if(!hx.length) return;
+      tails.push({r,foc,pts:hx.map(h=>({i:h.i,x:h.gx,y:h.gy,as_of:h.as_of,inList:pickFor(h.i).has(r.t)}))}); });
+    const xsAll=pts.map(r=>r.evc.gx).concat(ghosts.map(g=>g.x)).concat(...tails.map(t=>t.pts.map(p=>p.x)));
+    const ysAll=pts.map(r=>r.evc.gy).concat(ghosts.map(g=>g.y)).concat(...tails.map(t=>t.pts.map(p=>p.y)));
+    const anyUp=ysAll.some(y=>y>0), anyDn=ysAll.some(y=>y<0);
+    const yMax=anyUp?5.3:0.45, yMin=anyDn?-5.3:-0.45;
+    let xmin=Math.min(0,...xsAll), xmax=Math.max(0,...xsAll); const pad=Math.max(0.25,(xmax-xmin)*0.08); xmin-=pad; xmax+=pad; if(xmax-xmin<1.6){ const c=(xmax+xmin)/2; xmin=c-0.8; xmax=c+0.8; }
+    const col=r=>EVC_COL[r.evc.loc]||"#9aa3b8", tidyOK=r=>r.evc.tidy!=null&&r.evc.tidy>=9;
+    const data=pts.map(r=>({x:r.evc.gx,y:r.evc.gy,r,on:pass.has(r.t)}));
+    const ds=[{label:"names",data,parsing:false,order:1,
+        pointRadius:data.map(d=>d.on?(evcFocus===d.r.t?8.5:6):3.5),pointHoverRadius:9,
+        pointBackgroundColor:data.map(d=>d.on?(tidyOK(d.r)?col(d.r):"rgba(13,15,18,.92)"):"rgba(154,163,184,.16)"),
+        pointBorderColor:data.map(d=>d.on?(d.r.evc.cAgainst?"#ffffff":col(d.r)):"rgba(154,163,184,.28)"),
+        pointBorderWidth:data.map(d=>d.on?(d.r.evc.cAgainst?2.2:(tidyOK(d.r)?1:2)):1)},
+      {label:"ghosts",data:ghosts.map(g=>({x:g.x,y:g.y,g})),parsing:false,order:2,pointRadius:5,pointHoverRadius:7,pointStyle:"rectRot",
+        pointBackgroundColor:"rgba(154,163,184,.22)",pointBorderColor:"rgba(154,163,184,.5)",pointBorderWidth:1}];
+    const LN=["100","50","20","10","5"];
+    const lanes={id:"evcLanes",beforeDraw(c){ const {ctx,chartArea:a,scales:{x,y}}=c; if(!x||!y) return; ctx.save(); ctx.beginPath(); ctx.rect(a.left,a.top,a.right-a.left,a.bottom-a.top); ctx.clip();
+        ctx.font="10px Barlow, sans-serif";
+        const band=(y0,y1,k)=>{ if(k%2===0) return; const p0=y.getPixelForValue(Math.min(y1,y.max)), p1=y.getPixelForValue(Math.max(y0,y.min)); ctx.fillStyle="rgba(255,255,255,.025)"; ctx.fillRect(a.left,p0,a.right-a.left,p1-p0); };
+        const line=(v,label)=>{ if(v<y.min||v>y.max) return; const py=y.getPixelForValue(v); ctx.strokeStyle="rgba(127,139,160,.55)"; ctx.lineWidth=1; ctx.setLineDash([]); ctx.beginPath(); ctx.moveTo(a.left,py); ctx.lineTo(a.right,py); ctx.stroke();
+          ctx.fillStyle="#d5dbe5"; ctx.textAlign="right"; ctx.textBaseline="middle"; ctx.fillText("EMA "+label,a.right-4,py); };
+        const laneLbl=(yv,txt)=>{ if(yv<y.min||yv>y.max) return; ctx.fillStyle="rgba(154,163,184,.9)"; ctx.textAlign="left"; ctx.textBaseline="middle"; ctx.fillText(txt,a.left+6,y.getPixelForValue(yv)); };
+        if(anyUp){ for(let k=1;k<=5;k++) band(k-1,k,k); for(let k=0;k<5;k++) line(k,LN[k]); for(let k=1;k<=5;k++) laneLbl(k-0.5,LANE_UP[k]); }
+        else { line(0,"100"); laneLbl(0.3,"nothing above the 100 in this list"); }
+        if(anyDn){ for(let k=1;k<=5;k++) band(-k,-(k-1),k); for(let k=1;k<5;k++) line(-k,LN[k]); if(!anyUp) line(0,"100"); for(let k=1;k<=5;k++) laneLbl(-(k-0.5),LANE_DN[k]); }
+        else if(anyUp){ laneLbl(-0.16,"nothing under the 100 in this list"); }
+        ctx.setLineDash([6,4]); ctx.strokeStyle="#ff7b72"; ctx.fillStyle="#ff7b72"; ctx.textAlign="left"; ctx.font="bold 10px Barlow, sans-serif";
+        if(anyUp&&y.max>4.98){ const py=y.getPixelForValue(4.985); ctx.beginPath(); ctx.moveTo(a.left,py); ctx.lineTo(a.right,py); ctx.stroke(); ctx.textBaseline="top"; ctx.textAlign="right"; ctx.fillText("EXTENDED (pinned): > "+EVC.ext10+" ATR from the 10 or > "+EVC.ext5+" ATR from the 5",a.right-52,py+4); }
+        if(anyDn&&y.min<-4.98){ const py=y.getPixelForValue(-4.985); ctx.beginPath(); ctx.moveTo(a.left,py); ctx.lineTo(a.right,py); ctx.stroke(); ctx.textBaseline="bottom"; ctx.textAlign="right"; ctx.fillText("EXTENDED under (pinned)",a.right-52,py-4); }
+        if(x.min<0&&x.max>0){ const px0=x.getPixelForValue(0); ctx.setLineDash([]); ctx.strokeStyle="rgba(201,209,217,.75)"; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(px0,a.top); ctx.lineTo(px0,a.bottom); ctx.stroke();
+          ctx.fillStyle="#9aa3b8"; ctx.font="10px Barlow, sans-serif"; ctx.textBaseline="bottom"; ctx.textAlign="right"; ctx.fillText("10 under the 20 ◀",px0-5,a.bottom-4); ctx.textAlign="left"; ctx.fillText("▶ 10 over the 20",px0+5,a.bottom-4); }
         ctx.restore(); }};
-    const common={responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false}}};
-    const tipLine=r=>{ const e=r.evc; return [r.t+" · "+(r.n||"").slice(0,24)+" · "+(e.loc||"—"), "5 "+fmtD(u==="atr"?e.a5:e.d5,u)+" · 10 "+fmtD(u==="atr"?e.a10:e.d10,u)+" · 20 "+fmtD(u==="atr"?e.a20:e.d20,u)+" · "+(e.src50||"50")+" "+fmtD(u==="atr"?e.a50:e.d50,u)+" · "+(e.src100||"100")+" "+fmtD(u==="atr"?e.a100:e.d100,u),
-        "C "+(e.cUp==null?"?":e.cUp?"✓":"✗")+" · V "+(e.vUp==null?"?":e.vUp?"✓":"✗")+" · align "+e.alignN+"/"+e.alignJ+(e.gap!=null?" · gap "+e.gap.toFixed(2)+" ATR":"")+(r.earnSoon?" · EARN "+r.earnD+"s":""), pass.has(r.t)?"passes the EVC filters":"filtered out"]; };
-    if(EVC.view==="ladder"){
-      const any50=all.some(r=>r.e50!=null), any100=all.some(r=>r.e100!=null);
-      const labels=["5 (V)","10 (V)","20 (V)",any50?"50 (V)":"10 (W) ≈ 50",any100?"100 (V)":"20 (W) ≈ 100"];
-      const ds=all.map(r=>{ const e=r.evc, on=pass.has(r.t), col=EVC_COL[e.loc]||"#9aa3b8";
-        const v=u==="atr"?[e.a5,e.a10,e.a20,e.a50,e.a100]:[e.d5,e.d10,e.d20,e.d50,e.d100];
-        return {label:r.t,data:v,r,borderColor:on?col:"rgba(154,163,184,.18)",backgroundColor:on?col:"rgba(154,163,184,.18)",borderWidth:on?2:1,pointRadius:on?3.5:2,pointHoverRadius:7,tension:0,spanGaps:false,order:on?1:2}; });
-      evcChart=new Chart(cv.getContext("2d"),{type:"line",data:{labels,datasets:ds},options:Object.assign({},common,{interaction:{mode:"nearest",intersect:true},
-        onClick:(e,els)=>{ if(els.length){ const d=ds[els[0].datasetIndex]; if(d) MO.story(d.r.t,true); } },
-        plugins:{legend:{display:false},tooltip:{callbacks:{title:items=>items.length?ds[items[0].datasetIndex].r.t:"",label:c=>{ const r=ds[c.datasetIndex].r; return tipLine(r); }}}},
-        scales:{x:{ticks:tick,grid},y:{ticks:Object.assign({callback:v=>u==="atr"?v:v+"%"},tick),grid,title:{display:true,text:u==="atr"?"price above the MA, in ATR(14)":"price above the MA, % of the MA",color:"#9aa3b8"}}}}),plugins:[zero]});
-    } else if(EVC.view==="scatter"){
-      const data=all.map(r=>{ const e=r.evc; return {x:u==="atr"?e.a50:e.d50,y:u==="atr"?e.a10:e.d10,r,on:pass.has(r.t)}; }).filter(d=>d.x!=null&&d.y!=null);
-      const lab={id:"evcLab",afterDatasetsDraw(c){ const meta=c.getDatasetMeta(0); const {ctx}=c; ctx.save(); ctx.font="bold 10px Barlow, sans-serif"; ctx.textAlign="left"; meta.data.forEach((pt,i)=>{ const d=data[i]; if(d&&d.on){ ctx.fillStyle=EVC_COL[d.r.evc.loc]||"#9aa3b8"; ctx.fillText(d.r.t,pt.x+8,pt.y-6); } }); ctx.restore(); }};
-      evcChart=new Chart(cv.getContext("2d"),{type:"scatter",data:{datasets:[{data,parsing:false,backgroundColor:data.map(d=>d.on?(EVC_COL[d.r.evc.loc]||"#9aa3b8"):"rgba(154,163,184,.25)"),borderColor:data.map(d=>d.on?"rgba(13,15,18,.8)":"transparent"),borderWidth:1,pointRadius:data.map(d=>d.on?6:3.5),pointHoverRadius:9}]},
-        options:Object.assign({},common,{onClick:(e,els)=>{ if(els.length){ const d=data[els[0].index]; if(d) MO.story(d.r.t,true); } },
-          plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>tipLine(data[c.dataIndex].r)}}},
-          scales:{x:{ticks:Object.assign({callback:v=>u==="atr"?v:v+"%"},tick),grid,title:{display:true,text:"C · price above the "+(all.some(r=>r.e50!=null)?"50 (V)":"10 (W) ≈ 50")+(u==="atr"?", ATR":", %"),color:"#9aa3b8"}},
-                  y:{ticks:Object.assign({callback:v=>u==="atr"?v:v+"%"},tick),grid,title:{display:true,text:"V · price above the 10 (V)"+(u==="atr"?", ATR":", %"),color:"#9aa3b8"}}}}),plugins:[zero,lab]});
-    } else {
-      const list=MODEL.list||[]; const labels=list.map(sn=>sn.as_of); const m=EVC.metric;
-      const pick=rows.length?rows:all;                                           // the movement of the names that pass (all of them when nothing passes)
-      const ds=pick.map(r=>{ const e=r.evc, col=EVC_COL[e.loc]||"#9aa3b8"; const hx=HX[r.t]||[]; const by={}; hx.forEach(h=>by[h.i]=h);
-        const vals=labels.map((_,i)=>{ const h=by[i]; if(!h) return null; return m==="align"?h.align:m==="gap"?h.gap:h[m]; });
-        const inList=labels.map((_,i)=>by[i]?pickFor(i).has(r.t):false);
-        return {label:r.t,data:vals,r,inList,hx:by,borderColor:col,backgroundColor:col,borderWidth:1.5,tension:0,spanGaps:false,pointRadius:inList.map(f=>f?5:3),pointHoverRadius:8,
-                pointBackgroundColor:inList.map(f=>f?col:"rgba(13,15,18,.9)"),pointBorderColor:col,pointBorderWidth:inList.map(f=>f?1:1.5)}; });
-      const ytxt={d20:"% above the 20 (V)",d10:"% above the 10 (V)",d50:"% above the 50 (10 W)",align:"alignment count 0–7",gap:"10–20 gap, ATR"}[m];
-      evcChart=new Chart(cv.getContext("2d"),{type:"line",data:{labels,datasets:ds},options:Object.assign({},common,{interaction:{mode:"nearest",intersect:true},
-        onClick:(e,els)=>{ if(els.length){ const d=ds[els[0].datasetIndex]; if(d) MO.story(d.r.t,true); } },
-        plugins:{legend:{display:false},tooltip:{callbacks:{title:items=>items.length?ds[items[0].datasetIndex].r.t+" · "+labels[items[0].dataIndex]:"",
-          label:c=>{ const d=ds[c.datasetIndex], h=d.hx[c.dataIndex]; if(!h) return ""; return [ytxt+": "+(c.parsed.y==null?"—":(m==="align"?c.parsed.y:c.parsed.y.toFixed(m==="gap"?2:1))), d.inList[c.dataIndex]?"★ in that upload's export list":"in the file, not in the list", (h.d20!=null?"20 (V) "+fmtD(h.d20,"pct"):"")+(h.d50!=null?" · 50 "+fmtD(h.d50,"pct"):"")+(h.align!=null?" · align "+h.align+"/"+h.has:"")]; }}}},
-        scales:{x:{ticks:Object.assign({maxRotation:0,autoSkip:true},tick),grid},y:{ticks:Object.assign({callback:v=>(m==="align"||m==="gap")?v:v+"%"},tick),grid,title:{display:true,text:ytxt,color:"#9aa3b8"},...(m==="align"?{min:0,max:7}:{})}}}),plugins:[zero]});
-    }
+    const tailsPl={id:"evcTails",beforeDatasetsDraw(c){ const {ctx,chartArea:a,scales:{x,y}}=c; if(!x||!y||!tails.length) return; ctx.save(); ctx.beginPath(); ctx.rect(a.left,a.top,a.right-a.left,a.bottom-a.top); ctx.clip();
+        tails.forEach(t=>{ const cc=col(t.r), seq=t.pts.concat([{i:idx,x:t.r.evc.gx,y:t.r.evc.gy,now:true}]), n=seq.length;
+          for(let k=1;k<n;k++){ const p=seq[k-1], q=seq[k]; if(q.i-p.i!==1) continue;                 // a missing upload breaks the tail
+            ctx.strokeStyle=cc; ctx.globalAlpha=t.foc?0.85:0.18+0.45*(k/(n-1)); ctx.lineWidth=t.foc?2.2:1.4; ctx.setLineDash(t.foc?[]:[4,3]);
+            ctx.beginPath(); ctx.moveTo(x.getPixelForValue(p.x),y.getPixelForValue(p.y)); ctx.lineTo(x.getPixelForValue(q.x),y.getPixelForValue(q.y)); ctx.stroke(); }
+          ctx.setLineDash([]); t.pts.forEach((p,k)=>{ ctx.globalAlpha=t.foc?0.95:0.35+0.45*((k+1)/n); const px=x.getPixelForValue(p.x), py=y.getPixelForValue(p.y);
+            ctx.beginPath(); ctx.arc(px,py,t.foc?3.5:2.8,0,Math.PI*2); ctx.fillStyle=p.inList?cc:"rgba(13,15,18,.95)"; ctx.fill(); ctx.strokeStyle=cc; ctx.lineWidth=1.2; ctx.stroke(); }); });
+        ctx.restore(); }};
+    const marks={id:"evcMarks",afterDatasetsDraw(c){ const {ctx}=c, meta=c.getDatasetMeta(0), gm=c.getDatasetMeta(1); ctx.save(); ctx.font="bold 10px Barlow, sans-serif"; ctx.textAlign="left"; ctx.textBaseline="alphabetic";
+        const many=data.filter(d=>d.on).length>60;
+        meta.data.forEach((pt,i)=>{ const d=data[i]; if(!d||!d.on) return; const cc=col(d.r);
+          if(d.r.evc.eUp===true){ ctx.strokeStyle=cc; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(pt.x,pt.y-9); ctx.lineTo(pt.x,pt.y-14); ctx.stroke(); }
+          if(EVC.labels&&(!many||evcFocus===d.r.t)){ ctx.fillStyle=cc; ctx.fillText(d.r.t,pt.x+8,pt.y-7); } });
+        if(EVC.labels&&gm) gm.data.forEach((pt,i)=>{ const g=ghosts[i]; if(!g) return; ctx.fillStyle="rgba(154,163,184,.7)"; ctx.font="10px Barlow, sans-serif"; ctx.fillText(g.t+" · "+String(g.as_of).slice(5),pt.x+7,pt.y-6); });
+        ctx.restore(); }};
+    const tip=d=>{ if(!d) return ""; if(d.g){ const g=d.g; return [g.t+" · ghost", "last in a list "+g.as_of+" · "+laneText(g.k,g.dir), "gap then "+g.x.toFixed(2)+" ATR", "not in this upload's file"]; }
+      const r=d.r, e=r.evc; return [r.t+" · "+(r.n||"").slice(0,24)+" · "+locName(e.loc), "stands: "+e.lane+(e.k>0&&e.k<5?" ("+Math.round(e.laneH*100)+"% of the way)":e.k===5&&e.a5!=null?" ("+e.a5.toFixed(1)+" ATR past the 5)":""),
+        "gap "+(e.gap==null?"—":e.gap.toFixed(2)+" ATR"+(e.gapPct!=null&&e.gapMax>e.gap+1e-9?" · "+e.gapPct.toFixed(0)+"% of max":""))+" · stack "+(e.tidy==null?"—":e.tidy+"/10")+" · align "+e.alignN+"/"+e.alignJ,
+        "C "+(e.cUp==null?"?":e.cUp?"✓":"✗")+" · V "+(e.vUp==null?"?":e.vUp?"✓":"✗")+" · E "+(e.eUp==null?"?":e.eUp?"✓":"✗")+(r.earnSoon?" · EARN "+r.earnD+"s":""),
+        "5 "+fmtD(u==="atr"?e.a5:e.d5,u)+" · 10 "+fmtD(u==="atr"?e.a10:e.d10,u)+" · 20 "+fmtD(u==="atr"?e.a20:e.d20,u)+" · "+(e.src50||"50")+" "+fmtD(u==="atr"?e.a50:e.d50,u)+" · "+(e.src100||"100")+" "+fmtD(u==="atr"?e.a100:e.d100,u),
+        (r.rs?"RS "+r.rs.total.toFixed(0)+" #"+r.rs.rank+" · ":"")+"seen "+(HX[r.t]||[]).length+"/"+list.length, d.on?"passes the EVC filters":"filtered out"]; };
+    evcChart=new Chart(cv.getContext("2d"),{type:"scatter",data:{datasets:ds},options:{responsive:true,maintainAspectRatio:false,animation:false,
+      onClick:(e,els)=>{ const el=els.find(x=>x.datasetIndex===0); if(el){ const d=data[el.index]; evcFocus=(evcFocus===d.r.t)?null:d.r.t; renderEvc(); MO.story(d.r.t,true); } else if(evcFocus&&!els.length){ evcFocus=null; renderEvc(); } },
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>tip(c.raw)}}},
+      scales:{x:{min:xmin,max:xmax,ticks:{color:"#9aa3b8",includeBounds:false,callback:v=>(Math.round(v*100)/100)},grid:{color:"rgba(45,52,69,.5)"},title:{display:true,text:"10–20 gap in ATR(14) on V  =  (EMA 10 − EMA 20) ÷ ATR   ·   left of zero the 10 is under the 20   ·   wider = more mature cycle",color:"#9aa3b8"}},
+              y:{min:yMin,max:yMax,ticks:{display:false},grid:{display:false}}}},plugins:[lanes,tailsPl,marks]});
   }
   function renderEvcTable(rows,total){
     const el=$("moEvcTable"); if(!el) return;
-    if(!total){ el.innerHTML='<div class="mo-empty">No momentum export list yet — upload a Funnel file and loosen the filters above.</div>'; return; }
+    if(!total){ el.innerHTML='<div class="mo-empty">No momentum export list yet — upload a screener file and loosen the filters above.</div>'; return; }
     if(!rows.length){ el.innerHTML='<div class="mo-empty">Nothing in the momentum list passes the EVC filters.</div>'; return; }
-    const u=EVC.units; const N=(MODEL.list||[]).length;
+    const u=EVC.units, N=(MODEL.list||[]).length, sh=SGN()<0;
     const al=e=>'<span class="mo-al" title="'+esc(e.parts.map(p=>(p[1]===true?"✓ ":p[1]===false?"✗ ":"? ")+p[0]).join("\n"))+'">'+e.parts.map(p=>p[1]===true?"<b>●</b>":p[1]===false?"<u>●</u>":"<i>○</i>").join("")+' '+e.alignN+'/'+e.alignJ+'</span>';
     const dcell=(v,strong)=>'<td style="color:'+(v==null?"var(--text3)":v>=0?"var(--green)":"var(--red)")+(strong?";font-weight:700":"")+'">'+fmtD(v,u)+'</td>';
     const any50=rows.some(r=>r.e50!=null), any100=rows.some(r=>r.e100!=null), anyE=rows.some(r=>r.evc.eUp!=null);
-    let h='<table class="mo-evct"><thead><tr><th>#</th><th class="l">Ticker</th><th class="l">Location</th><th class="l" title="price above 5 · 10 · 20 · 50 · 100, 10 > 20 on V, 10 > 20 on W">Align</th>'
-      +'<th title="Context (1W): 10 EMA > 20 EMA, slopes vs the previous upload">C</th><th title="Validation (1D): 10 EMA > 20 EMA, slopes vs the previous upload">V</th>'+(anyE?'<th title="Entry (1H): 10 EMA > 20 EMA">E</th>':'')
-      +'<th>Δ5</th><th>Δ10</th><th>Δ20</th><th>'+(any50?'Δ50':'Δ10W')+'</th><th>'+(any100?'Δ100':'Δ20W')+'</th><th title="(10 − 20) ÷ ATR on V · share of the largest gap in this run of 10 > 20">Gap</th><th>Earn</th><th>RS</th><th title="uploads this name appears in (of all stored) · uploads where it was in the export list under today\'s settings">Seen</th><th class="l">Read</th></tr></thead><tbody>';
+    let h='<table class="mo-evct"><thead><tr><th>#</th><th class="l">Ticker</th><th class="l">Location</th><th class="l" title="the rung price stands on, climbing from the 100 (and how far along the lane)">Rung</th><th title="stack tidiness: EMA pairs in this side\'s order, of 10">Stack</th><th class="l" title="price past 5 · 10 · 20 · 50 · 100, 10 vs 20 on V, 10 vs 20 on W">Align</th>'
+      +'<th title="Context (1W): 10 vs 20 EMA, slopes vs the previous upload">C</th><th title="Validation (1D): 10 vs 20 EMA, slopes vs the previous upload">V</th>'+(anyE?'<th title="Entry (1H): 10 vs 20 EMA">E</th>':'')
+      +'<th title="price distance from the average in this side\'s direction (positive = past it the right way)">Δ5</th><th>Δ10</th><th>Δ20</th><th>'+(any50?'Δ50':'Δ10W')+'</th><th>'+(any100?'Δ100':'Δ20W')+'</th><th title="(10 − 20) ÷ ATR on V in this side\'s direction · share of the largest gap in this run of validation">Gap</th><th>Earn</th><th>RS</th><th title="uploads this name appears in (of all stored) · uploads where it was in the export list under today\'s settings">Seen</th><th class="l">Read</th></tr></thead><tbody>';
     rows.forEach(r=>{ const e=r.evc, hx=HX[r.t]||[]; const inL=hx.filter(x=>pickFor(x.i).has(r.t)).length;
-      h+='<tr data-t="'+esc(r.t)+'"><td class="mo-dim">'+(r.rank||"—")+'</td><td class="l"><span class="mo-tk" onclick="MO.story(\''+esc(r.t)+'\',true)">'+esc(r.t)+'</span><span class="mo-dim" style="display:block;font-size:10px">'+esc((r.n||"").slice(0,22))+'</span></td>'
-        +'<td class="l">'+locTag(e.loc)+(e.flushedBefore&&e.loc!=="ACCMB"&&e.loc!=="FLUSH"?' <span class="mo-dim" title="was at or under the 20 within the last three uploads">↺</span>':'')+'</td><td class="l">'+al(e)+'</td>'
-        +'<td>'+yn(e.cUp)+' '+arrow(e.s10w)+arrow(e.s20w)+'</td><td>'+yn(e.vUp)+' '+arrow(e.s10)+arrow(e.s20)+'</td>'+(anyE?'<td>'+yn(e.eUp)+'</td>':'')
+      h+='<tr data-t="'+esc(r.t)+'"'+(evcFocus===r.t?' style="outline:1px solid var(--accent)"':'')+'><td class="mo-dim">'+(r.rank||"—")+'</td><td class="l"><span class="mo-tk" onclick="MO.story(\''+esc(r.t)+'\',true)">'+esc(r.t)+'</span><span class="mo-dim" style="display:block;font-size:10px">'+esc((r.n||"").slice(0,22))+'</span></td>'
+        +'<td class="l">'+locTag(e.loc)+(e.flushedBefore&&e.loc!=="ACCMB"&&e.loc!=="FLUSH"?' <span class="mo-dim" title="was at or past the 20 the wrong way within the last three uploads">↺</span>':'')+(e.cAgainst?' <span class="mo-tag mo-warn" title="the weekly 10 vs 20 is against this side">W ✗</span>':'')+'</td>'
+        +'<td class="l"><span class="mo-lane">'+esc(e.lane||"—")+(e.k>0&&e.k<5?' <span class="mo-dim">'+Math.round(e.laneH*100)+'%</span>':'')+'</span></td>'
+        +'<td title="'+(e.tidy==null?'':esc(e.tidy+' of '+e.np+' EMA pairs in order'))+'">'+(e.tidy==null?'<span class="mo-dim">—</span>':(e.tidy>=9?'<b style="color:var(--green)">'+e.tidy+'/10</b>':'<span style="color:var(--orange)">'+e.tidy+'/10</span>'))+'</td>'
+        +'<td class="l">'+al(e)+'</td>'
+        +'<td>'+yn(e.cUp)+' '+arrowS(e.s10w,e.s)+arrowS(e.s20w,e.s)+'</td><td>'+yn(e.vUp)+' '+arrowS(e.s10,e.s)+arrowS(e.s20,e.s)+'</td>'+(anyE?'<td>'+yn(e.eUp)+'</td>':'')
         +dcell(u==="atr"?e.a5:e.d5)+dcell(u==="atr"?e.a10:e.d10,true)+dcell(u==="atr"?e.a20:e.d20)+dcell(u==="atr"?e.a50:e.d50)+dcell(u==="atr"?e.a100:e.d100)
-        +'<td style="color:'+(e.gap==null?"var(--text3)":e.gap>0?"var(--text)":"var(--red)")+'">'+(e.gap==null?"—":e.gap.toFixed(2))+(e.gapPct!=null&&e.gapMax>e.gap+1e-9?' <span class="mo-dim" title="of the largest gap seen in the stored uploads of this 10 > 20 run ('+e.gapMax.toFixed(2)+' ATR)">'+e.gapPct.toFixed(0)+'%</span>':'')+'</td>'
+        +'<td style="color:'+(e.gap==null?"var(--text3)":e.gap>0?"var(--text)":"var(--red)")+'">'+(e.gap==null?"—":e.gap.toFixed(2))+(e.gapPct!=null&&e.gapMax>e.gap+1e-9?' <span class="mo-dim" title="of the largest gap seen in the stored uploads of this run ('+e.gapMax.toFixed(2)+' ATR)">'+e.gapPct.toFixed(0)+'%</span>':'')+'</td>'
         +'<td'+(r.earnSoon?' class="mo-warn" style="font-weight:700"':'')+'>'+(r.earnD==null?"—":r.earnD+"s")+'</td><td>'+(r.rs?r.rs.total.toFixed(0):"—")+'</td>'
         +'<td title="first seen '+esc(hx.length?hx[0].as_of:"")+'">'+hx.length+'/'+N+' · ★'+inL+'</td>'
-        +'<td class="read">'+esc(EVC_TXT[e.loc]||"")+(e.cUp===false?' <b>W context off</b> (10 under the 20 on the weekly): 1D trades off, 1H only with care.':'')+(r.earnSoon?' <b>Reports in '+r.earnD+' sessions</b> — no entry on the day.':'')+(e.loc==="RIDING"||e.loc==="MMB"?(e.a10!=null?' Now '+e.a10.toFixed(1)+' ATR from the 10'+(e.a5!=null?', '+e.a5.toFixed(1)+' from the 5.':'.'):''):'')+'</td></tr>'; });
+        +'<td class="read">'+esc(locText(e.loc))+(e.cUp===false?' <b>W context against</b> ('+(sh?"10 over the 20":"10 under the 20")+' on the weekly): 1D trades off, 1H only with care.':'')+(r.earnSoon?' <b>Reports in '+r.earnD+' sessions</b> — no entry on the day.':'')+(e.loc==="RIDING"||e.loc==="MMB"?(e.a10!=null?' Now '+e.a10.toFixed(1)+' ATR from the 10'+(e.a5!=null?', '+e.a5.toFixed(1)+' from the 5.':'.'):''):'')+'</td></tr>'; });
     el.innerHTML=h+'</tbody></table>';
   }
   function exportEvc(){
     const rows=evcRows(); if(!rows.length){ toast("Nothing passes the EVC filters","error"); return; }
     const code=uniCode(), date=MODEL.snap?String(MODEL.snap.as_of).replace(/-/g,""):"";
-    const tag=(EVC.off.length?"_L"+EVC_LOCS.filter(l=>!EVC.off.includes(l)).map(l=>l[0]).join(""):"")+(EVC.cOnly?"_C":"")+(EVC.allOnly?"_ALL":"")+(EVC.slopeOnly?"_SL":"")+(EVC.minAlign>0?"_A"+EVC.minAlign:"")+(EVC.earnSkip?"_NE":"");
+    const tag=(EVC.off.length?"_L"+EVC_LOCS.filter(l=>!EVC.off.includes(l)).map(l=>locName(l)[0]).join(""):"")+(EVC.cOnly?"_C":"")+(EVC.allOnly?"_ALL":"")+(EVC.slopeOnly?"_SL":"")+(EVC.eOnly?"_E":"")+(EVC.minAlign>0?"_A"+EVC.minAlign:"")+(EVC.stackMin>0?"_S"+EVC.stackMin:"")
+      +((EVC.gapMin!=null||EVC.gapMax!=null)?"_G"+(EVC.gapMin!=null?EVC.gapMin:"")+"-"+(EVC.gapMax!=null?EVC.gapMax:""):"")+(EVC.earnSkip?"_NE":"")+(uniSide()==="short"?"_SHORT":"");
     const sec=(name,arr)=>arr.length?"###EVC_"+code+"_"+name+"\n"+arr.map(sym).join(",")+"\n\n":"";
-    let t=""; EVC_LOCS.forEach(l=>{ t+=sec(l,rows.filter(r=>r.evc.loc===l)); });
-    dl(t,"evc_"+code.toLowerCase()+"_"+date+tag.toLowerCase()+".txt"); toast("Exported "+rows.length+" EVC names in "+t.split("###").length+" sections".replace(/ in 1 sections/," "),"success");
+    let t=""; EVC_LOCS.forEach(l=>{ t+=sec(locName(l),rows.filter(r=>r.evc.loc===l)); });
+    dl(t,"evc_"+code.toLowerCase()+"_"+date+tag.toLowerCase()+".txt"); const ns=t.split("###").length-1; toast("Exported "+rows.length+" EVC names"+(ns>1?" in "+ns+" sections":""),"success");
   }
-
   /* ---------- the Smooth map: climb (y) vs wobble (x); steepness = the score ---------- */
   function renderMap(){
     const box=$("moMapBox"); if(!box) return;
@@ -6121,13 +6271,13 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     mapChart=new Chart($("moMap").getContext("2d"),{type:"scatter",data:{datasets:[{data,backgroundColor:data.map(col),borderColor:data.map(d=>d.top?"#fff":"rgba(13,15,18,.8)"),borderWidth:data.map(d=>d.top?1.5:1),pointRadius:data.map(d=>d.top?7:d.pass?5.5:3.5),pointHoverRadius:9}]},
       options:{responsive:true,maintainAspectRatio:false,animation:false,parsing:false,onClick:(e,els)=>{ if(els.length){ const d=data[els[0].index]; if(d) MO.story(d.r.t,true); } },
         plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{ const d=data[c.dataIndex], r=d.r;
-          return [r.t+" · "+(r.n||"").slice(0,26), "climb "+pct(r.climb)+" (6M "+pct(r.p6m)+" · 12M "+pct(r.p1y)+")",
+          return [r.t+" · "+(r.n||"").slice(0,26), (uniSide()==="short"?"fall ":"climb ")+pct(r.climb)+" (6M "+pct(r.p6m)+" · 12M "+pct(r.p1y)+")",
                   "wobble "+r._vol.toFixed(2)+"%"+(r.volRaw!=null&&Math.abs(r.volRaw-r._vol)>1e-9?" (raw "+r.volRaw.toFixed(2)+")":""),
                   "smooth "+(r.smooth==null?"—":r.smooth.toFixed(1))+" · Z "+(r.score==null?"—":r.score.toFixed(2))+" · rank "+(r.rank||"—"),
                   "RS "+(r.rs?r.rs.total.toFixed(0)+" #"+r.rs.rank:"—")+" · "+(r.bucket||"no EMA data")+(r.earnSoon?" · EARN "+r.earnD+"s":""),
                   d.top?"★ in the export list":d.pass?"passes every filter":"filtered out"]; }}}},
         scales:{x:{min:x0,max:x1,title:{display:true,text:"wobble · 1-month volatility as the score uses it (avg daily swing, % of price)"+((volSmooth&&MODEL.count>=3)?" · 3-upload average":""),color:"#9aa3b8"},ticks:{color:"#9aa3b8",includeBounds:false,callback:v=>(Math.round(v*100)/100)+"%"},grid:{color:"rgba(45,52,69,.5)"}},
-                y:{min:y0,max:y1,title:{display:true,text:"climb · average of the 6-month and 12-month gain, %",color:"#9aa3b8"},ticks:{color:"#9aa3b8",includeBounds:false,callback:v=>(Math.round(v*10)/10)+"%"},grid:{color:"rgba(45,52,69,.5)"}}}},
+                y:{min:y0,max:y1,title:{display:true,text:uniSide()==="short"?"fall · average of the 6-month and 12-month loss, % (sign flipped)":"climb · average of the 6-month and 12-month gain, %",color:"#9aa3b8"},ticks:{color:"#9aa3b8",includeBounds:false,callback:v=>(Math.round(v*10)/10)+"%"},grid:{color:"rgba(45,52,69,.5)"}}}},
       plugins:[rayPlugin]});
   }
 
@@ -6164,17 +6314,21 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     $("moTgFit").classList.toggle("on",mapFit); $("moTgFit").onclick=function(){ mapFit=!mapFit; this.classList.toggle("on",mapFit); saveF2(); renderMap(); };
     $("moTgLbl").classList.toggle("on",mapLabels); $("moTgLbl").onclick=function(){ mapLabels=!mapLabels; this.classList.toggle("on",mapLabels); saveF2(); renderMap(); };
     loadEvc();
-    const locEl=$("moEvcLoc"); locEl.innerHTML=EVC_LOCS.map(l=>'<button data-l="'+l+'" class="'+(EVC.off.includes(l)?"":"on")+'" title="'+esc(EVC_TXT[l])+'" style="border-left:3px solid '+EVC_COL[l]+'">'+l+'</button>').join("");
-    locEl.querySelectorAll("button").forEach(b=>{ b.onclick=()=>{ const l=b.dataset.l; if(EVC.off.includes(l)) EVC.off=EVC.off.filter(x=>x!==l); else EVC.off.push(l); b.classList.toggle("on",!EVC.off.includes(l)); saveEvc(); renderEvc(); }; });
-    const tg=(id,k,after)=>{ const el=$(id); el.classList.toggle("on",!!EVC[k]); el.onclick=()=>{ EVC[k]=!EVC[k]; el.classList.toggle("on",!!EVC[k]); saveEvc(); (after||renderEvc)(); }; };
-    tg("moEvcC","cOnly"); tg("moEvcAll","allOnly"); tg("moEvcSlope","slopeOnly"); tg("moEvcEarn","earnSkip");
+    const locEl=$("moEvcLoc");
+    evcChips=function(){ locEl.innerHTML=EVC_LOCS.map(l=>'<button data-l="'+l+'" class="'+(EVC.off.includes(l)?"":"on")+'" title="'+esc(locText(l))+'" style="border-left:3px solid '+EVC_COL[l]+'">'+locName(l)+'</button>').join("");
+      locEl.querySelectorAll("button").forEach(b=>{ b.onclick=()=>{ const l=b.dataset.l; if(EVC.off.includes(l)) EVC.off=EVC.off.filter(x=>x!==l); else EVC.off.push(l); b.classList.toggle("on",!EVC.off.includes(l)); saveEvc(); renderEvc(); }; }); };
+    evcChips(); evcChipSide=uniSide();
+    const tg=(id,k,after)=>{ const el=$(id); if(!el) return; el.classList.toggle("on",!!EVC[k]); el.onclick=()=>{ EVC[k]=!EVC[k]; el.classList.toggle("on",!!EVC[k]); saveEvc(); (after||renderEvc)(); }; };
+    tg("moEvcC","cOnly"); tg("moEvcAll","allOnly"); tg("moEvcSlope","slopeOnly"); tg("moEvcE","eOnly"); tg("moEvcEarn","earnSkip"); tg("moEvcGhost","ghosts"); tg("moEvcLbl","labels");
     $("moEvcAlign").value=String(EVC.minAlign||0); $("moEvcAlign").onchange=function(){ EVC.minAlign=parseInt(this.value)||0; saveEvc(); renderEvc(); };
+    $("moEvcStack").value=String(EVC.stackMin||0); $("moEvcStack").onchange=function(){ EVC.stackMin=parseInt(this.value)||0; saveEvc(); renderEvc(); };
+    const gapIn=(id,k)=>{ const el=$(id); el.value=EVC[k]==null?"":EVC[k]; el.addEventListener("input",()=>{ const v=parseFloat(el.value); EVC[k]=isNaN(v)?null:v; saveEvc(); renderEvc(); }); };
+    gapIn("moEvcGapMin","gapMin"); gapIn("moEvcGapMax","gapMax");
     $("moEvcExt10").value=EVC.ext10; $("moEvcExt5").value=EVC.ext5;
     $("moEvcExt10").addEventListener("input",function(){ const v=parseFloat(this.value); if(!isNaN(v)&&v>0){ EVC.ext10=v; saveEvc(); build(); } });
     $("moEvcExt5").addEventListener("input",function(){ const v=parseFloat(this.value); if(!isNaN(v)&&v>0){ EVC.ext5=v; saveEvc(); build(); } });
     $("moEvcUnits").querySelectorAll("button").forEach(b=>{ b.classList.toggle("on",b.dataset.u===EVC.units); b.onclick=()=>{ EVC.units=b.dataset.u; $("moEvcUnits").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); saveEvc(); renderEvc(); }; });
-    $("moEvcView").querySelectorAll("button").forEach(b=>{ b.classList.toggle("on",b.dataset.v===EVC.view); b.onclick=()=>{ EVC.view=b.dataset.v; $("moEvcView").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); $("moEvcMetric").style.display=EVC.view==="move"?"":"none"; saveEvc(); renderEvc(); }; });
-    $("moEvcMetric").value=EVC.metric; $("moEvcMetric").style.display=EVC.view==="move"?"":"none"; $("moEvcMetric").onchange=function(){ EVC.metric=this.value; saveEvc(); renderEvc(); };
+    $("moEvcTails").value=String(EVC.tails); $("moEvcTails").onchange=function(){ EVC.tails=parseInt(this.value)||0; saveEvc(); renderEvc(); };
     $("moEvcExport").onclick=exportEvc;
     $("moRankBy").querySelectorAll("button").forEach(b=>b.onclick=()=>{ rankMode=b.dataset.m; $("moRankBy").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); build(); if(window.OR&&OR.onMO)OR.onMO(); });
     $("moTgV").classList.toggle("on",volSmooth);
@@ -6182,15 +6336,15 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
   }
 
   /* ---------- read by the RS x Momentum intersect ---------- */
-  function runs(){
-    return SNAPS.map(sn=>{ const u=UNIS.find(x=>x.id===sn.universe_id);
+  function runs(){                 // long universes only: the Orange cockpit is long-only
+    return SNAPS.filter(sn=>sideOfU(UNIS.find(x=>x.id===sn.universe_id))==="long").map(sn=>{ const u=UNIS.find(x=>x.id===sn.universe_id);
       return {id:sn.id, uniId:sn.universe_id, uniName:u?u.name:"Universe", code:u?(u.code||u.name):"", as_of:sn.as_of, n:sn.n_rows||0, uploaded_at:sn.uploaded_at||sn.created_at||null}; });
   }
   function rankFor(id){
     const sn=SNAPS.find(x=>x.id===id); if(!sn) return null;
     const list=snapsFor(sn.universe_id), idx=list.findIndex(x=>x.id===id); if(idx<0) return null;
-    const rsu=rsFor(sn.universe_id,sn.as_of);
-    const rows=rankSnapshot(list,idx,{use3M,smooth:volSmooth,mode:rankMode})||[]; rows.forEach(r=>enrich(r,rsu));
+    const rsu=rsFor(sn.universe_id,sn.as_of), sd=sideOfU(UNIS.find(x=>x.id===sn.universe_id));
+    const rows=rankSnapshot(list,idx,{use3M,smooth:volSmooth,mode:rankMode,side:sd})||[]; rows.forEach(r=>enrich(r,rsu,sd==="short"?-1:1));
     return { rows, uni:UNIS.find(x=>x.id===sn.universe_id)||null, snap:{id:sn.id,as_of:sn.as_of,uploaded_at:sn.uploaded_at||sn.created_at||null,n:sn.n_rows||0},
              rs:rsu, filters:{minF,minTurn,use3M,volSmooth,rankMode,rsOnly,rsMin,smMin,volMax,clMin,postOff:[...postSet]}, pass:r=>!!r.rank&&!r.thin&&passAll(r) };
   }
@@ -6200,13 +6354,118 @@ document.getElementById('lockInput').addEventListener('keydown', e => {
     pick:id=>{curUni=id;curSnapId=null;renderUnis();build();},
     pickSnap:id=>{ curSnapId=id; const sn=SNAPS.find(x=>x.id===id); if(sn&&sn.universe_id!==curUni){ curUni=sn.universe_id; renderUnis(); } build(); if(window.OR&&OR.onMO)OR.onMO(); },
     map:()=>mapState, filters:()=>({smMin,volMax,clMin,postOff:[...postSet],rsOnly,rsMin,minF,topN,indCap,mapFit,mapLabels}),
-    evc:()=>evcState, evcRows:()=>evcRows().map(r=>({t:r.t,loc:r.evc.loc,align:r.evc.alignN,cUp:r.evc.cUp,vUp:r.evc.vUp,d20:r.evc.d20,a10:r.evc.a10,gap:r.evc.gap,gapPct:r.evc.gapPct,flushedBefore:r.evc.flushedBefore,seen:(HX[r.t]||[]).length})),
+    evc:()=>evcState, evcRows:()=>evcRows().map(r=>({t:r.t,loc:r.evc.loc,locName:locName(r.evc.loc),lane:r.evc.lane,k:r.evc.k,dir:r.evc.dir,tidy:r.evc.tidy,gx:r.evc.gx,gy:r.evc.gy,align:r.evc.alignN,cUp:r.evc.cUp,vUp:r.evc.vUp,eUp:r.evc.eUp,d20:r.evc.d20,a10:r.evc.a10,a5:r.evc.a5,gap:r.evc.gap,gapPct:r.evc.gapPct,flushedBefore:r.evc.flushedBefore,seen:(HX[r.t]||[]).length})),
+    evcAll:()=>evcList().map(r=>({t:r.t,loc:r.evc.loc,lane:r.evc.lane,k:r.evc.k,dir:r.evc.dir,tidy:r.evc.tidy,gx:r.evc.gx,gy:r.evc.gy,cUp:r.evc.cUp,vUp:r.evc.vUp,eUp:r.evc.eUp,gap:r.evc.gap})),
+    ghosts:()=>ghostList(), focus:t=>{ evcFocus=t||null; renderEvc(); }, readOf:t=>{ const r=(MODEL.rows||[]).find(x=>x.t===t); return r&&r.evc?JSON.parse(JSON.stringify(Object.assign({rank:r.rank,bucket:r.bucket,stretch:r.stretch,climb:r.climb,smooth:r.smooth,score:r.score},r.evc))):null; },
     evcSettings:()=>JSON.parse(JSON.stringify(EVC)), hx:t=>(HX[t]||[]).map(h=>Object.assign({inList:pickFor(h.i).has(t)},h)),
+    universes:()=>UNIS.map(u=>({id:u.id,name:u.name,code:u.code,side:sideOfU(u),snaps:snapsFor(u.id).length,latest:(snapsFor(u.id).slice(-1)[0]||{}).as_of||null})),
+    snapsByCode, pickByCode, saveRows:saveSnap, parseRows:text=>ingest(parseCSV(text)), createUni, delUniByCode, currentSnap:()=>MODEL.snap?MODEL.snap.id:null, side:uniSide, loaded:()=>inited, reload:load,
     delUni, delSnap,
     sort:c=>{ if(sortBy.c===c)sortBy.d=sortBy.d==="asc"?"desc":"asc"; else sortBy={c:c,d:(c==="rank"||c==="t"||c==="n"||c==="sec")?"asc":"desc"}; render(); },
     story:(t,open)=>{ openStory = (openStory===t&&!open) ? null : t; render(); if(open){ const tr=document.querySelector('#moTable tr[data-t="'+String(t).replace(/"/g,'')+'"]'); if(tr) tr.scrollIntoView({block:"center",behavior:"smooth"}); } }
   };
 })();
+</script>
+<script>
+/* ============ SLUICE — the strip that ties RS Score and Momentum together: one universe list, one run strip, one upload for both stores ============ */
+(function(){
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const slug=v=>String(v||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+  let cur=null, inited=false, busy=false, aligned=false; const got={rs:false,mo:false};
+  try{ cur=localStorage.getItem("sl_uni")||null; }catch(e){}
+  function unis(){                                   // the two stores' universes merged by code
+    const rs=(window.RS2&&RS2.universes)?RS2.universes():[], mo=(window.MO&&MO.universes)?MO.universes():[]; const by={};
+    rs.forEach(u=>{ const k=slug(u.code||u.name); by[k]=Object.assign(by[k]||{code:k},{name:u.name,bench:u.benchmark,side:u.side||"long",rs:u}); });
+    mo.forEach(u=>{ const k=slug(u.code||u.name); const e=by[k]=by[k]||{code:k,name:u.name,side:u.side||"long"}; e.mo=u; if(!e.name) e.name=u.name; if(!e.rs&&u.side) e.side=u.side; });
+    return Object.values(by).sort((a,b)=>((a.rs?a.rs.id:1e9)-(b.rs?b.rs.id:1e9))||a.code.localeCompare(b.code));
+  }
+  function runs(code){                               // the dates of both stores, oldest → newest
+    const r=(window.RS&&RS.runsByCode)?RS.runsByCode(code):[], m=(window.MO&&MO.snapsByCode)?MO.snapsByCode(code):[]; const by={};
+    r.forEach(x=>{ by[x.as_of]=Object.assign(by[x.as_of]||{as_of:x.as_of},{rs:x}); }); m.forEach(x=>{ by[x.as_of]=Object.assign(by[x.as_of]||{as_of:x.as_of},{mo:x}); });
+    return Object.values(by).sort((a,b)=>a.as_of<b.as_of?-1:a.as_of>b.as_of?1:0);
+  }
+  function curAsOf(code){                            // the run on screen: the momentum upload when it has one, else the RS run
+    try{ const id=MO.currentSnap&&MO.currentSnap(); if(id!=null){ const m=MO.snapsByCode(code).find(x=>x.id===id); if(m) return m.as_of; } }catch(e){}
+    try{ const st=RS.getState(); if(st&&st.run!=null){ const r=RS.runsByCode(code).find(x=>x.id===st.run); if(r) return r.as_of; } }catch(e){}
+    return null;
+  }
+  function render(){
+    const el=$("slUnis"), rn=$("slRuns"); if(!el) return;
+    const list=unis();
+    if(!list.length){ el.innerHTML='<div class="rs-note" style="margin:0">No universes yet — click <b>+ Universe</b> (Russell 1000 / QQQ, Russell 2000 / IWM; each with a side, long or short).</div>'; rn.innerHTML=""; return; }
+    if(!cur||!list.find(u=>u.code===cur)) cur=list[0].code;
+    el.innerHTML=list.map(u=>{ const n=runs(u.code).length;
+      return '<div class="rs-uni'+(u.code===cur?" on":"")+'" onclick="SL.pick(\''+u.code+'\')"><span>'+esc(u.name)+'</span>'+(u.bench?'<span class="rs-bm" title="the index Step 2 measures against">vs '+esc(u.bench)+'</span>':'')
+        +'<span class="rs-tag '+(u.side==="short"?"sh":"lg")+'" title="the side this universe is read for">'+(u.side==="short"?"SHORT":"LONG")+'</span><span class="rs-cnt">'+n+' run'+(n===1?"":"s")+'</span>'
+        +((!u.rs||!u.mo)?'<span class="rs-tag gr" title="this universe exists in one store only ('+(u.rs?"RS":"Momentum")+'); the next upload creates its twin">half</span>':'')
+        +'<button class="rs-x" title="Delete this universe from both stores" onclick="SL.delUni(\''+u.code+'\',event)">&times;</button></div>'; }).join("");
+    const rs=runs(cur), asOf=curAsOf(cur), idx=rs.findIndex(x=>x.as_of===asOf);
+    if(!rs.length){ rn.innerHTML='<span class="rs-note" style="margin:0">No run saved for this universe yet — drop its screener export in box &#9312; below.</span>'; return; }
+    const newest=rs.slice().reverse(), shown=asOf||rs[rs.length-1].as_of;
+    rn.innerHTML='<span class="lbl">Run</span><span class="sl-cur">'+esc(shown)+'</span>'
+      +(rs.length>1?'<input type="range" id="slTime" min="0" max="'+(rs.length-1)+'" value="'+(idx>=0?idx:rs.length-1)+'" title="slide through the stored uploads — every stage follows">':'')
+      +newest.slice(0,12).map((r,i)=>'<span class="rs-snap'+(r.as_of===shown?" on":"")+'" onclick="SL.pickRun(\''+r.as_of+'\')" title="'+(r.rs?'RS run · '+r.rs.n+' names':'no RS run')+' · '+(r.mo?'momentum upload · '+r.mo.n+' names':'no momentum upload')+'"><b>'+esc(r.as_of)+'</b>'+(i===0?'<span class="rs-tag g">latest</span>':'')+(!(r.rs&&r.mo)?'<span class="sl-dot '+(r.rs?"rs":"mo")+'" title="'+(r.rs?"RS only":"Momentum only")+'"></span>':'')+'</span>').join("")
+      +(rs.length>12?'<span class="rs-note" style="margin:0">+ '+(rs.length-12)+' older</span>':'');
+    const sl=$("slTime"); if(sl) sl.oninput=function(){ const r=rs[+this.value]; if(r) pickRun(r.as_of); };
+    const hint=$("slHint"), u=list.find(x=>x.code===cur); if(hint) hint.textContent=(u?u.name:"")+(shown?" · run of "+shown:"");
+  }
+  async function pick(code){ cur=code; try{ localStorage.setItem("sl_uni",code); }catch(e){} render(); if(window.MO&&MO.pickByCode) MO.pickByCode(code); if(window.RS&&RS.pickByCode) await RS.pickByCode(code); render(); }
+  async function pickRun(asOf){ const r=runs(cur).find(x=>x.as_of===asOf); if(!r) return; if(r.mo&&window.MO) MO.pickSnap(r.mo.id); if(r.rs&&window.RS) await RS.open(r.rs.id); render(); }
+  function dateFromName(name){ const m=String(name||"").match(/(20\d{2})[-_]?(\d{2})[-_]?(\d{2})/); if(m) return m[1]+"-"+m[2]+"-"+m[3]; const d=new Date(), p=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); }
+  function status(msg,cls){ const e=$("slStatus"); if(e){ e.innerHTML=msg; e.className="rs-status "+(cls||""); } }
+  function readText(file){ return new Promise((res,rej)=>{ const ext=file.name.split(".").pop().toLowerCase(), rd=new FileReader();
+    if(ext==="xlsx"||ext==="xls"){ rd.onload=e=>{ try{ const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"}); res(XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]])); }catch(err){ rej(err); } }; rd.onerror=rej; rd.readAsArrayBuffer(file); }
+    else { rd.onload=e=>res(e.target.result); rd.onerror=rej; rd.readAsText(file); } }); }
+  async function ensureTwins(code){ const u=unis().find(x=>x.code===code); if(!u) return;
+    if(!u.rs&&window.RS&&RS.createUni) await RS.createUni(u.name,code,"QQQ",u.side);
+    if(!u.mo&&window.MO&&MO.createUni) await MO.createUni(u.name,code,u.side); }
+  async function upload(file,dateGiven){
+    if(busy) return; if(!cur){ toast("Add or pick a universe first","error"); return; }
+    let text; try{ text=await readText(file); }catch(e){ status("Could not read that file: "+esc(e.message||e),"err"); return; }
+    let matrix=null; try{ matrix=RS.parseText(text); }catch(e){}
+    if(!matrix||matrix.length<2){ status("That file has no data rows.","err"); return; }
+    const d=dateGiven||prompt("Date this export represents (YYYY-MM-DD):",dateFromName(file.name)); if(!d) return;
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(d.trim())){ toast("Date must be YYYY-MM-DD","error"); return; }
+    let rows=null, moErr=""; try{ rows=MO.parseRows(text); }catch(e){ moErr=e.message||String(e); }
+    busy=true; status("Saving the run of "+esc(d.trim())+" to both stores&hellip;","");
+    try{
+      await ensureTwins(cur);
+      await RS.pickByCode(cur); await RS.saveMatrix(matrix,file.name,d.trim());
+      if(rows&&rows.length){ MO.pickByCode(cur); await MO.saveRows(rows,file.name,d.trim()); }
+      await pickRun(d.trim());
+      status("Run of <b>"+esc(d.trim())+"</b> saved &middot; RS "+(matrix.length-1)+" names"+(rows&&rows.length?" &middot; Momentum "+rows.length+" names":" &middot; <span style='color:var(--orange)'>momentum skipped: "+esc(moErr||"no rows")+"</span>")+" &middot; "+esc(file.name),rows&&rows.length?"ok":"warn");
+    }catch(e){ status("Save failed: "+esc(e.message||e),"err"); }
+    busy=false; render();
+  }
+  async function addUni(){
+    const n=prompt("Universe name (e.g. Russell 2000):"); if(!n||!n.trim()) return;
+    const code=(prompt("Short code for exports (e.g. R2000):","")||n).trim().toUpperCase().replace(/[^A-Z0-9]/g,""); if(!code) return;
+    const bm=(prompt("Index for Step 2 (QQQ for Russell 1000, IWM for Russell 2000, SPY…):","QQQ")||"").trim().toUpperCase();
+    const sideIn=(prompt("Side — long or short? (a short universe reads every scale upside down)","long")||"long").trim().toLowerCase(); const side=sideIn.startsWith("s")?"short":"long";
+    try{ const have=unis().find(u=>u.code===code);
+      if(!(have&&have.rs)&&RS.createUni) await RS.createUni(n,code,bm,side);
+      if(!(have&&have.mo)&&MO.createUni) await MO.createUni(n,code,side);
+      await pick(code); toast("Universe added ("+side+")","success"); }
+    catch(e){ toast("Add failed: "+e.message,"error"); const er=$("rsErr"); if(er) er.textContent="Add failed: "+e.message; }
+  }
+  async function delUni(code,ev){ if(ev) ev.stopPropagation(); const u=unis().find(x=>x.code===code); if(!u) return;
+    if(!confirm("Delete \""+u.name+"\" and all its saved runs and uploads from both stores? This cannot be undone.")) return;
+    try{ if(u.rs) await RS.delUniByCode(code); if(u.mo) await MO.delUniByCode(code); if(cur===code) cur=null; render(); toast("Deleted","success"); }catch(e){ toast("Delete failed: "+e.message,"error"); } }
+  function bindDrop(el){ if(!el) return;
+    el.addEventListener("click",()=>{ const i=document.createElement("input"); i.type="file"; i.accept=".csv,.xlsx,.xls,text/csv"; i.onchange=e=>{ if(e.target.files[0]) upload(e.target.files[0]); }; i.click(); });
+    ["dragenter","dragover"].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();el.classList.add("over");}));
+    ["dragleave","drop"].forEach(ev=>el.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();el.classList.remove("over");}));
+    el.addEventListener("drop",e=>{ const f=e.dataTransfer.files[0]; if(f) upload(f); }); }
+  function init(){ if(inited) return; inited=true; bindDrop($("slDrop")); const a=$("slAddUni"); if(a) a.onclick=addUni;
+    const r=$("slReload"); if(r) r.onclick=async()=>{ status("Reloading both stores&hellip;",""); try{ if(RS.reload) await RS.reload(); if(MO.reload) await MO.reload(); }catch(e){} status("",""); render(); };
+    render(); onData(); }
+  function onData(which){ if(which) got[which]=true; if(!inited) return;
+    if(!aligned&&got.rs&&got.mo&&unis().length){ aligned=true; pick(cur||unis()[0].code); return; }     // both stores loaded: point them at the same universe
+    render(); }
+  window.SL={init, onData, pick, pickRun, upload, addUni, delUni, current:()=>cur, runs:()=>runs(cur), universes:unis, render};
+})();
+
 </script>
 
 <script>
